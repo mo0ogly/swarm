@@ -35,7 +35,9 @@
         "mutated_prompt_refuses_and_original_recovers",
         "gaps_overlap_truncation_and_false_origins_refuse",
         "new_or_missing_producer_inputs_require_schema_review",
-        "4 passed; 0 failed"
+        "engine_integrity_requires_current_instruction_bytes",
+        "engine_integrity_attests_only_grammar_checked_framing",
+        "6 passed; 0 failed"
       ],
       "required_stderr": []
     },

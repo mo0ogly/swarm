@@ -6,9 +6,12 @@ use crate::{
     MissionSupervisionPolicy, SettingCount, SupervisorIdentity,
 };
 use rusqlite::{params, Connection, Params, Row};
+use std::time::Duration;
 
 #[path = "mission_worker_adoption.rs"]
 mod worker_adoption;
+#[cfg(target_os = "linux")]
+pub(crate) use worker_adoption::adoption_preflight;
 #[path = "mission_worker_recovery.rs"]
 mod worker_recovery;
 pub use worker_recovery::MissionWorkerRecovery;
@@ -191,8 +194,12 @@ pub(super) fn read_transaction<T>(
 /// Execute one explicit transaction, checking rollback/commit and preserving
 /// both failures. Uses saved SQLite busy timeout; no hidden retry or test watchdog.
 /// A commit error with autocommit true remains uncertain, never assumed rollback.
-fn transaction<T>(db: &Connection, operation: impl FnOnce() -> Result<T, E>) -> Result<T, E> {
-    db.execute_batch("BEGIN IMMEDIATE").map_err(E::Sql)?;
+fn transaction<T>(
+    db: &Connection,
+    begin_error: impl FnOnce(rusqlite::Error) -> E,
+    operation: impl FnOnce() -> Result<T, E>,
+) -> Result<T, E> {
+    db.execute_batch("BEGIN IMMEDIATE").map_err(begin_error)?;
     match operation() {
         Ok(value) => match db.execute_batch("COMMIT") {
             Ok(()) => Ok(value),
@@ -251,6 +258,15 @@ fn write<T>(
     store: &RootStore,
     operation: impl FnOnce(&EngineSettingsDocument) -> Result<T, E>,
 ) -> Result<T, E> {
+    write_with_begin(store, |error, _| E::Sql(error), operation)
+}
+/// Run the same writer contract, allowing a caller to observe a BEGIN refusal
+/// and the validated settings used for that attempt. Later failures bypass it.
+fn write_with_begin<T>(
+    store: &RootStore,
+    begin_error: impl FnOnce(rusqlite::Error, &EngineSettingsDocument) -> E,
+    operation: impl FnOnce(&EngineSettingsDocument) -> Result<T, E>,
+) -> Result<T, E> {
     if !store.writable {
         return Err(E::Refused("mission-root-read-only"));
     }
@@ -267,7 +283,7 @@ fn write<T>(
                     .map_err(|e| caused("mission-storage-timeout-invalid", e))?,
             ))
             .map_err(E::Sql)?;
-        transaction(&store.db, || operation(&settings))
+        transaction(&store.db, |error| begin_error(error, &settings), || operation(&settings))
     })();
     let recorded = result.is_ok();
     let joined = finish(
@@ -438,24 +454,85 @@ impl RootStore {
     ) -> Result<(), E> {
         bound(self, lease)?;
         parse(now)?;
-        write(self, |_| {
+        write(self, |_| write_heartbeat(&self.db, lease, now, stop))
+    }
+
+    /// Renew from the real clock after taking the writer. Retry only a clean
+    /// BEGIN BUSY, using saved storage policy and the remaining frozen lease
+    /// lifetime. A true return records a pulse; false means cancellation between
+    /// attempts. The supplied wait reports cancellation and starts no work.
+    /// Ownership, expiry, commit and release failures are never retried.
+    pub(super) fn renew_mission_supervision(
+        &self,
+        lease: &MissionLease,
+        mut cancelled: impl FnMut(Duration) -> bool,
+    ) -> Result<bool, E> {
+        let mut retries = 0u64;
+        loop {
+            bound(self, lease)?;
+            let mut busy = None;
+            let result = write_with_begin(self, |error, settings| {
+                if self.db.is_autocommit() && error.sqlite_error()
+                    .is_some_and(|e| e.code == rusqlite::ErrorCode::DatabaseBusy)
+                {
+                    busy = Some((settings.values.storage_busy_retries.as_ref().map(|n| n.0 as u64),
+                        Duration::from_millis(settings.values.storage_busy_retry_delay_ms.0 as u64)));
+                }
+                E::Sql(error)
+            }, |_| write_heartbeat(&self.db, lease, &renewal_time()?, false));
+            let (error, limit, delay) = match (result, busy) {
+                (Ok(()), _) => return Ok(true),
+                (Err(error @ E::Sql(_)), Some((limit, delay))) => (error, limit, delay),
+                (Err(error), _) => return Err(error),
+            };
+            if limit.is_some_and(|limit| retries >= limit) {
+                return Err(error);
+            }
+            let remaining = self.renewal_remaining(lease)?;
+            if cancelled(delay.min(remaining)) {
+                return Ok(false);
+            }
+            self.renewal_remaining(lease)?;
+            retries = retries.checked_add(1).ok_or(E::Refused("mission-renewal-retries-unrepresentable"))?;
+        }
+    }
+
+    /// Check the unchanged owner and compute remaining frozen lifetime in one
+    /// read snapshot between BEGIN retries. No heartbeat or authority changes.
+    fn renewal_remaining(&self, lease: &MissionLease) -> Result<Duration, E> {
+        read_transaction(&self.db, || {
             let heartbeat = owned_heartbeat(&self.db, lease)?;
-            let policy = &lease.policy;
-            if !stop && policy.observe(&heartbeat, now)? != MissionLeaseClock::Present {
+            let now = renewal_time()?;
+            if lease.policy.observe(&heartbeat, &now)? != MissionLeaseClock::Present {
                 return Err(E::Refused("mission-lease-not-present"));
             }
-            let next = if stop {
-                String::new()
-            } else {
-                next(now, policy)?
-            };
-            let count = execute(&self.db, "UPDATE mission_supervision SET heartbeat_at=?,next_check_at=?,stopped_at=? WHERE work_id=? AND conductor_id=? AND stopped_at=''",params![now,next,if stop {now} else {""},lease.work,lease.conductor])?;
-            if count != 1 {
-                return Err(E::Refused("mission-lease-lost"));
-            }
-            Ok(())
+            let age = parse(&now)?.unix_timestamp_nanos() - parse(&heartbeat)?.unix_timestamp_nanos();
+            let remaining = i128::from(lease.policy.stale_after_ms.0) * 1_000_000 - age;
+            Ok(Duration::new((remaining / 1_000_000_000) as u64, (remaining % 1_000_000_000) as u32))
         })
     }
+}
+
+/// Observe the real time for a native pulse, retaining the clock error.
+fn renewal_time() -> Result<String, E> {
+    crate::system_timestamp().map_err(|e| caused("mission-cycle-clock", e))
+}
+
+/// Write one checked pulse or retirement under the caller's immediate
+/// transaction. The current epoch must still own the lease. Renewal also
+/// verifies time before publishing; retirement may stop its own stale lease.
+fn write_heartbeat(db: &Connection, lease: &MissionLease, now: &str, stop: bool) -> Result<(), E> {
+    let heartbeat = owned_heartbeat(db, lease)?;
+    let policy = &lease.policy;
+    if !stop && policy.observe(&heartbeat, now)? != MissionLeaseClock::Present {
+        return Err(E::Refused("mission-lease-not-present"));
+    }
+    let next = if stop { String::new() } else { next(now, policy)? };
+    let count = execute(db, "UPDATE mission_supervision SET heartbeat_at=?,next_check_at=?,stopped_at=? WHERE work_id=? AND conductor_id=? AND stopped_at=''",params![now,next,if stop {now} else {""},lease.work,lease.conductor])?;
+    if count != 1 {
+        return Err(E::Refused("mission-lease-lost"));
+    }
+    Ok(())
 }
 
 impl crate::work_engine::MutationFence for MissionLease {
@@ -679,7 +756,7 @@ impl RootStore {
 
 #[path = "mission_workspace_fifo.rs"]
 mod workspace_fifo;
-pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal};
+pub use workspace_fifo::{MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal};
 pub(super) use workspace_fifo::schema as workspace_fifo_schema;
 
 #[path = "mission_worker_continuation.rs"]
@@ -756,6 +833,45 @@ mod peer_tests {
     /// Close owned test descriptors before deleting only this fresh fixture.
     fn close(path:std::path::PathBuf,store:RootStore,lease:MissionLease){
         lease.close().unwrap();store.close().unwrap();std::fs::remove_dir_all(path).unwrap();
+    }
+    /// Hold a real independent SQLite writer until the renewal reports clean
+    /// BEGIN contention. Then release it and observe the same epoch renew.
+    /// Repeat with retirement during the wait to prove it cannot be undone.
+    #[test]
+    fn mission_renewal_retries_begin_busy_without_reviving_a_stopped_owner() {
+        let (path, store, lease, _) = fixture();
+        let settings = store.settings().unwrap();
+        let mut change = settings.history.last().unwrap().change.clone();
+        change.event_id = "mission-renewal-fixture-contention".into();
+        change.expected_revision = settings.revision;
+        change.values.storage_busy_timeout_ms = SettingCount(0);
+        change.values.storage_busy_retries = Some(SettingCount(1));
+        change.preview_token = store.preview_settings(&change).unwrap().preview_token;
+        store.apply_settings(&change, &mut crate::SystemEnvironment).unwrap();
+        let peer = RootStore::open(&path, true).unwrap();
+        let writer = Connection::open(path.join(".swarm/state.db")).unwrap();
+        let initial = owned_heartbeat(&store.db, &lease).unwrap();
+        writer.execute_batch("BEGIN IMMEDIATE").unwrap();
+        let mut waits = 0;
+        assert!(peer.renew_mission_supervision(&lease, |_| {
+            waits += 1;
+            assert_eq!(owned_heartbeat(&store.db, &lease).unwrap(), initial);
+            writer.execute_batch("ROLLBACK").unwrap();
+            false
+        }).unwrap());
+        assert_eq!(waits, 1);
+        assert!(parse(&owned_heartbeat(&store.db, &lease).unwrap()).unwrap() > parse(&initial).unwrap());
+        writer.execute_batch("BEGIN IMMEDIATE").unwrap();
+        let lost = peer.renew_mission_supervision(&lease, |_| {
+            writer.execute_batch("ROLLBACK").unwrap();
+            store.update_mission_supervision(&lease, &renewal_time().unwrap(), true).unwrap();
+            false
+        }).unwrap_err();
+        assert_eq!(lost.code(), "mission-lease-lost");
+        assert_eq!(owned_heartbeat(&store.db, &lease).unwrap_err().code(), "mission-lease-lost");
+        writer.close().unwrap();
+        peer.close().unwrap();
+        close(path, store, lease);
     }
     /// Actual peer opens in a scoped thread; reads/callback errors leave the
     /// heartbeat unchanged. This proves no pulse, not concurrent-writer safety.

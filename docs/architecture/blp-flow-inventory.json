@@ -34,8 +34,8 @@
     {
       "id": "send",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 664,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 720,
       "anchor": "pub fn preparation_send<"
     },
     {
@@ -69,15 +69,15 @@
     {
       "id": "claim",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 978,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 1033,
       "anchor": "pub fn preparation_worker_claim("
     },
     {
       "id": "storage",
       "path": "rust/crates/swarm-engine/src/local_storage.rs",
-      "sha256": "d6238533cc254dfe52bebd0500d6402d68e723670f472f00fd87dc893fd4d5e3",
-      "line": 804,
+      "sha256": "d1d19a830612dc78bb140877a110a99826a69025ec8ac309cb54f90687510c1b",
+      "line": 850,
       "anchor": "pub(crate) fn publish("
     },
     {
@@ -97,8 +97,8 @@
     {
       "id": "api_worker",
       "path": "rust/crates/swarm-cli/src/preparation_worker.rs",
-      "sha256": "9f810034affc30d570b4313d90dbc9c4f3bd905534444c9f23be28a161e0e36e",
-      "line": 142,
+      "sha256": "6a2f70273a86073555e49a0eac4e59e84e08269fbc401e7c0e590cb10a508f75",
+      "line": 141,
       "anchor": "async fn run("
     },
     {
@@ -132,8 +132,8 @@
     {
       "id": "worker_exec",
       "path": "rust/crates/swarm-engine/src/agent_execution_gate.rs",
-      "sha256": "6abe7984322685a29d814ebfa2649ac63e74a83607e8d559b5eb88494fa4b9ed",
-      "line": 92,
+      "sha256": "e493799df7ea13c401b313ec21fda1e8597705a8bc7ccfcf5923cb00272b5e2b",
+      "line": 81,
       "anchor": "fn prepare_exec("
     },
     {
@@ -195,8 +195,8 @@
     {
       "id": "finish",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 1137,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 1192,
       "anchor": "pub fn preparation_worker_finish<"
     },
     {
@@ -293,22 +293,22 @@
     {
       "id": "trust_store",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
+      "sha256": "685d986fc31adf709706b39adab353bfb5257cd51d6abbab89d8577ccfae27bf",
       "line": 54,
       "anchor": "pub fn trust("
     },
     {
       "id": "blp_diag",
       "path": "rust/crates/swarm-engine/src/trust/confidentiality.rs",
-      "sha256": "4041989318399cc60addbf28c41c38820edb86336ebcbf4269c8979304c92ecb",
+      "sha256": "855be91a77a2996461a4fae11aa802ce6ede146bfb2d0a98c753e55863a7b5a4",
       "line": 265,
       "anchor": "pub(crate) fn capability("
     },
     {
       "id": "prompt_provenance",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
-      "sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d",
-      "line": 146,
+      "sha256": "215eed1854a032e57fd0642f2e46173dd01ffc170ec3a08d343058b25fd8e3a2",
+      "line": 177,
       "anchor": "pub(super) fn assemble("
     },
     {
@@ -321,35 +321,42 @@
     {
       "id": "prompt_classifications",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
-      "sha256": "2c977828bd39969af3fc6f94dd1df724d1dc1e3559407aa30508b64d3c76725d",
-      "line": 69,
+      "sha256": "215eed1854a032e57fd0642f2e46173dd01ffc170ec3a08d343058b25fd8e3a2",
+      "line": 100,
       "anchor": "pub(super) fn classifications("
+    },
+    {
+      "id": "prompt_engine_source",
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_prompt.rs",
+      "sha256": "215eed1854a032e57fd0642f2e46173dd01ffc170ec3a08d343058b25fd8e3a2",
+      "line": 73,
+      "anchor": "pub(super) fn engine_source("
     },
     {
       "id": "preparation_blp_check",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 339,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 344,
       "anchor": "pub(super) fn confidentiality_check("
     },
     {
       "id": "trust_cli_route",
       "path": "rust/crates/swarm-cli/src/trust.rs",
-      "sha256": "7a3653535e638045d7e7500d1631a47335da9402697b7338278de684b301dba7",
-      "line": 15,
+      "sha256": "f5928c375245b18410d887e4e6a920ba6bdb0baeff7b2216ff203be03bda8a61",
+      "line": 17,
       "anchor": "pub(super) fn execute("
     },
     {
       "id": "trust_http_route",
       "path": "rust/crates/swarm-web/src/service/trust.rs",
-      "sha256": "3c88f2b98feaa8fd91ae985ebc075709ccd5b515ec916306bd6459c6926a5142",
-      "line": 14,
+      "sha256": "a0779d2778042212390698e84c546ba93c8e6c1333d6747b822cb407b7151813",
+      "line": 16,
       "anchor": "pub(super) fn trust_actions("
     },
     {
       "id": "diagnostic_http_status",
       "path": "rust/crates/swarm-web/src/service.rs",
-      "sha256": "fbb5618ddb55b88095d0d7a1659c798dbdb2c9acd2a49d1e37936c3952872780",
+      "sha256": "57afd793670ef1f4379805b27b79a42e09a2b9e44878af771ec5c581a2c55c1b",
       "line": 385,
       "anchor": "\"blp-access-denied\" if *operation==\"trust-command\""
     },
@@ -363,14 +370,14 @@
     {
       "id": "preparation_egress_lock",
       "path": "rust/crates/swarm-engine/src/local_storage.rs",
-      "sha256": "d6238533cc254dfe52bebd0500d6402d68e723670f472f00fd87dc893fd4d5e3",
+      "sha256": "d1d19a830612dc78bb140877a110a99826a69025ec8ac309cb54f90687510c1b",
       "line": 457,
       "anchor": "pub(crate) fn reserve_preparation_egress("
     },
     {
       "id": "preparation_control",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
+      "sha256": "685d986fc31adf709706b39adab353bfb5257cd51d6abbab89d8577ccfae27bf",
       "line": 81,
       "anchor": "pub(super) fn with_preparation_control("
     },
@@ -391,8 +398,8 @@
     {
       "id": "captured_source",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 389,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 445,
       "anchor": "pub(super) fn attribution_source("
     },
     {
@@ -412,65 +419,65 @@
     {
       "id": "shared_prompt_producer",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 741,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 797,
       "anchor": "fn capture_in_tx("
     },
     {
       "id": "pretransport_capture",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
-      "sha256": "99d0e19aa9340c7df2a763fbccea5a4583b0e7f2221349d41e8cdf72e582a8c9",
-      "line": 795,
+      "sha256": "056971681f9f1780630caf5e1a56df19eff3bc3c5a6bd72675bad88f17e1757e",
+      "line": 850,
       "anchor": "pub(super) fn capture_admission_intent("
     },
     {
       "id": "transport_digest",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
-      "sha256": "c70cf31c278ce35d03f5a8055bfcf7f3472ba7eec59f269611ee72cd9e8c01b5",
-      "line": 188,
+      "sha256": "862b6df1d8441b4937f7da244103395e6dc25ee41102d3318deca5f37f8a23be",
+      "line": 200,
       "anchor": "fn destination_digest("
     },
     {
       "id": "transport_resolve",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
-      "sha256": "c70cf31c278ce35d03f5a8055bfcf7f3472ba7eec59f269611ee72cd9e8c01b5",
-      "line": 204,
+      "sha256": "862b6df1d8441b4937f7da244103395e6dc25ee41102d3318deca5f37f8a23be",
+      "line": 216,
       "anchor": "fn resolve_destination("
     },
     {
       "id": "transport_execute",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
-      "sha256": "c70cf31c278ce35d03f5a8055bfcf7f3472ba7eec59f269611ee72cd9e8c01b5",
-      "line": 326,
+      "sha256": "862b6df1d8441b4937f7da244103395e6dc25ee41102d3318deca5f37f8a23be",
+      "line": 338,
       "anchor": "pub(super) fn execute(root: &RootStore"
     },
     {
       "id": "transport_dispatch",
       "path": "rust/crates/swarm-engine/src/root_store/trust_store.rs",
-      "sha256": "92c4d973a953ffc95a454cb25d67baf7d4b3fa5d67879254301c885e36b12d9f",
+      "sha256": "685d986fc31adf709706b39adab353bfb5257cd51d6abbab89d8577ccfae27bf",
       "line": 69,
       "anchor": "if matches!(operation,\"blp-preparation-admit\""
     },
     {
       "id": "transport_http_map",
       "path": "rust/crates/swarm-web/src/service.rs",
-      "sha256": "fbb5618ddb55b88095d0d7a1659c798dbdb2c9acd2a49d1e37936c3952872780",
-      "line": 394,
+      "sha256": "57afd793670ef1f4379805b27b79a42e09a2b9e44878af771ec5c581a2c55c1b",
+      "line": 395,
       "anchor": "\"blp-transport-invalid\"|\"blp-destination-invalid\"|\"blp-destination-echo-mismatch\""
     },
     {
       "id": "worker_gate",
       "path": "rust/crates/swarm-engine/src/root_store/preparation_transport.rs",
-      "sha256": "c70cf31c278ce35d03f5a8055bfcf7f3472ba7eec59f269611ee72cd9e8c01b5",
-      "line": 37,
+      "sha256": "862b6df1d8441b4937f7da244103395e6dc25ee41102d3318deca5f37f8a23be",
+      "line": 38,
       "anchor": "pub fn preparation_worker_transport_gate("
     },
     {
       "id": "worker_gate_cli",
       "path": "rust/crates/swarm-cli/src/preparation_worker.rs",
-      "sha256": "9f810034affc30d570b4313d90dbc9c4f3bd905534444c9f23be28a161e0e36e",
-      "line": 148,
-      "anchor": "root.preparation_worker_transport_gate(id, token, &r.base_url, &r.model)?;"
+      "sha256": "6a2f70273a86073555e49a0eac4e59e84e08269fbc401e7c0e590cb10a508f75",
+      "line": 147,
+      "anchor": "root.preparation_worker_transport_gate(id, token, &r.base_url, &r.model, &r.prompt)?;"
     },
     {
       "id": "security_metadata",
@@ -510,15 +517,15 @@
     {
       "id": "attribution_ui",
       "path": "web/trust-native.html",
-      "sha256": "3b88046d101075727bed31bf328db62ccdeff65490edc921dbd6d7162b94d057",
+      "sha256": "2e8620d56f0733e91fb5d5cd173286d26a542c331d41fc731057c6ec3a5ef65d",
       "line": 1,
       "anchor": "Attribution d’un objet existant (migration)"
     },
     {
       "id": "attribution_js",
       "path": "web/trust-confidentiality.js",
-      "sha256": "598a2db9a0b0d56b8fb8346098550a16f85dffd6ca215ae5979a69cbbf2cb5e0",
-      "line": 70,
+      "sha256": "d51881cf04cb29fd1e430dbaf5b949ad01bb754c5e5fbc5f7b0c364b4c01f00b",
+      "line": 76,
       "anchor": "$('blp-attribute-preview').addEventListener('click',()=>guarded(async()=>{"
     }
   ],
@@ -687,7 +694,7 @@
         "worker_gate_cli"
       ],
       "material": "serialized prompt, model identifier and bearer key",
-      "current_controls": "saved deadline/cancellation, redirects/retries disabled; no classified-send BLP engagement reservation Explicit persisted preparation_quarantine blocks admission/claim and controlled API/CLI egress. A dedicated shared egress reservation serializes config/BLP mutations through actual IO while releasing the business Trust reservation. Absent/false retains legacy behavior; no classified destination/sender authorization, descendant confinement or output inheritance is established. The controlled last-use decision path (CLI/HTTP readonly) is typemapped 400/404/409/403/500 and publishes nothing; it still does not engage the real send, which remains legacy/quarantined. BF-07 hook delivered: the Api worker calls preparation_worker_transport_gate inside its egress reservation before building the request — zero matching admission receipts keeps the legacy path, >=1 triggers full re-verification, destination attribution, mandatory base_url/model echo and last-use no-write-down; fail-closed receipt scan, turn custody required; no socket without a decision. Still no result inheritance, OS confinement or production activation.",
+      "current_controls": "Saved deadline and cancellation, redirects and retries disabled. Persisted preparation_quarantine blocks admission, claim and controlled API/CLI egress. A shared egress reservation coordinates configuration and BLP writers with controlled IO. The CLI/HTTP transport decision is readonly. Before constructing an API request, the worker verifies custody and exact prompt equality with its owned turn. Zero matching admission receipts keeps the legacy path. With matching receipts, the gate re-verifies the capsules, compares captured source revision and prompt, requires current destination attribution for the effective base_url/model and checks no-write-down. Unreadable receipts refuse. The guard creates no classified-send engagement reservation and establishes no result inheritance, OS confinement or production activation.",
       "missing_blp": [
         "BLP-04",
         "BLP-05"
@@ -1028,7 +1035,7 @@
         "reader_guard"
       ],
       "material": "full proposal/context, exact terms, approver metadata and credential use",
-      "current_controls": "session/Host/CSRF, exact prepared action and approval channel; preview and approval presentation re-read current Trust identity, BLP policy and digest/project attribution before projection; attribution renewal cannot lower prior level/compartments. BF-23c (2026-11-08): the Admin dialog offers the explicit per-object attribution form (BLP-03): 64-hex digest, absolute project path, level/compartments chosen from the re-read policy (never invented by the page), non-empty reason; preview then apply replaying the exact previewed event bytes; apply disabled until preview passes; session-alone and weak-bearer refusals stay typed 403 without mutation; no unclassified-object enumeration or bulk scan. No human declassification or general source mediation.",
+      "current_controls": "session/Host/CSRF, exact prepared action and approval channel; preview and approval presentation re-read current Trust identity, BLP policy and digest/project attribution before projection; attribution renewal cannot lower prior level/compartments. BF-23c (2026-11-08): the Admin dialog offers the explicit per-object attribution form (BLP-03): 64-hex digest, absolute project path, level/compartments chosen from the re-read policy (never invented by the page), non-empty reason; readonly engine preview with no attribution or audit proof publication, then apply of the same event bytes; edits and stale preview responses disarm apply; apply disabled until preview passes; session-alone and weak-bearer refusals stay typed 403 without mutation; no unclassified-object enumeration or bulk scan. No human declassification or general source mediation.",
       "missing_blp": [
         "BLP-04",
         "BLP-05",
@@ -1076,10 +1083,13 @@
         "trust_cli_route",
         "trust_http_route",
         "diagnostic_http_status",
-        "trust_store"
+        "trust_store",
+        "prompt_engine_source",
+        "shared_prompt_producer",
+        "project"
       ],
-      "material": "joined classification, authenticated diagnostic actor, policy revision, prompt digest and part count; no prompt text",
-      "current_controls": "current Trust reservation/authentication/grant and BLP revision; physical Root/parent/provenance checks; every exact slice attributed, no default; conservative join/read clearance; typed HTTP refusals and explicit read-only rollback/close; runtime_authorized=false",
+      "material": "joined classification, authenticated diagnostic actor, policy revision, prompt digest and part count; optional selected origin evidence kind, slice digest, index and turn revision; no prompt text",
+      "current_controls": "current Trust reservation/authentication/grant and BLP revision; physical Root/parent/provenance checks; every exact slice attributed, no default; conservative join/read clearance; typed HTTP refusals and explicit read-only rollback/close; runtime_authorized=false; selected ProjectContext origin requires the same bound Root, historical settings digest, retained context metadata and exact bytes from the current project context reader",
       "missing_blp": [
         "BLP-04",
         "BLP-05"

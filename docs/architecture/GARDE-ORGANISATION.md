@@ -12,7 +12,9 @@ possibles ; elles demandent une intervention et ne sont pas une revue IA.
 Un refus ne crée ni autorisation ni nouvelle tentative. Une ancienne autorisation
 ne contourne pas le contrôle au moment de réserver l’agent. Les agents déjà
 lancés ne sont pas interrompus par ce diagnostic. Les données historiques restent
-conservées et les lancements manuels conservent leurs contrôles habituels.
+conservées. L’admission manuelle et la préparation effective du processus
+exigent la même organisation, y compris lors du démarrage d’une intention
+historique encore en file.
 
 Le contrat structurel est revérifié au cycle du conducteur et à la réservation.
 Les contrôles existants de fournisseur, budget, espaces, dépendances, tentative,
@@ -35,8 +37,30 @@ indépendante est décrite dans le [parcours de préparation](../../PREPARATION-
 
 ## Reprendre une mission historique
 
-Il n’existe pas encore de migration automatique de son organisation. Conserver
-le travail et ses preuves. Créer une mission vide avec le besoin restant, puis
-activer « Confier ce besoin à une équipe autonome » avec un fournisseur et des
-contrôles adaptés. La reprise de résultats anciens exige leur vérification,
-pas une acceptation rétroactive. Le mode manuel reste disponible.
+Le périmètre racine est identifié par le couple (identifiant du travail,
+`root`). Cette identité existe dès la création et reste observable sans
+réécrire les documents historiques. La présence du rôle ne configure ni
+fournisseur ni vérificateur et ne donne aucun droit de départ.
+
+Utiliser `planning attach` pour rattacher un travail existant via son identifiant
+et sa révision. Les sous-orchestrateurs s’inscrivent sous leur parent dans
+`planning.scopes`. Les tâches ont leurs propres liens de prérequis. Le
+rattachement conserve les tentatives et les résultats, et laisse les départs
+soumis à une autorisation explicite. Voir le
+[guide](../../GUIDE-UTILISATEUR.md#rattacher-une-équipe-à-un-projet-existant).
+
+## Vérification / Verification
+
+La [recette](../../tools/verification/recipes/default-orchestration.json)
+prend le binaire natif candidat via `SWARM_ORGANIZATION_BINARY`. Elle observe
+le refus sans réservation, le départ manuel avec un fournisseur inerte après
+rattachement, la conservation des prérequis et le rendu du canevas. Le test
+navigateur de base charge les sources du checkout. Le parcours cockpit protégé
+contrôle séparément les scripts réellement servis et la racine affichée.
+
+The [recipe](../../tools/verification/recipes/default-orchestration.json)
+uses the candidate native binary selected by `SWARM_ORGANIZATION_BINARY`.
+It checks refusal without reservation, a manual start with an inert provider
+after attachment, preservation of prerequisites, and canvas rendering. The
+basic browser test loads the checkout sources. The protected cockpit journey
+separately checks the actual served scripts and the displayed root.

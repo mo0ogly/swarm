@@ -76,6 +76,21 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/i18n-en.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/i18n-en.js"))),
         "/i18n.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/i18n.js"))),
         "/swarm-shell.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-shell.js"))),
+        "/task-detail-files.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/task-detail-files.js"))),
+        "/lib/monaco/LICENSE.txt" => Some(("text/plain; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/LICENSE.txt"))),
+        "/lib/monaco/ThirdPartyNotices.txt" => Some(("text/plain; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/ThirdPartyNotices.txt"))),
+        "/lib/monaco/chunk-6NYP3BCE.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/chunk-6NYP3BCE.js"))),
+        "/lib/monaco/chunk-LB5NC5KB.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/chunk-LB5NC5KB.js"))),
+        "/lib/monaco/chunk-RFRKVIMS.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/chunk-RFRKVIMS.js"))),
+        "/lib/monaco/chunk-SYF7BLLQ.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/chunk-SYF7BLLQ.js"))),
+        "/lib/monaco/codicon-KP4OV2OO.ttf" => Some(("font/ttf", include_bytes!("../../../../../web/lib/monaco/codicon-KP4OV2OO.ttf"))),
+        "/lib/monaco/editor.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/editor.css"))),
+        "/lib/monaco/editor.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/editor.js"))),
+        "/lib/monaco/json-worker.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/json-worker.js"))),
+        "/lib/monaco/jsonMode-FCANVPFQ.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/jsonMode-FCANVPFQ.js"))),
+        "/lib/monaco/jsonMode-K4MMNWJG.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/jsonMode-K4MMNWJG.css"))),
+        "/lib/monaco/markdown-MIPYNTKF.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/markdown-MIPYNTKF.js"))),
+        "/lib/monaco/worker.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/monaco/worker.js"))),
         "/swarm-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.js"))),
         "/swarm-workbench.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/swarm-workbench.css"))),
         "/trust-workbench.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/trust-workbench.js"))),
@@ -207,7 +222,7 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     }
     source = source.replacen(admin_button, "<button data-view=\"admin\">Administration</button><button data-view=\"authority\">Utilisateurs et accès</button>", 1);
     source = source.replacen(admin_section, "<section id=\"authority\" class=\"view\" hidden aria-labelledby=\"authority-title\"><h2 id=\"authority-title\">Utilisateurs et accès</h2><div id=\"native-authority-admin\" hidden></div></section><section id=\"admin\" class=\"view\"", 1);
-    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><link rel=\"stylesheet\" href=\"/swarm-workbench.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/swarm-workbench.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/native-runtime/authority-admin.js\" defer></script><script src=\"/cockpit-authority.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
+    let scripts = "<meta name=\"swarm-style-nonce\" content=\"\"><link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><link rel=\"stylesheet\" href=\"/swarm-workbench.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/task-detail-files.js\" defer></script><script src=\"/swarm-workbench.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/native-runtime/authority-admin.js\" defer></script><script src=\"/cockpit-authority.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
     source = source.replacen("</head>", scripts, 1);
     let tag = "<html lang=\"fr\" data-theme=\"etat\">";
     if source.matches(tag).count() != 1 {
@@ -242,7 +257,15 @@ pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError>
             asset(r.uri().path()).ok_or(HttpServiceError::Refused("web-route-unported"))?;
         (kind, bytes.to_vec())
     };
+    let (bytes, nonce) = if r.uri().path() == "/" {
+        super::live::harness_page(&bytes)?
+    } else {
+        (bytes, None)
+    };
     let mut response = response(StatusCode::OK, bytes, r.method() == Method::HEAD, None);
+    if let Some(nonce) = nonce {
+        super::live::apply_style_nonce(&mut response, &nonce, true)?;
+    }
     response
         .headers_mut()
         .insert(CONTENT_TYPE, HeaderValue::from_static(kind));

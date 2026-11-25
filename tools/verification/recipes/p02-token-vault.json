@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "p02-token-vault",
+  "inputs": [
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/p02_invoice.rs",
+    "rust/crates/swarm-engine/src/root_store/p02_vault.rs",
+    "rust/crates/swarm-engine/src/root_store/trust_store.rs",
+    "rust/crates/swarm-engine/src/trust/*.rs",
+    "rust/crates/swarm-engine/tests/p02_vault.rs",
+    "tests/fixture_area.py",
+    "tools/verification/cargo_space_guard.py",
+    "rust/crates/swarm-engine/src/root_store/p02_transport.rs",
+    "rust/crates/swarm-engine/tests/fixtures/p02_draft_receiver.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-rust-root",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "p02_vault",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test fictional_invoices_require_current_scoped_mandate_and_respect_revocation ... ok",
+        "test fictional_invoice_projection_and_draft_are_closed_and_mandate_bound ... ok",
+        "test fictional_draft_crosses_socket_and_requires_an_exact_receipt ... ok",
+        "test fictional_receiver_rejects_nonobject_and_oversized_drafts ... ok",
+        "4 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

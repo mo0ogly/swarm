@@ -32,7 +32,7 @@ def provider_markers(root):
     return set(root.glob('model-received-*.json')) | set(root.glob('.swarm/biba-i0/planning/*/model-received-*.json'))
 
 
-def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=None,source_entries=None,pending_dependent=False):
+def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=None,source_entries=None,pending_dependent=False,settings_values=None):
     """Plan under public budgets/fences on a prepared real Git commit, never launch.
 
     Source commit uses the checkout's configured identity. Missing-copy injection
@@ -50,10 +50,15 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
     Optional source_entries supplies explicit committed fixture paths with bytes
     or ('symlink', literal_target), before any worker. It never patches a candidate
     or SQL and refuses escaping source names. None preserves the original tree.
+    settings_values applies explicit fixture settings via public preview/apply
+    before planning authorization. None preserves the native defaults.
     """
     out.mkdir(parents=True,mode=0o700,exist_ok=False)
     qualified=json.loads(profile.read_bytes());assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
     f=fixture.Fixture(binary,out/'setup','managed-planning')
+    if settings_values is not None:
+        from rust_planning_activation import apply_policy
+        apply_policy(f, 'managed-explicit-settings', settings_values)
     fixture.publish(out/'fixture.json',dict(root=str(f.root),binary_sha256=qualified['sha256']))
     source=f.root/'source';source.mkdir(mode=0o700);repository.git(source,'init','--quiet')
     checkout=Path(__file__).resolve().parents[1]

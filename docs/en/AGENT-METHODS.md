@@ -78,6 +78,29 @@ binary flags. Audits are read-only by default. Methods answer in the user's lang
 
 </details>
 
+## Repository map for coding agents
+
+This guide complements the [method table](#start-here). Read the
+[shared contract](../../tools/agent-workflows/CONTRACT.md) first, then find the
+producer, consumers and checks for the assigned scope.
+
+| Topic | Swarm entry point | What to establish |
+| --- | --- | --- |
+| Project and boundaries | Read the [Rust architecture](ARCHITECTURE.md), [Cargo manifest](../../rust/Cargo.toml) and [two-interface architecture](../PRODUCT-ARCHITECTURE.md). Follow CLI and Web operations through the engine to the Root instance. | Compiled components, process boundaries, public surfaces and migration scope. Distinguish slots within one Work from the workspace FIFO shared across Work in one Root. [Tokio orchestration](TOKIO-ORCHESTRATION.md) |
+| Setup, build and style | Start with [CI](../../.github/workflows/ci.yml), the manifest and the [local launcher](NATIVE-LOCAL-LAUNCHER.md). UI and localization scripts are in [package.json](../../package.json). | Toolchain, features, dependencies, profile, served assets and local code conventions. Read the effective check configuration before adopting a threshold from another repository. |
+| Tests and recipes | Select the named Rust test and affected public journey. Read the [verification guide](../../tools/verification/README.md) for recipes, outputs and limits. | Exercise the relevant success, refusal and recovery in an isolated fixture Root. Identify fixture, real provider and installed evidence explicitly. Justify any added deadline and record which tests ran. |
+| File patterns and operations | HTTP in [swarm-web](../../rust/crates/swarm-web/src/lib.rs), commands in [swarm-cli](../../rust/crates/swarm-cli/src/lib.rs), models and transitions in [swarm-engine](../../rust/crates/swarm-engine/src/lib.rs). | Find schema and errors at the producer. Verify instance binding, callers and the path from saved setting through validation and Admin/API/CLI to the effective consumer. [HTTP errors](NATIVE-HTTP-ERRORS.md) |
+| Domains and methods | Use the existing table to choose architecture, delivery, review, diagnosis or verification. Canonical definitions are in [.claude/skills](../../.claude/skills), also exposed through [Codex entry points](../../.agents/skills). | The current role and mandate govern authority. Apply the relevant rights and budgets to paid calls, delegation and independent review. |
+| Interfaces and tools | Inventory public operations from CLI/HTTP handlers and their evidence. Check the [permanent recipes](../../tools/verification/README.md) before adding a check. | A read, preview and mutation have distinct effects. Any tool or MCP gateway needs an established operation, identity and authority contract for its own journey. |
+| Adapters and memory | Trace the [native provider](NATIVE-PROVIDER-RESOLUTION.md) profile, route and guards. Inspect the [mission graph](GRAPH-STUDIO.md), [project memory](../PROJECT-MEMORY.md) and supplied context independently. | Provenance, version, scope, usage rights, destination and receipt. Retrieval and selected memory supply context. Authority is checked at the point of use. |
+| Security and retention | Start with [Biba](BIBA-RUST.md), [BLP](BELL-LAPADULA.md) and [identity](AGENT-IDENTITY-CONTRACT.md), then follow the [traceability chain](TRACEABILITY.md). | Locate the guards actually called, safe diagnostics, retained originals and per-circuit retention. Activity logs, audit and effect receipts each establish a different part of the record. |
+
+This structure adapts the [pinned Agents-Orchestrator AGENTS.md](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/AGENTS.md).
+The Swarm entries above were matched to its manifest, CI, Rust entry points and
+contracts at `50f1daee655fd735c913116cd6b61314ff871bdf`. These links record the
+method’s provenance. Native context receipt and operational behaviour require
+their own evidence.
+
 ## In Swarm preparation
 
 The existing **Prepare with AI** method selector uses:

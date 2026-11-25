@@ -409,8 +409,10 @@ flowchart LR
 
 ## Extractive selection for an explicit launch
 
-A first manually requested automated worker launch outside a hierarchical
-mission may include `summary_selection`: schema 1, M18 packet hash, dialogue
+A first manually requested worker launch in a configured team may include
+`summary_selection`. Each selected dialogue must belong to the task’s own scope.
+Reading the source, admitting the request and checking the queued receipt before
+launch all refuse dialogues from another scope. The selection includes schema 1, M18 packet hash, dialogue
 references, cutoff, protected annotations and reason. The engine rebuilds quotes
 from persisted texts; it accepts neither free paraphrases nor a Python receipt
 as authority. The full operator snapshot is checked but never injected: the

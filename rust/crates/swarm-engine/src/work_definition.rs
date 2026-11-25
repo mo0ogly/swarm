@@ -146,6 +146,8 @@ pub fn encode_work_mutation_intent(r: &Request) -> Result<Vec<u8>, crate::Error>
 /// invalid input or prerequisites retain the original candidate. Git is a supplied
 /// observation, not authenticated repository state. No IO, policy fallback or
 /// authority is introduced; callers own replay, transaction and persistence.
+/// The new Work owns the canonical root role as soon as its Work id exists.
+/// The root is unconfigured until the operator supplies its team and policies.
 pub fn apply_work_creation(
     w: &mut Work,
     r: &Request,

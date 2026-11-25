@@ -11,6 +11,9 @@
     "rust/crates/swarm-engine/src/root_store.rs",
     "rust/crates/swarm-engine/src/lib.rs",
     "rust/crates/swarm-engine/tests/agent_launch.rs",
+    "rust/crates/test_support/manual_launch_team.rs",
+    "docs/PROJECT-MEMORY.md",
+    "docs/en/PROJECT-MEMORY.md",
     "rust/crates/swarm-web/src/service.rs",
     "rust/crates/swarm-web/src/service/project_memory.rs",
     "internal/engine/memory_summary_selection.go",
@@ -62,8 +65,9 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "running 31 tests",
-        "test result: ok. 31 passed"
+        "running 32 tests",
+        "summary_selection_refuses_dialogue_in_another_scope ... ok",
+        "test result: ok. 32 passed"
       ],
       "required_stderr": []
     },

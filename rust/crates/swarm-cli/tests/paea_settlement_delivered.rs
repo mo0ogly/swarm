@@ -37,13 +37,50 @@ fn document() -> (Proposal, AdmissionContext, Vec<u8>) {
     (doc.proposal, doc.context, raw.to_vec())
 }
 
-/// Create one owned native Root; no existing user/project database is opened.
+/// In controlled runs, use the effective scratch directory passed to this
+/// test process. The Cargo launcher may replace the recipe's initial TMPDIR.
+/// Direct callers keep the historical fallback when the mode is unset.
+fn admitted_parent() -> Option<PathBuf> {
+    let mode = std::env::var_os("SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES")?;
+    assert_eq!(mode, "1", "invalid delivered fixture placement mode");
+    let path = std::env::var_os("TMPDIR").expect("admitted fixture run requires TMPDIR");
+    Some(PathBuf::from(path))
+}
+
+/// Create a signed identity fixture under the same admitted parent as the
+/// ledger and project fixtures. In controlled mode, placement errors stop the
+/// test before it can fall back to a different filesystem.
+fn identity_fixture(
+    permission: swarm_identity_contract::Permission,
+    scope: Scope,
+    revision: i64,
+) -> fixture::Fixture {
+    match admitted_parent() {
+        Some(parent) => fixture::Fixture::build_for_trust_in(permission, scope, revision, &parent),
+        None => fixture::Fixture::build_for_trust(permission, scope, revision),
+    }
+}
+
+/// Create one owned native Root after the selected parent passes the existing
+/// private path check. Failure stops before creating a database.
 fn root() -> (tempfile::TempDir, RootStore) {
-    // The CLI child reads the operator declaration through
-    // authenticated_startup::open → open_private_directory, which refuses
-    // group/other-writable ancestors (checkout is 775): the private fallback
-    // area is required here.
-    let dir = tempfile::tempdir_in(swarm_engine::fallback_area()).unwrap();
+    let selected = admitted_parent();
+    let parent = match &selected {
+        Some(parent) => parent.clone(),
+        None => swarm_engine::fallback_area(),
+    };
+    let _parent = selected.as_ref().map(|parent| {
+        swarm_enrollment_config::store::open_private_directory(
+            parent,
+            rustix::process::geteuid().as_raw(),
+        )
+        .expect("delivered ledger fixture parent must be private")
+    });
+    let dir = tempfile::tempdir_in(&parent).unwrap();
+    assert_eq!(dir.path().parent(), Some(parent.as_path()));
+    if selected.is_some() {
+        println!("delivered-root-fixture-parent {}", parent.display());
+    }
     fs::set_permissions(dir.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let store = RootStore::initialize(dir.path(), &mut SystemEnvironment).unwrap();
     (dir, store)
@@ -327,7 +364,7 @@ fn invoke_between(
     let permission: swarm_identity_contract::Permission =
         serde_json::from_value(prepared["permission"].clone()).unwrap();
     between();
-    let f = fixture::Fixture::build_for_trust(permission, owned.scope.clone(), revision);
+    let f = identity_fixture(permission, owned.scope.clone(), revision);
     if !bad_frame {
         fs::copy(&f.path, &declaration).unwrap();
         fs::set_permissions(&declaration, fs::Permissions::from_mode(0o600)).unwrap();
@@ -855,7 +892,7 @@ impl Prepared {
 /// consumption (verified reproducible defect of the first contention harness
 /// revision; the sequential harness keeps `f` alive through `invoke_between`).
 fn provision(owned: &Owned, prepared: &Prepared) -> (fixture::Fixture, Vec<u8>) {
-    let f = fixture::Fixture::build_for_trust(
+    let f = identity_fixture(
         prepared.permission.clone(),
         owned.scope.clone(),
         owned.trust_revision,
@@ -1030,7 +1067,7 @@ fn delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers() {
     let (_alternate_child, _alternate_stdout, alternate_permission) = alternate;
     // --- Mismatched consumption: preparation A answered with agreement B. ---
     let (fixture1, packet1) = {
-        let f = fixture::Fixture::build_for_trust(
+        let f = identity_fixture(
             alternate_permission.clone(),
             owned.scope.clone(),
             owned.trust_revision,
@@ -1136,7 +1173,7 @@ fn delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers() {
         "recovery preparation did not bind the original canonical action"
     );
     let (fixture2, packet2) = {
-        let f = fixture::Fixture::build_for_trust(
+        let f = identity_fixture(
             permission,
             owned.scope.clone(),
             owned.trust_revision,

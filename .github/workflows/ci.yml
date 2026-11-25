@@ -74,10 +74,77 @@ jobs:
           print('SWARM_RUNNER_TMPDIR=' + str(d))
           PYEOF
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
+      - name: Check configured worker admission and extractive summary scope
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test agent_launch
+      - name: Check admitted settlement fixture placement
+        shell: bash
+        run: |
+          export SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1
+          export SWARM_PAEA_DELIVERED_BIN="$PWD/bin/swarm"
+          SWARM_PAEA_DELIVERED_BIN_SHA256=$(sha256sum "$SWARM_PAEA_DELIVERED_BIN" | cut -d ' ' -f 1)
+          export SWARM_PAEA_DELIVERED_BIN_SHA256
+          output=$(mktemp -d "$SWARM_RUNNER_TMPDIR/settlement-check.XXXXXXXX")
+          TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked \
+            -p swarm-cli --test paea_settlement_delivered --no-run --message-format=json > "$output/cargo.json"
+          test_binary=$(python3 - "$output/cargo.json" <<'PYEOF'
+          import json
+          import sys
+
+          with open(sys.argv[1]) as stream:
+              events = [json.loads(line) for line in stream]
+          executables = [event["executable"] for event in events
+                         if event.get("target", {}).get("name") == "paea_settlement_delivered"
+                         and event.get("executable")]
+          executable, = executables
+          print(executable)
+          PYEOF
+          )
+          nominal=delivered_settlement_commit_replay_reconcile_once
+          wrong_agreement=delivered_settlement_wrong_agreement_refuses_without_effect_then_recovers
+          for case in "$nominal" "$wrong_agreement"; do
+            TMPDIR="$SWARM_RUNNER_TMPDIR" "$test_binary" --ignored --exact "$case" --nocapture | tee "$output/$case.log"
+            grep -F "test $case ... ok" "$output/$case.log"
+            grep -F "delivered-root-fixture-parent $SWARM_RUNNER_TMPDIR" "$output/$case.log"
+            grep -F "delivered-identity-fixture-parent $SWARM_RUNNER_TMPDIR" "$output/$case.log"
+          done
+          status=0
+          env -u TMPDIR "$test_binary" --ignored --exact "$nominal" --nocapture > "$output/missing.log" 2>&1 || status=$?
+          test "$status" -eq 101
+          grep -F "admitted fixture run requires TMPDIR" "$output/missing.log"
+          status=0
+          TMPDIR="$output/absent" "$test_binary" --ignored --exact "$nominal" --nocapture > "$output/invalid.log" 2>&1 || status=$?
+          test "$status" -eq 101
+          grep -F "delivered ledger fixture parent must be private" "$output/invalid.log"
+          test ! -e "$output/absent"
+          ! grep -E 'delivered-(root|identity)-fixture-parent|delivered-binary-witness' "$output/missing.log" "$output/invalid.log"
+      - name: Check the P02 vault with fictional invoices
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test p02_vault
+      - name: Replay the fictional P02 pilot and verify closure
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" make check-p02-pilot
+      - name: Retain P02 pilot evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p02-pilot-evidence
+          path: .cache/ci-p02-pilot/
+          if-no-files-found: warn
+          include-hidden-files: true
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-cli --test version_no_repository
       - run: npm test
       - run: make smoke
       - run: SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/existing-cockpit-rust.json --output .cache/ci-cockpit
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Check cockpit help and task review in the embedded Cockpit
+        run: |
+          export SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm"
+          export SWARM_TASK_REVIEW_FIXTURE="$SWARM_RUNNER_TMPDIR/ci-task-detail-human-review"
+          python3 tools/verification/recipe.py run --recipe tools/verification/recipes/task-detail-human-review.json --output .cache/ci-task-detail-human-review
+          python3 tools/verification/recipe.py verify --evidence .cache/ci-task-detail-human-review
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Check recorded exchange navigation in the embedded Cockpit
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" python3 tests/rust_agent_exchanges_browser.py --binary "$PWD/bin/swarm" --output .cache/ci-exchange-navigation
         env:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Restore namespace test environment
@@ -95,7 +162,14 @@ jobs:
         with:
           name: cockpit-recipe-diagnostics
           path: |
+            .cache/ci-exchange-navigation/result.json
+            .cache/ci-exchange-navigation/failure.txt
+            .cache/ci-exchange-navigation/browser.stderr
+            .cache/ci-exchange-navigation/browser/failure.json
             .cache/ci-cockpit/result.json
+            .cache/ci-task-detail-human-review/result.json
+            .cache/ci-task-detail-human-review/step-*.stdout
+            .cache/ci-task-detail-human-review/step-*.stderr
             .cache/ci-cockpit/step-*.json
             .cache/ci-cockpit/step-*.stdout
             .cache/ci-cockpit/step-*.stderr

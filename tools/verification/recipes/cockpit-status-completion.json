@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "cockpit-status-completion",
+  "inputs": [
+    "locales/en.json",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/status_tests.rs",
+    "tests/fixture_area.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_cockpit_status_completion.cjs",
+    "tests/rust_cockpit_status_completion.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_orchestration_scopes.py",
+    "tests/rust_planning_attach.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "version_history.json",
+    "web/cockpit-native-read.js",
+    "web/cockpit-native.js",
+    "web/i18n-en.js"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "protected-completion",
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import os, subprocess, sys\nfrom pathlib import Path\nsys.path.insert(0, 'tests')\nfrom fixture_area import fixture_root\nout = fixture_root('status-completion-')\nsubprocess.run([sys.executable, '-B', 'tests/rust_cockpit_status_completion.py', '--binary', os.environ['SWARM_STATUS_COMPLETION_BINARY'], '--sha256', os.environ['SWARM_STATUS_COMPLETION_SHA256'], '--output', str(out / 'result')], check=True)\nprint('REPLAY_EVIDENCE ' + str(out))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS status endpoint recovered after worker completion",
+        "PASS cockpit completion-stable fr",
+        "PASS cockpit completion-stable en",
+        "PASS cockpit completion-conflict fr",
+        "PASS cockpit completion-conflict en",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

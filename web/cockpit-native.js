@@ -12,9 +12,90 @@
  function failure(code,cause){const error=new Error(code,{cause});error.code=code;return error}
  /** One same-origin, cookie-protected GET. No CSRF mutation, auto retry, provider,
   * local cap or deadline is added. The caller owns visible failure/recovery. */
- async function read(path){let response;try{response=await fetch(path,{credentials:'same-origin',headers:{Accept:'application/json'}})}catch(cause){throw failure('web-native-response-unavailable',cause)}
-  let value;try{value=await response.json()}catch(cause){throw failure('web-native-response-invalid',cause)}
-  if(!response.ok){const code=value?.failure?.code||value?.error;throw failure(typeof code==='string'&&/^[a-z][a-z0-9_.-]*$/.test(code)?code:'web-native-request-refused')}
+ async function read(path,detailed=false){let response;try{response=await fetch(path,{credentials:'same-origin',headers:{Accept:'application/json'}})}catch(cause){throw failure('web-native-response-unavailable',cause)}
+  let value;try{value=await response.json()}catch(cause){throw failure(response.status===403?'web-access-refused':response.status===503?'web-native-service-unavailable':'web-native-response-invalid',cause)}
+  if(!response.ok)throw responseFailure(value,'web-native-request-refused',detailed);
+  return value;
+ }
+ /** Render only a static engine reason or error family from a failed response. */
+ function responseFailure(value,fallback,detailed=true){
+  const code=[detailed?value?.failure?.reason:null,value?.failure?.code,value?.error]
+   .find(code=>typeof code==='string'&&/^[a-z][a-z0-9_.-]*$/.test(code));
+  return failure(code||fallback);
+ }
+ /** Observe one protected, revision-matched acceptance precheck. A refused
+  * condition surfaces as an engine code. The observation grants no later write. */
+ async function previewTaskReview(work,task,revision){
+  const value=await read('/api/v1/action?'+new URLSearchParams({work,task,revision}),true);
+  if(value?.schema_version!==1||value.work!==work||value.task!==task||value.revision!==revision||value.eligible!==true)
+   throw failure('web-native-task-review-preview-invalid');
+  return value;
+ }
+ /** Submit the exact observed task/revision through the existing mutation
+  * route, then independently read Work. The UI context is checked after CSRF
+  * and before POST. A lost response or readback never triggers another write. */
+ async function acceptTaskReview(id,task,revision,isCurrent){
+  const ticket=generation;
+  const currentIntent=()=>ticket===generation&&selected===id&&works.find(work=>work.id===id)?.revision===revision&&isCurrent();
+  if(!currentIntent())throw failure('task-review-revision-changed');
+  const session=await read('/api/v1/native-session');
+  if(typeof session?.csrf_token!=='string'||!/^[0-9a-f]{64}$/.test(session.csrf_token))throw failure('web-native-session-invalid');
+  if(!currentIntent())throw failure('task-review-revision-changed');
+  let response,value;
+  try{
+   response=await fetch('/api/v1/action',{method:'POST',credentials:'same-origin',
+    headers:{Accept:'application/json','Content-Type':'application/json','X-Swarm-CSRF':session.csrf_token},
+    body:JSON.stringify({kind:'task',work:id,task,event_id:'task-review-'+crypto.randomUUID(),
+     expected_revision:revision,request:{status:'accepted'}})});
+   value=await response.json();
+  }catch(cause){throw failure('web-native-task-review-outcome-unknown',cause)}
+  if(!response.ok){
+   if(value?.recorded_work||response.status>=500||['command-commit-uncertain','command-transaction-lost','command-rollback']
+    .includes(value?.failure?.code))throw failure('web-native-task-review-outcome-unknown');
+   throw responseFailure(value,'web-native-task-review-refused');
+  }
+  const accepted=work=>work?.id===id&&Array.isArray(work.tasks)&&work.tasks.some(item=>item.id===task&&item.status==='accepted');
+  if(!accepted(value)||value.revision!==revision+1)throw failure('web-native-task-review-outcome-unknown');
+  const observed=await read('/api/v1/planning?'+new URLSearchParams({work:id}))
+   .catch(cause=>{throw failure('web-native-task-review-readback-unconfirmed',cause)});
+  if(!accepted(observed)||!Number.isSafeInteger(observed.revision)||observed.revision<value.revision)
+   throw failure('web-native-task-review-readback-unconfirmed');
+  works=works.map(work=>work.id===id&&work.revision<=observed.revision?observed:work);
+  if(ticket===generation&&selected===id){
+   await select(id,true);
+   document.querySelector('.workbench-task-dialog[open] h2')?.focus();
+  }
+  return observed;
+ }
+ /** Read one revision-bound original or the task's protected originals list,
+  * optionally including the initial report or its explicit per-file error.
+  * Server checks ownership and hashes. No user path is resolved in the browser. */
+ async function readTaskOriginal(work,task,revision,file,includeReport=false){
+  const query=new URLSearchParams({work,task,revision});
+  if(file!==undefined)query.set('file',file);
+  else if(includeReport)query.set('include_report','1');
+  const value=await read('/api/v1/agent-logs/task-review-files?'+query,true);
+  if(value?.schema_version!==1||value.work!==work||value.task!==task||value.revision!==revision
+   ||!value.data||(file===undefined?!Array.isArray(value.data.files):value.data.id!==file))
+   throw failure('task-review-files-response-invalid');
+  if(includeReport){
+   const report=value.data.report;
+   const hasText=typeof report?.text==='string';
+   const hasError=typeof report?.error==='string'&&/^[a-z][a-z0-9_.-]*$/.test(report.error);
+   if(report?.id!=='report'||hasText===hasError)throw failure('task-review-files-response-invalid');
+  }
+  return value.data;
+ }
+ const taskReview=Object.freeze({preview:previewTaskReview,accept:acceptTaskReview,original:readTaskOriginal,read});
+ /** Read safe engine codes for this Work and the observed control revision.
+  * Reject missing, stale or malformed data and propagate safe transport codes. */
+ async function readLaunchDiagnostics(id, control){
+  const value=await read('/api/v1/mission?'+new URLSearchParams({work:id,action:'launch-diagnostics'}));
+  if(value?.work!==id||!Number.isSafeInteger(value.revision)||!Array.isArray(value.refusals)||
+    !value.refusals.every(r=>r&&(r.task===null||typeof r.task==='string')&&
+      Array.isArray(r.codes)&&r.codes.length>0&&r.codes.every(code=>typeof code==='string'&&/^[a-zA-Z0-9:_-]+$/.test(code))))
+    throw failure('web-native-launch-diagnostics-invalid');
+  if(value.revision!==control?.revision)throw failure('revision_conflict');
   return value;
  }
  /** Preserve language and theme on actual supported destinations. Only trusted
@@ -45,13 +126,14 @@
   * prevents delayed responses replacing newer selection. Errors are visible and
   * data is read-only; controls do not establish conductor/process liveness.
   * An empty/missing selection clears the owned graph modal and view memory;
-  * another Work cannot inherit that modal or its pending presentation. */
- async function select(id){const ticket=++generation,changedContext=selected!==id;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;globalThis.SwarmWorkbench?.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));if(instructions){if(changedContext)SwarmNativeInstructions.clear(instructions);else instructions.replaceChildren()}SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
+  * another Work cannot inherit that modal or its pending presentation. A confirmed
+  * acceptance can keep the same Work's inspector open while reloading panels. */
+ async function select(id,preserveTaskDetail=false){const ticket=++generation,changedContext=selected!==id;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;if(!preserveTaskDetail||changedContext)globalThis.SwarmWorkbench?.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));if(instructions){if(changedContext)SwarmNativeInstructions.clear(instructions);else instructions.replaceChildren()}SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
   if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan'])$(id).replaceChildren();SwarmRustDependencyGraph.clear(tr('Aucune mission sélectionnée.'));$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
-  SwarmRustCockpitRead.render({work,mission:null,missionError:'web-native-read-pending',control:null});
-  let control=null,mission=null,error=null,panelsObserved=false,readMode='current';let statusObserved=false;
+  if(!preserveTaskDetail||changedContext)SwarmRustCockpitRead.render({work,mission:null,missionError:'web-native-read-pending',control:null,taskReview});
+  let control=null,mission=null,error=null,panelsObserved=false,readMode='current';let statusObserved=false,launchDiagnostics=null,launchDiagnosticError=null;
   try{control=await read('/api/v1/mission?'+new URLSearchParams({work:id}));if(!control||!Number.isSafeInteger(control.revision)||typeof control.archived!=='boolean')throw failure('web-native-control-invalid')}catch(cause){error=cause.code||'web-native-control-invalid'}
   if(ticket!==generation)return;
   // A saved history read consumes public records, not execution qualification.
@@ -64,8 +146,13 @@
   try{const value=await read('/api/v1/mission?'+new URLSearchParams({work:id,action:'status'}));if(!value||!Object.hasOwn(value,'tasks')||typeof value.summary!=='string'||typeof value.next!=='string'||!(value.tasks===null||Array.isArray(value.tasks)&&value.tasks.every(t=>t&&typeof t.id==='string')))throw failure('web-native-status-invalid');mission=value}catch(cause){error=cause.code||'web-native-status-invalid'}
   }else if(readMode!=='history')error='web-native-status-not-observed';
   if(ticket!==generation)return;
+  if(statusObserved){
+   try{launchDiagnostics=await readLaunchDiagnostics(id,control)}
+   catch(cause){launchDiagnosticError=cause.code||'web-native-launch-diagnostics-invalid'}
+  }
+  if(ticket!==generation)return;
   try{const observation=await read('/api/v1/cockpit-read?'+new URLSearchParams({work:id}));if(ticket!==generation)return;if(observation?.work_id!==id)throw failure('web-native-observation-invalid');SwarmRustCockpitPanels.render(observation);panelsObserved=true}catch(cause){if(ticket!==generation)return;error=cause.code||'web-native-observation-invalid';SwarmRustCockpitPanels.clear(tr('Lecture impossible. Actualisez pour reprendre.')+' ('+error+')')}
-  current={work,mission,missionError:error,control,panelsObserved,statusObserved,readMode};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':readMode==='history'?'Historique reçu — statut opérationnel non évalué.':'Lecture reçue — actualisation manuelle.');
+  current={work,mission,missionError:error,control,panelsObserved,statusObserved,readMode,launchDiagnostics,launchDiagnosticError,taskReview};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error||launchDiagnosticError?'Lecture partielle — actualisez pour reprendre.':readMode==='history'?'Historique reçu — statut opérationnel non évalué.':'Lecture reçue — actualisation manuelle.');
  }
  /** Reject only the explicitly selected, observed instruction revision. CSRF
   * is freshly read; the server owns authorization/CAS/active-task checks. Lost
@@ -106,6 +193,54 @@
    return !!current&&current.work.id===selected&&current.panelsObserved;
   }catch(cause){$('message').hidden=false;$('message').className='notice alert';$('message').textContent=tr('Lecture impossible. Actualisez pour reprendre.')+' ('+(cause.code||'web-native-response-invalid')+')';return false}finally{$('main-content').removeAttribute('aria-busy');$('refresh').disabled=false;$('work').disabled=works.length===0}
  }
+ /** Enable the cockpit guide on the existing rail control. Read-only guidance
+  * works without a selected mission. Shortcuts use current view permissions
+  * and normal navigation; opening and closing the guide only change the DOM. */
+ function setupCockpitHelp(){
+  const opener=$('help'),dialog=document.createElement('dialog');
+  const title='Aide du cockpit IA',header=document.createElement('header'),heading=document.createElement('h2');
+  const close=document.createElement('button'),body=document.createElement('section');
+  const railSettings=opener.closest('.rail-settings');
+  railSettings?.before(opener);
+  opener.disabled=false;opener.textContent=tr(title);opener.setAttribute('aria-haspopup','dialog');
+  dialog.id='native-cockpit-help';dialog.setAttribute('aria-labelledby','native-cockpit-help-title');
+  heading.id='native-cockpit-help-title';heading.textContent=tr(title);heading.tabIndex=-1;
+  close.type='button';close.textContent=tr('Fermer');close.addEventListener('click',()=>dialog.close());
+  header.append(heading,close);dialog.append(header,body);
+
+  const shortcuts=[];
+  for(const [label,description,links] of [
+   ['Lire un livrable','Dans Conduite, choisissez Voir sous À vérifier. Le rapport remis s’ouvre dès qu’il est disponible. Utilisez Rechercher pour trouver un passage.',[['conduite','Ouvrir Conduite']]],
+   ['Comprendre la validation','Après lecture, utilisez Valider si le bouton est actif. En cas de blocage, lisez le motif à côté du bouton et ouvrez Diagnostic pour voir le code.',[]],
+   ['Consulter les journaux et la reprise','Journaux affiche les événements des agents. Reprise présente les éléments enregistrés pour reprendre le travail.',[['logs','Ouvrir les journaux'],['resume','Ouvrir Reprise']]],
+  ]){
+   const section=document.createElement('section'),subtitle=document.createElement('h3');
+   const text=document.createElement('p'),actions=document.createElement('div');
+   subtitle.textContent=tr(label);text.textContent=tr(description);
+   for(const [view,label] of links){
+    const button=document.createElement('button');
+    button.type='button';button.textContent=tr(label);
+    button.addEventListener('click',()=>dialog.close(view));
+    shortcuts.push([view,button]);actions.append(button);
+   }
+   section.append(subtitle,text);
+   if(links.length)section.append(actions);
+   body.append(section);
+  }
+  opener.addEventListener('click',()=>{
+   for(const [view,button] of shortcuts)button.hidden=globalThis.SwarmAuthorityMenu?.visibleView(view)===false;
+   dialog.returnValue='';
+   dialog.showModal();
+   if(globalThis.SwarmShell)SwarmShell.focusWindowStart(dialog);
+   else heading.focus();
+  });
+  dialog.addEventListener('close',()=>{
+   if(views.has(dialog.returnValue)&&globalThis.SwarmAuthorityMenu?.visibleView(dialog.returnValue)!==false)
+    showView(dialog.returnValue,true);
+   else opener.focus({preventScroll:true});
+  });
+  document.body.append(dialog);
+ }
  /** Limitations sit in their original sections, with working navigation and an
   * actual links to supported Rust Admin/settings and its scoped limits modal.
   * Historical Go-only forms stay hidden in this native profile. No unsupported action sends
@@ -117,7 +252,8 @@
    const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Le graphe permet de créer des tâches et de modifier leurs liens. Les consignes attribuées sont consultables et rejetables avant transmission.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
-  $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
+  $('assistant').hidden=true;$('mode').disabled=true;$('version-open').disabled=false;
+  setupCockpitHelp();
   const link=document.createElement('a');link.href=url('/native-runtime.html?view=admin');link.textContent=tr('Ouvrir les réglages Rust');link.className='workbench-admin-primary';$('admin-title').after(link);const limits=document.createElement('a');limits.href=url('/native-runtime.html?view=admin#native-run-limits');limits.textContent=tr('Régler les limites d’exécution');limits.className='workbench-admin-primary';link.after(limits);for(const node of $('admin').children)if(![link,limits,$('admin-title')].includes(node)&&!node.querySelector('#admin-pricing-open'))node.hidden=true;
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link||a===limits)continue;const target=new URL(a.href);if(['/prepare.html','/trust-actions.html','/security-proofs.html','/paea.html'].includes(target.pathname)){const destination=target.pathname+target.search+target.hash;const sync=()=>{a.href=url(destination)};sync();a.addEventListener('click',sync);continue;}if(!['/','/trust-actions.html','/security-proofs.html','/paea.html'].includes(target.pathname)){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
   // Saving remains pending through the actual observation reload. The editor

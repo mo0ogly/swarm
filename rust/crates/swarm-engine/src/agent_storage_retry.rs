@@ -84,6 +84,7 @@ pub(crate) fn execute<T>(
 /// operational SQLite policy is reread; no launch/permission/budget decision uses
 /// current settings here. Atomic settings snapshots suffice, so holding Admin's
 /// shared reservation during the SQL pulse would create needless starvation.
+/// Redacted actions share the same transaction, ownership and retry policy.
 /// Callback is fixed to pulse; this is not a caller-selectable grant bypass.
 #[cfg(target_os = "linux")]
 pub(crate) fn heartbeat(
@@ -92,6 +93,7 @@ pub(crate) fn heartbeat(
     expected: &crate::Agent,
     progress: &crate::AgentProgress,
     facts: &crate::agent_provider_facts::ProviderFactsSnapshot,
+    actions: &crate::task_action_observation::ActionReceipt,
 ) -> Result<crate::Agent, RootStoreError> {
     execute_with_boundary(
         db,
@@ -99,7 +101,7 @@ pub(crate) fn heartbeat(
         true,
         SettingsBoundary::AtomicSnapshot,
         |db, _settings| {
-            crate::agent_execution_store::pulse(db, expected, progress, facts)
+            crate::agent_execution_store::pulse(db, expected, progress, facts, actions)
                 .map_err(|e| RootStoreError::Launch(Box::new(e)))
         },
     )

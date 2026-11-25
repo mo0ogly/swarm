@@ -34,6 +34,7 @@ pub use assistant_provider::{prepare_assistant_provider, AssistantProviderError}
 mod agent_worker_context;
 pub use agent_launch_error::AgentLaunchError;
 mod agent_tool_guard;
+mod task_action_observation;
 pub use agent_tool_guard::{
     AgentGuardError, AgentGuardObservation, AgentGuardStop, AgentGuardVisibility, AgentToolGuard,
 };
@@ -95,6 +96,7 @@ mod mission_status_runtime;
 mod mission_organization;
 pub use mission_organization::{
     validate_mission_organization, validate_mission_reviewer_capacity, MissionOrganizationError,
+    ROOT_ORCHESTRATOR_SCOPE,
 };
 mod mission_control_request;
 pub use mission_control_request::{decode_mission_priority_request, decode_mission_control_request, decode_mission_start_request, MissionControlAction, MissionControlRequest, MissionControlView};
@@ -110,7 +112,7 @@ pub use root_store::{
     TaskFreshnessEvidence, MissionResultObservation, MissionStatusObservation,
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
     MissionWorkspaceQueue, MissionWorkspaceTurn, MissionWorkspaceBlocker,
-    MissionQueueRegistration, MissionCandidateRefusal,
+    MissionQueueRegistration, MissionCandidateRefusal, MissionLaunchDiagnostics, MissionLaunchRefusal,
     MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome, MissionWorkerRecovery,
     MissionWorkerDispatchRequest, MissionWorkerDispatchOutcome, MissionWorkerDispatchFailure,
     MissionDispatchCause, MissionDispatchQueueEffect, MissionDispatchPreparationEffect,
@@ -337,7 +339,11 @@ pub use local_storage::{LocalStorageError, LocalStorageOperation, PublicationSta
 #[cfg(unix)]
 pub use root_schema::{RootSchemaError, RootSchemaFailure};
 #[cfg(target_os = "linux")]
-pub use root_store::{RootBinding, TrustEnrollmentRequest};
+pub use root_store::{
+    P02AgentInvoice, P02Context, P02DraftDeliveryError, P02DraftDestination, P02DraftReceipt,
+    P02Grant, P02InvoiceBatch, P02InvoiceDraft,
+    P02InvoiceInput, P02ResolvedValue, P02Vault, RootBinding, TrustEnrollmentRequest,
+};
 #[cfg(target_os = "linux")]
 pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]
@@ -741,6 +747,7 @@ mod planning_scope_context;
 
 #[cfg(target_os = "linux")]
 pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_gate, TaskReviewOutcome};
+pub use root_store::TaskReviewFileReader;
 
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;

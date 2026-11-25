@@ -36,24 +36,36 @@ fn close(file: File) -> Result<(), AgentLaunchError> {
     nix::unistd::close(file.into_raw_fd())
         .map_err(|e| AgentLaunchError::caused("agent-launch-close", e))
 }
-/// Read the executable fully and bind the observation to one unchanged inode.
-/// Buffered transfer size is an allocation detail, not an executable-size policy.
-/// Read/metadata/close failures refuse; no executable is launched or trusted.
-pub(crate) fn executable(path: &Path) -> Result<String, AgentLaunchError> {
+/// Provider commands must be absolute regular files with executable mode bits.
+fn command_path(path: &Path) -> Result<(), AgentLaunchError> {
     if !path.is_absolute() {
         return Err(AgentLaunchError::Refused(
             "agent-provider-absolute-command-required",
         ));
     }
+    Ok(())
+}
+
+/// Reject directories, special files and non-executable regular files.
+fn command_metadata(metadata: &std::fs::Metadata) -> Result<(), AgentLaunchError> {
+    if !metadata.is_file() || metadata.mode() & 0o111 == 0 {
+        return Err(AgentLaunchError::Refused("agent-provider-not-executable"));
+    }
+    Ok(())
+}
+
+/// Read the executable fully and bind the observation to one unchanged inode.
+/// Buffered transfer size is an allocation detail, not an executable-size policy.
+/// Read/metadata/close failures refuse; no executable is launched or trusted.
+pub(crate) fn executable(path: &Path) -> Result<String, AgentLaunchError> {
+    command_path(path)?;
     let mut file =
         File::open(path).map_err(|e| AgentLaunchError::caused("agent-provider-open", e))?;
     let result = (|| {
         let before = file
             .metadata()
             .map_err(|e| AgentLaunchError::caused("agent-provider-metadata", e))?;
-        if !before.is_file() || before.mode() & 0o111 == 0 {
-            return Err(AgentLaunchError::Refused("agent-provider-not-executable"));
-        }
+        command_metadata(&before)?;
         let mut hasher = Sha256::new();
         let mut buffer = [0u8; 8192];
         loop {
@@ -138,11 +150,40 @@ fn environment(
         digests: observed,
     })
 }
-/// Exercise host directory read, isolated write/sync/close/removal and configured
-/// free-space floor. Uses an owned directory descriptor; cleanup errors refuse.
+/// Verify an actual host write, fsync and removal with separate retained causes.
+fn probe_directory_write(directory: &File) -> Result<(), AgentLaunchError> {
+    let name = crate::generate_identifier(".swarm-preflight-")
+        .map_err(|e| AgentLaunchError::caused("agent-preflight-identifier", e))?;
+    let fd = rustix::fs::openat(
+        directory,
+        &name,
+        rustix::fs::OFlags::WRONLY
+            | rustix::fs::OFlags::CREATE
+            | rustix::fs::OFlags::EXCL
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::from_raw_mode(0o600),
+    )
+    .map_err(|e| AgentLaunchError::caused("agent-workspace-write-create", e))?;
+    let mut probe: File = fd.into();
+    let write = probe
+        .write_all(b"swarm-preflight\n")
+        .and_then(|()| probe.sync_all())
+        .map_err(|e| AgentLaunchError::caused("agent-workspace-write-sync", e));
+    let write = finish(write, close(probe));
+    let removed = rustix::fs::unlinkat(directory, &name, rustix::fs::AtFlags::empty())
+        .map_err(|e| AgentLaunchError::caused("agent-preflight-remove", e));
+    finish(write, removed)
+}
+/// Check directory readability, the supplied host check and the saved disk
+/// floor. Uses an owned directory descriptor; cleanup errors refuse.
 /// Linux dirent buffer4096 reads one entry, not a count/volume policy. This proves
 /// host observations only; no claim about provider sandbox capabilities is made.
-fn host_directory(path: &Path, minimum: u64) -> Result<(u64, u64), AgentLaunchError> {
+fn host_directory(
+    path: &Path,
+    minimum: u64,
+    check: impl FnOnce(&File) -> Result<(), AgentLaunchError>,
+) -> Result<(u64, u64), AgentLaunchError> {
     let fd = rustix::fs::open(
         path,
         rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::DIRECTORY | rustix::fs::OFlags::CLOEXEC,
@@ -159,28 +200,7 @@ fn host_directory(path: &Path, minimum: u64) -> Result<(u64, u64), AgentLaunchEr
         if let Some(entry) = reader.next() {
             entry.map_err(|e| AgentLaunchError::caused("agent-workspace-read", e))?;
         }
-        let name = crate::generate_identifier(".swarm-preflight-")
-            .map_err(|e| AgentLaunchError::caused("agent-preflight-identifier", e))?;
-        let fd = rustix::fs::openat(
-            &directory,
-            &name,
-            rustix::fs::OFlags::WRONLY
-                | rustix::fs::OFlags::CREATE
-                | rustix::fs::OFlags::EXCL
-                | rustix::fs::OFlags::NOFOLLOW
-                | rustix::fs::OFlags::CLOEXEC,
-            rustix::fs::Mode::from_raw_mode(0o600),
-        )
-        .map_err(|e| AgentLaunchError::caused("agent-workspace-write-create", e))?;
-        let mut probe: File = fd.into();
-        let write = probe
-            .write_all(b"swarm-preflight\n")
-            .and_then(|()| probe.sync_all())
-            .map_err(|e| AgentLaunchError::caused("agent-workspace-write-sync", e));
-        let write = finish(write, close(probe));
-        let removed = rustix::fs::unlinkat(&directory, &name, rustix::fs::AtFlags::empty())
-            .map_err(|e| AgentLaunchError::caused("agent-preflight-remove", e));
-        finish(write, removed)?;
+        check(&directory)?;
         if minimum > 0 {
             let stat = rustix::fs::fstatvfs(&directory)
                 .map_err(|e| AgentLaunchError::caused("agent-workspace-resources", e))?;
@@ -195,18 +215,12 @@ fn host_directory(path: &Path, minimum: u64) -> Result<(u64, u64), AgentLaunchEr
     })();
     finish(result, close(directory))
 }
-/// Produce a host-compatible receipt from the checked model-route candidate.
-/// Required/provider probes still refuse. Requested route/catalogue/rules enter
-/// the scope only as unverified observations, never capability or authority.
-/// Current policy supplies all TTL/resource/environment choices. No child runs.
-pub(crate) fn observe(
-    root: &Path,
-    provider_name: &str,
-    model: &ModelRoutePreparation,
-    launch: &Launch,
+/// Resolve static provider preflight requirements and its effective receipt TTL.
+/// Missing verified capabilities or invalid saved provider settings refuse.
+fn provider_preflight_ttl(
     policy: &AgentLaunchPolicy,
-) -> Result<HostPreparation, AgentLaunchError> {
-    let provider = model.provider();
+    provider: &Provider,
+) -> Result<i64, AgentLaunchError> {
     if !policy.allow_unverified {
         return Err(AgentLaunchError::Refused(
             "agent-provider-verified-context-required",
@@ -241,6 +255,51 @@ pub(crate) fn observe(
             "agent-preflight-ttl-outside-saved-policy",
         ));
     }
+    Ok(ttl)
+}
+
+/// Read-only host checks for automatic startup diagnostics. The command is
+/// inspected by metadata and access checks without opening a special file or
+/// hashing executable bytes. Workspace and disk checks create no test file.
+/// Actual admission still verifies the write and binds a current receipt.
+pub(crate) fn inspect(
+    root: &Path,
+    model: &ModelRoutePreparation,
+    launch: &Launch,
+    policy: &AgentLaunchPolicy,
+) -> Result<PathBuf, AgentLaunchError> {
+    use rustix::fs::{accessat, Access, AtFlags, CWD};
+
+    let provider = model.provider();
+    provider_preflight_ttl(policy, provider)?;
+    let path = workspace(root, &launch.workspace)?;
+    let command = Path::new(&provider.command);
+    command_path(command)?;
+    let metadata = std::fs::metadata(command)
+        .map_err(|e| AgentLaunchError::caused("agent-provider-open", e))?;
+    command_metadata(&metadata)?;
+    accessat(CWD, command, Access::READ_OK | Access::EXEC_OK, AtFlags::EACCESS)
+        .map_err(|e| AgentLaunchError::caused("agent-provider-access", e))?;
+    host_directory(&path, policy.minimum_free_bytes, |directory| {
+        accessat(directory, ".", Access::WRITE_OK | Access::EXEC_OK, AtFlags::EACCESS)
+            .map_err(|e| AgentLaunchError::caused("agent-workspace-write-access", e))
+    })?;
+    environment(policy, provider)?;
+    Ok(path)
+}
+/// Produce a host-compatible receipt from the checked model-route candidate.
+/// Required/provider probes still refuse. Requested route/catalogue/rules enter
+/// the scope only as unverified observations, never capability or authority.
+/// Current policy supplies all TTL/resource/environment choices. No child runs.
+pub(crate) fn observe(
+    root: &Path,
+    provider_name: &str,
+    model: &ModelRoutePreparation,
+    launch: &Launch,
+    policy: &AgentLaunchPolicy,
+) -> Result<HostPreparation, AgentLaunchError> {
+    let provider = model.provider();
+    let ttl = provider_preflight_ttl(policy, provider)?;
     let started = Instant::now();
     let checked = SystemTime::now();
     let stamp = |v: SystemTime| -> Result<String, AgentLaunchError> {
@@ -259,7 +318,7 @@ pub(crate) fn observe(
         .ok_or(AgentLaunchError::Refused("agent-preflight-time-overflow"))?;
     let path = workspace(root, &launch.workspace)?;
     let executable_digest = executable(Path::new(&provider.command))?;
-    let directory_identity = host_directory(&path, policy.minimum_free_bytes)?;
+    let directory_identity = host_directory(&path, policy.minimum_free_bytes, probe_directory_write)?;
     let EnvironmentObservation {
         names: environment_names,
         digests: environment,

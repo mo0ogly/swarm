@@ -162,6 +162,11 @@ distinctes (CLI 2/4/3, HTTP 400/403/409 selon la cause). `verify` est pur : expo
 v2, ancre HMAC schéma 1 et clé acquise séparément. La vérification n’atteste ni
 heure tierce, ni protection contre le même UID, ni acceptation indépendante.
 
+Le [coffre P02](P02-TOKEN-VAULT.md) expose une substitution en mémoire par lot
+et une résolution sous mandat dans l’API Rust locale. La préparation de facture
+Q04 utilise ce coffre pour produire une projection et un brouillon minimal.
+L’envoi du brouillon relève du pilote.
+
 ## Confidentialité Bell-LaPadula — administration livrée, contrôle partiel
 
 Confidentialité distincte de l’intégrité Biba, indépendante et combinable :
@@ -687,7 +692,7 @@ ce contrat.
 La branche Api du travailleur Rust (`_prepare_turn` dans
 `swarm-cli/src/preparation_worker.rs`) applique désormais la décision avant
 toute émission classifiée, par
-`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`,
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model, prompt)`,
 exécutée dans la réservation egress partagée déjà tenue par le travailleur
 (`with_preparation_egress`) et appelée avant la construction de la requête :
 aucun socket ne s’ouvre sans décision.

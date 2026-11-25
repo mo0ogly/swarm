@@ -31,12 +31,16 @@ pub use paea_git_call::PaeaGitCallSource;
 pub use paea_git_call::PaeaGitCallApprovalSource;
 mod paea;
 mod planning;
+mod workflow_architecture;
 mod lifecycle_inventory;
 mod mission;
 mod cockpit_read;
 mod work_budget;
 mod work_resume;
 mod agent_logs;
+mod task_actions;
+#[cfg(target_os = "linux")]
+mod orchestration_signals;
 mod agent_transcript;
 mod pricing;
 mod provider_policies;
@@ -383,19 +387,22 @@ impl HttpServiceError {
                 // Only these typed Trust diagnostic refusals are caller states.
                 // Corrupt provenance, storage and wrapped cleanup stay server errors.
                 "blp-access-denied" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
-                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"|"blp-admission-event-conflict"|"blp-admission-policy-changed"
+                "blp-policy-required"|"blp-policy-stale"|"blp-classification-required"|"blp-preparation-provenance-required"|"preparation-integrity-producer-not-attested"|"preparation-integrity-engine-bytes-unavailable"|"preparation-integrity-settings-unavailable"|"preparation-integrity-project-context-unavailable"|"blp-preparation-parent-mismatch"|"preparation-revision-conflict"|"blp-admission-event-conflict"|"blp-admission-policy-changed"
                     if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "preparation-send-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
                 "preparation-send-invalid"|"preparation-message-over-limit"|"preparation-context-over-limit"
                     if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
                 "preparation-capability-stale"|"preparation-method-unavailable"|"preparation-stale-method"|"preparation-turn-active"|"preparation-call-disabled"
                     if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
+                "blp-preparation-check-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Preparation(_))=>StatusCode::BAD_REQUEST,
                 "blp-admission-invalid"|"blp-preparation-check-invalid"|"blp-preparation-attribute-invalid"|"blp-classification-invalid" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
                 "blp-transport-invalid"|"blp-destination-invalid"|"blp-destination-echo-mismatch" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::BAD_REQUEST,
                 "blp-destination-not-attributed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 "blp-transport-connection-changed"|"blp-transport-provider-source-changed"|"blp-transport-settings-changed" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "blp-admission-not-found"|"preparation-turn-not-found"|"blp-preparation-source-not-found" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 "blp-preparation-platform-unsupported" if *operation=="trust-command" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_IMPLEMENTED,
+                "workflow-architecture-stale" | "workflow-architecture-insufficient"
+                    if *operation == "workflow-architecture" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
                 "project-profile-conflict" if matches!(*operation,"project-profile-preview"|"project-profile-write") && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::CONFLICT,
                 "project-profile-choice-unknown" if *operation=="project-profile-write" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::NOT_FOUND,
                 // The versioned-memory guard is ported (project_memory_source.rs),
@@ -498,6 +505,10 @@ impl HttpServiceError {
                 "blp-dialogue-authentication-required"|"blp-dialogue-policy-required"|"blp-dialogue-policy-stale"|"blp-dialogue-access-denied"
                     if *operation=="preparation-call" && matches!(cause.as_ref(),RootStoreError::Refused(_))=>StatusCode::FORBIDDEN,
                 "preparation-organization-mode-unported" | "preparation-organization-worker-role-required" | "preparation-release-scope-unported" => StatusCode::NOT_IMPLEMENTED,
+                // Only the typed invalidated status observation is a conflict.
+                // Independent close and storage errors keep their own status.
+                "mission-status-observation-changed" if *operation == "read"
+                    && matches!(cause.as_ref(), RootStoreError::MissionStatusChanged { .. }) => StatusCode::CONFLICT,
                 // Declared port boundary of the planning-tree status read, not a server fault.
                 "mission-status-planning-unported" if *operation == "read" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_IMPLEMENTED,
                 "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,
@@ -548,6 +559,19 @@ impl HttpServiceError {
                 | "preparation-revision-requirement-limit"
                 | "preparation-organization-already-configured" | "preparation-organization-contract-changed" | "preparation-organization-history-present" | "preparation-organization-target-invalid" | "preparation-already-released" | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
+                "task-review-file-not-declared" | "task-review-file-unavailable" if *operation == "task-review-files-read"
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_FOUND,
+                "review-revision-conflict" | "task-review-file-digest-changed" if *operation == "task-review-files-read"
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                "task-review-revision-changed" | "task-review-submission-required" | "task-review-human-policy-required"
+                    if *operation == "task-review-preview" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                _ if *operation == "task-review-preview" && matches!(cause.as_ref(),
+                    RootStoreError::Mutation(swarm_engine::WorkEngineError::Lifecycle(
+                        swarm_engine::TaskLifecycleError::Refused(_)
+                        | swarm_engine::TaskLifecycleError::Gate(swarm_engine::GateContractError::Refused(_))
+                    ))) => StatusCode::CONFLICT,
+                "task-actions-task-missing" if matches!(*operation, "task-actions-read" | "task-review-preview") &&
+                    matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_FOUND,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
                 // Read-only PA-09 reconciliation: the typed separation refusal
@@ -749,6 +773,7 @@ pub struct NativeHttpService {
     /// v52 access gate read at start (owner key or authority assertions).
     access: AccessGate,
     probe_shutdown: std::sync::atomic::AtomicBool,
+    task_review_reader: swarm_engine::TaskReviewFileReader,
 }
 /// Read-only identity/readiness probes of the local launcher (`swarm.sh
 /// status|restart`): GET/HEAD of the compiled version and native capabilities
@@ -910,6 +935,7 @@ impl NativeHttpService {
                 cookie_max_age_seconds,
                 access,
                 probe_shutdown:std::sync::atomic::AtomicBool::new(false),
+                task_review_reader: swarm_engine::TaskReviewFileReader::default(),
             }),
             (Err(primary), cleanup) => close(Err(primary), cleanup),
             (Ok((_, binding)), Err(cause)) => {
@@ -980,6 +1006,7 @@ impl NativeHttpService {
                     cookie_max_age_seconds,
                     access,
                     probe_shutdown:std::sync::atomic::AtomicBool::new(false),
+                    task_review_reader: swarm_engine::TaskReviewFileReader::default(),
                 }),
                 Err(cause) => close(Err(root("bootstrap-close", cause)), binding.close()),
             },
@@ -1399,13 +1426,22 @@ impl NativeHttpService {
             "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
             "/api/v1/agent-transcript" => self.agent_transcript(request),
             "/api/v1/agent-logs" => self.agent_logs(request),
+            "/api/v1/agent-logs/task-actions" => self.task_actions(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/agent-logs/task-review-files" => self.task_review_files(request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/agent-logs/orchestration-signals" => self.orchestration_signals(request),
+            "/api/v1/planning/workflow-architecture" => self.workflow_architecture(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),
             "/api/v1/work-budget/apply" => self.work_budget_route(work_budget::Operation::Apply,request),
             "/api/v1/action" => {
+                if matches!(*request.method(), Method::GET | Method::HEAD) {
+                    return self.task_human_review_preview(request);
+                }
                 if request.method() != Method::POST {
-                    return Err(HttpServiceError::Method("POST"));
+                    return Err(HttpServiceError::Method("GET, HEAD, POST"));
                 }
                 let action = task_action(request.body())?;
                 self.task(action)
@@ -1533,7 +1569,9 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     #[cfg(target_os="linux")]
     if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}
-    if let Some(reason)=graph_batch::public_reason(&error){document["failure"]["reason"]=reason.into();}
+    if let Some(reason)=graph_batch::public_reason(&error).or_else(|| task_actions::public_reason(&error)){
+        document["failure"]["reason"]=reason.into();
+    }
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
@@ -1757,6 +1795,10 @@ mod tests {
             ("blp-policy-stale",StatusCode::CONFLICT),
             ("blp-classification-required",StatusCode::CONFLICT),
             ("blp-preparation-provenance-required",StatusCode::CONFLICT),
+            ("preparation-integrity-producer-not-attested",StatusCode::CONFLICT),
+            ("preparation-integrity-engine-bytes-unavailable",StatusCode::CONFLICT),
+            ("preparation-integrity-settings-unavailable",StatusCode::CONFLICT),
+            ("preparation-integrity-project-context-unavailable",StatusCode::CONFLICT),
             ("blp-preparation-parent-mismatch",StatusCode::CONFLICT),
             ("blp-preparation-check-invalid",StatusCode::BAD_REQUEST),
             ("blp-preparation-attribute-invalid",StatusCode::BAD_REQUEST),
@@ -1784,6 +1826,40 @@ mod tests {
             cleanup:Box::new(RootStoreError::Refused("fixture-close-failed")),
         });
         assert_eq!(error.status(),StatusCode::INTERNAL_SERVER_ERROR);
+    }
+    /// A real malformed Trust diagnostic preserves its decoder cause and maps
+    /// to a client error through the same adapter as the bearer HTTP route.
+    /// The isolated Root has no provider and the diagnostic cannot publish.
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn malformed_engine_source_index_is_a_typed_bad_request() {
+        let fixture = swarm_engine::fixture_root("blp-source-index-");
+        let store = RootStore::initialize(&fixture, &mut SystemEnvironment).unwrap();
+        let token = "fixture-admin-token";
+        store.trust_as_principal("config-apply", br#"{
+            "schema_version":1,"event_id":"init","expected_revision":0,"reason":"owned fixture",
+            "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,
+                      "evidence_retention_days":365,"require_separation":true},
+            "identities":[
+                {"subject":"admin","integrity":3,"roles":["admin"],"token":"fixture-admin-token"},
+                {"subject":"worker","integrity":1,"roles":["requester"],"token":"fixture-worker-token"},
+                {"subject":"approver","integrity":2,"roles":["approver"],"token":"fixture-approver-token"}
+            ]
+        }"#, "").unwrap_or_else(|error| panic!("fixture configuration: {error:?}"));
+        let well_formed = br#"{"schema_version":1,"expected_revision":1,
+            "preparation_id":"preparation","turn_id":"turn","engine_source_index":0}"#;
+        let missing_policy = store.trust_as_principal("blp-preparation-check", well_formed, token).err().unwrap();
+        assert_eq!(missing_policy.code(), "blp-policy-required");
+        let request = br#"{"schema_version":1,"expected_revision":1,
+            "preparation_id":"preparation","turn_id":"turn","engine_source_index":-1}"#;
+        let failure = store.trust_as_principal("blp-preparation-check", request, token).err().unwrap();
+        assert!(matches!(&failure,RootStoreError::Preparation(_)));
+        let cause = std::error::Error::source(&failure).unwrap();
+        assert!(cause.source().is_some());
+        let response = root("trust-command", failure);
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(response.code(), "blp-preparation-check-invalid");
+        store.close().unwrap();
     }
     /// Quota validation refusals are client/state/capability responses. Corrupt
     /// history, encoding, clock and settings failures stay server errors; no

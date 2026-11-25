@@ -16,12 +16,17 @@ def main():
     public association/cursor admission and browser states. Preserve original
     outputs and every cleanup error; a failed prerequisite stops dependent work.
     """
-    p=argparse.ArgumentParser();p.add_argument('--binary',required=True);p.add_argument('--output',required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--binary',required=True);p.add_argument('--output',required=True)
+    p.add_argument('--legacy-binary',type=Path,help='Optionally produce a genuine ordinary attempt with a historical executable')
+    a=p.parse_args()
     binary=Path(a.binary).resolve();out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False)
-    owned=fixture.Fixture(binary,out,'logs-web')
+    producer=a.legacy_binary.resolve(strict=True) if a.legacy_binary else binary
+    owned=fixture.Fixture(producer,out,'logs-web')
     program=fixture.PROGRAM.replace("print(json.dumps({'type':'result'", "for i in range(230):\n    print(json.dumps({'type':'assistant','message':{'model':model,'content':[{'type':'text','text':'log witness '+str(i)+' <b>literal</b>'}]}}),flush=True)\nprint(json.dumps({'type':'result'")
     program=program.replace("'model':model,'content'","'model':model,'usage':{'input_tokens':3,'output_tokens':2},'content'",1)
     fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700)
+    if not a.legacy_binary:
+        owned.configure_team()
     prepared=owned.prepare()
     other=owned.ok(['work','create'],dict(schema_version=1,event_id='empty-work',expected_revision=0,title='Empty log mission',objective='Read only',scope='Owned fixture',criteria=['No agents']))['work']['id']
     def stored_agent():
@@ -45,6 +50,7 @@ def main():
         import rust_agent_transcript_http
         rust_agent_transcript_http.before_execution(server,owned.work)
         owned.run_and_assert(prepared)
+        owned.binary=binary
         before=owned.ok(['work','show',owned.work]);agent_before=owned.ok(['agent','show','session']);agent_bytes=stored_agent();budget=server.request('/api/v1/work-budget?work='+owned.work,observe=False)
         base='/api/v1/agent-logs?work='+owned.work+'&agent=session&after='
         pages={}
@@ -80,8 +86,11 @@ def main():
         after_agent=owned.ok(['agent','show','session']);check('agent-record-unchanged',stored_agent()==agent_bytes and all(after_agent[k]==agent_before[k] for k in ['agent','desired','observed_status']))
         check('budget-unchanged',server.request('/api/v1/work-budget?work='+owned.work,observe=False)==budget)
         import rust_status_incomplete
-        rust_status_incomplete.verify(server,owned,check)
-        rust_status_incomplete.verify_abandoned(server,owned,check)
+        if a.legacy_binary:
+            rust_status_incomplete.verify(server,owned,check)
+            rust_status_incomplete.verify_abandoned(server,owned,check)
+        else:
+            rust_status_incomplete.verify_scoped_abandon_refused(server,owned,check)
         fixture.publish(out/'http-result.json',dict(status='PASS',checks=checks,binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),global_watchdog=None,scope='Owned CLI fixture, one inert process; no real provider'))
         print('AGENT_LOGS_HTTP_UI_PASS '+str(len(checks))+' HTTP assertions',flush=True)
     except BaseException as e:primary=e

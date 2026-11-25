@@ -146,6 +146,8 @@ peut servir aux deux si ses capacités le permettent.
 
 ## 3. Préparer une mission
 
+Dans la conversation de préparation, ouvrez **Choisir l’architecture du workflow** pour [demander un avis IA ou le réévaluer](docs/architecture/NATIVE-AGENT-EXCHANGES.md#auditer-et-réévaluer-le-choix-avec-lia). Relisez le brouillon et envoyez-le. Vous gardez la décision d’adoption.
+
 Depuis le cockpit, choisissez **Préparer un projet**.
 Décrivez le résultat attendu, le dossier concerné, les limites et la façon de
 vérifier la réussite. Exemple à adapter :
@@ -205,6 +207,52 @@ Après **Relire et autoriser le démarrage**, ouvrez le pilotage et utilisez
 **Lancer la mission**. Relisez le fournisseur, le dossier, les créneaux et les
 limites avant confirmation. L’autorisation du plan et le lancement sont deux étapes.
 
+Chaque travail s’ouvre sur le canevas de son orchestrateur principal. Son
+périmètre `root` existe dès la création. Tant que l’équipe reste à
+configurer, le canevas indique les rôles en attente. La création et l’ajout
+de tâches ne déclenchent aucun fournisseur.
+
+Le moteur exige une équipe configurée pour tout départ. Le départ automatique
+est refusé avant enregistrement du consentement. Le départ manuel est refusé
+avant réservation et l’équipe est revérifiée avant l’exécution. La capacité du
+vérificateur et les contrôles de la tâche restent requis.
+
+### Rattacher une équipe à un projet existant
+
+Sur un travail ordinaire sans départ autorisé ni activité en cours, la commande
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` rattache
+l’équipe sans créer une mission. Le document indique la révision attendue, le
+fournisseur du planificateur et du réviseur, les budgets de planification et
+`task_scopes`, qui affecte chaque tâche existante à un sous-planificateur.
+Chaque tâche doit déjà avoir une politique de validation autorisée et des critères.
+Les politiques humaines et automatiques peuvent coexister. La politique
+existante couvre les critères identiques affectés à une tâche enfant qui reste
+dans le plan. Fournir dans `checks` les contrôles des exigences racines et des
+autres exigences sans couverture. Une future tâche peut hériter de ces contrôles
+explicites selon les règles de planification.
+L’opération conserve les dépendances, statuts, tentatives et résultats existants.
+Une liste incomplète ou une activité en cours refuse toute l’écriture.
+
+Le champ facultatif `task_workspaces` associe des tâches à des répertoires
+existants dans le projet. Des espaces distincts permettent au conducteur de faire
+avancer des branches indépendantes selon leurs dépendances, leurs autorisations et
+les créneaux disponibles. Le rattachement n’enregistre aucun consentement au départ.
+Pour un dépôt géré, fournissez `repository` avec un chemin local et
+`committed_only: true`. Swarm épingle le commit existant et refuse la
+combinaison avec des espaces personnalisés ou une demande d’inclure des
+modifications hors commit. Les copies par tentative sont préparées au départ.
+Une fin native échouée ou interrompue et vérifiable est remise au périmètre
+rattaché. Le superviseur reçoit l’original attribué. La tentative historique
+et le statut de la tâche sont conservés. Cette remise n’autorise aucune relance.
+Le cockpit lit les tentatives ordinaires terminées avant rattachement depuis
+leur reçu natif, y compris une sortie de code zéro. La tâche conserve son état
+et reste soumise à sa validation. Une preuve historique absente ou incohérente
+laisse l’état opérationnel indisponible.
+Le lancement et la validation utilisent ensuite les commandes habituelles.
+Si la révision change pendant un aperçu de départ, le conducteur relit le
+projet au cycle suivant lorsque le moteur confirme qu’aucune admission n’a été
+tentée. La file déjà synchronisée est conservée.
+
 Le nombre de créneaux fixe un maximum de tentatives simultanées. Des dépendances
 non validées ou un dossier déjà occupé peuvent réduire le parallélisme réel.
 **Lancer tout** démarre les tâches prêtes à cet instant ; pour un enchaînement
@@ -245,6 +293,58 @@ filtres et sélection ne changent pas la révision métier.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
 - Les liens de responsabilité relient les rôles à leurs périmètres. Ne déduisez
   pas le sens d’un lien de sa seule couleur ou de son seul style : lisez sa légende.
+- Les boutons **Graphe des tâches** et **Équipe et validation** sont en haut
+  du panneau affiché et restent accessibles en plein écran. Sélectionner l’équipe
+  quitte le plein écran. Sur écran étroit en plein écran, ouvrez **Aide des gestes**
+  pour les raccourcis. **Graphe des tâches** montre les dépendances, les états
+  et les commandes du graphe. Les cartes de rôles y montrent l’orchestrateur
+  principal en bleu ◆, les sous-orchestrateurs en ambre ↳ et le validateur
+  indépendant configuré en vert ✓. La légende distingue dépendance, délégation,
+  affectation et revue configurée. Sur un plan organisé, le graphe s’ouvre sur les orchestrateurs.
+  Les délégations sont alignées par niveau. Activez une carte pour isoler le
+  chemin du principal jusqu’à son périmètre, ou **Afficher tous les agents et tâches**
+  pour la vue complète. Les flèches grises relient l’orchestrateur aux tâches
+  affichées par des courbes qui partagent un trajet au départ d’un même périmètre. La carte de tâche indique l’agent observé quand le moteur le fournit.
+  Un second clic sur le même orchestrateur, ou **Remonter aux orchestrateurs**,
+  revient à la vue initiale. Le validateur indépendant configuré apparaît en vert
+  auprès de l’orchestrateur principal dans le périmètre ouvert ou la vue complète. Glissez la carte pour la déplacer ou utilisez les flèches du clavier
+  quand elle a le focus. Les points colorés accompagnent les états. Le contour animé suit
+  Dans un périmètre, les tâches sont rangées par niveau de dépendance. Les
+  affectations partagent une ligne au-dessus des rangées et les prérequis
+  arrivent par la droite. Les cartes omettent le préfixe répété d’un titre. Le
+  titre complet reste dans la recherche et dans le libellé de la carte.
+  La mini-carte apparaît dans la vue complète pour laisser les cartes dégagées
+  dans les autres niveaux.
+  l’exécution confirmée. L’en-tête indique l’organisation
+  hiérarchique enregistrée quand des sous-orchestrateurs sont rattachés au
+  principal. Il affiche aussi l’avis du moteur et son état de validation.
+  **Localiser une dépendance** centre la vue
+  sur chaque flèche de prérequis à tour de rôle. Le repère bleu **En action** correspond à une
+  exécution confirmée. Le contour bleu défile tant que cet état est affiché.
+  **Suspendre l’animation** permet de l’immobiliser. La préférence système de
+  mouvement réduit s’applique également. Le rouge **Arrêtée** correspond à une tentative interrompue ou en
+  échec, et l’ambre **En pause** à une tâche à faire dans une mission en pause.
+  Le gris **Activité à confirmer** signale qu’une tentative enregistrée en cours
+  n’a pas d’observation actuelle d’exécution. Les tâches rattachées reprennent
+  ces mêmes repères. Pour les orchestrateurs, le repère décrit la pause des
+  départs ou l’absence de confirmation individuelle. Le repère du vérificateur
+  peut indiquer une revue en cours. **Équipe et validation** affiche l’observation du
+  conducteur et le vérificateur indépendant configuré. **Équipe et périmètres**
+  présente l’orchestrateur principal, les sous-orchestrateurs et leurs tâches.
+  Chaque sous-orchestrateur a un parent et reçoit des exigences et des tâches
+  attribuées à son périmètre. Les incidents qui dépassent ce périmètre
+  relèvent du parent. Les sous-orchestrateurs de même niveau restent des branches
+  distinctes. Les flèches de tâches indiquent leurs prérequis. La
+  raison courante fournie par le moteur figure dans les tâches rattachées et le
+  libellé des cartes. Sous chaque tâche rattachée figurent les contrôles
+  configurés, les verdicts du reçu, l’avis indépendant enregistré et, si le
+  moteur le fournit, l’état de la validation actuelle. En lecture historique, le détail opérationnel est
+  indisponible. Si l’équipe n’est pas rattachée, le graphe l’indique.
+
+En CLI, `swarm-rust planning graph ID --root ROOT --json` expose les
+périmètres et parents, le validateur, les prérequis et les identifiants des
+contrôles. Une observation absente du conducteur est représentée par `null`.
+Cette commande de lecture ne donne aucun consentement au départ.
 - **Horizontale / Verticale** change l’orientation, **Simplifiées / Détaillées**
   change les informations visibles. Aucun de ces réglages ne réordonne le travail.
 - **+ / −** replie ou déplie une branche. Cela ne supprime aucune tâche.
@@ -288,6 +388,64 @@ Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le rep
 ![Liste détaillée des trois tâches de démonstration](docs/screenshots/agents-liste.png)
 
 </details>
+
+### Valider une tâche soumise
+
+Dans la synthèse **Conduite**, choisissez **Voir** sous **À vérifier** pour
+ouvrir le détail. Une tâche soumise en revue humaine affiche **Valider**.
+Le moteur vérifie la révision et les preuves requises. Pour une tâche
+planifiée, celles-ci comprennent un avis indépendant d’origine et une preuve
+de livraison à jour. Le détail indique le motif d’un blocage.
+
+Cliquez sur **Valider** après avoir relu le livrable. Le bouton utilise les droits
+de modification de la mission. Le détail confirme l’état après l’avoir relu
+depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
+actualisez la mission avant de reprendre.
+
+La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
+est illisible, les autres pièces restent dans **Livrables**.
+Si la mission change pendant la lecture, actualisez-la pour ouvrir les fichiers
+de sa nouvelle révision.
+En passant d’un livrable à l’autre, le serveur vérifie et lit le fichier choisi
+en réutilisant l’enregistrement décodé de la mission tant que ses octets restent identiques.
+Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
+referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
+tâche. Monaco offre une recherche en lecture seule. Les originaux Word,
+OpenDocument et PDF disponibles se téléchargent. Si une lecture échoue,
+**Réessayer** relance la lecture concernée. Les pièces protégées utilisent les
+droits de la vue Journaux. **Valider** et son motif restent au-dessus du lecteur.
+En cas de refus, **Diagnostic** montre le code du moteur.
+
+Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un
+livrable, lire le motif d’une validation bloquée et retrouver Journaux ou
+Reprise. Les raccourcis ouvrent les vues accessibles. **Échap** referme l’aide.
+
+### Suivre une remontée entre orchestrateurs
+
+Dans **Conduite → Équipe et validation**, ouvrez **Remontées de statut** avec
+un compte qui a accès aux Journaux. **Transmis** date le dépôt dans la boîte
+du destinataire. **Reçu dans le contexte** indique l’activation enregistrée qui
+contient le signal. **Traité** indique une décision appliquée qui le cite.
+Ouvrez **Voir les preuves** pour les références. Le traitement d’une remontée
+peut être un acquittement sans opération. La lecture ne relance rien.
+
+### Ouvrir le fichier d’actions d’une tâche
+
+Dans **Conduite**, le bouton **Actions** sur la carte ouvre le plan de la tâche,
+ses tentatives et les ajustements enregistrés. L’instruction de départ
+reste lisible lorsque la remise modifie la prochaine action. Cliquez sur une action pour lire
+sa catégorie et son résultat observé. **Télécharger le fichier JSON** exporte
+la même lecture. Le compte doit avoir accès à la vue **Journaux**. Une tâche
+qui attend votre acceptation affiche **En attente
+de votre revue humaine** dans le fichier.
+
+Swarm rapproche les événements d’outil déclarés par le fournisseur. Le dernier
+relevé de supervision peut précéder l’action en cours. Le reçu de fin indique
+les résultats observés. Les anciens reçus peuvent manquer de détails. Les
+arguments d’outils, les chemins bruts et les sorties privées restent hors du
+fichier. Une observation partielle reste signalée. Les lectures et exports
+ne déclenchent aucune action métier.
 
 ## 6. Comprendre les états et valider
 

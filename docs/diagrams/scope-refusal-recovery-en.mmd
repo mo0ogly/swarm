@@ -1,0 +1,23 @@
+flowchart TB
+    accTitle: Child scope refusal and recovery in Swarm
+    accDescr: The engine retains the child refusal. The root receives a safe notice and acknowledges planning recovery.
+    E_CHILD["Native sub-orchestrator proposal"]
+    E_REFUSAL["Authority refusal retained in the child scope"]
+    E_NOTICE["Root notice, scope and safe code"]
+    E_WAIT["Child planning waits for acknowledgment"]
+    E_ROOT["Root orchestrator decision"]
+    E_CHECK["Engine verifies recovery"]
+    E_RESUME["Child planning becomes eligible again"]
+    E_CHILD -->|"out-of-scope refusal"| E_REFUSAL
+    E_REFUSAL -->|"same recorded operation"| E_NOTICE
+    E_REFUSAL --> E_WAIT
+    E_NOTICE --> E_ROOT
+    E_ROOT -->|"acknowledgment"| E_CHECK
+    E_WAIT --> E_CHECK
+    E_CHECK -->|"checks pass"| E_RESUME
+    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
+    classDef data fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+    class E_CHECK core;
+    class E_REFUSAL,E_NOTICE data;
+    class E_CHILD,E_WAIT,E_ROOT,E_RESUME ordinary;

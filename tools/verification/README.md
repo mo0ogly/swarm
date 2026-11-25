@@ -1,5 +1,43 @@
 # Recettes permanentes / Permanent verification recipes
 
+**Remontées de statut** — `recipes/orchestration-signals.json` utilise le
+binaire Rust de livraison indiqué par `SWARM_SIGNALS_BINARY`. Elle suit
+l’escalade native d’un sous-orchestrateur, la décision du parent et l’affichage
+protégé du même événement. Fournisseur inerte, Root et preuves isolés.
+
+**Status updates** — `recipes/orchestration-signals.json` takes a delivered
+Rust binary in `SWARM_SIGNALS_BINARY`. It follows native child escalation,
+the parent decision, and the protected display of that same event. It uses
+an inert provider and isolated Root and evidence.
+
+
+**Fichier d’actions** — `recipes/task-actions.json` prend un Swarm Rust livré
+dans `SWARM_ACTIONS_BINARY`. Elle vérifie la lecture avant tentative, le relevé
+pendant l’appel, le reçu terminal, les modales et le fichier effectivement
+téléchargé avec Chrome, puis l’attente humaine. Le fournisseur est inerte et
+l’acceptation prématurée est refusée. Préparer un répertoire de preuves neuf
+sur le volume gouverné et utiliser un Root de recette isolé.
+
+**Task action file** — `recipes/task-actions.json` takes a delivered Rust
+Swarm in `SWARM_ACTIONS_BINARY`. It checks the pre-attempt read, in-flight
+observation, terminal receipt, dialogs, Chrome download, and human review
+wait. An inert provider is used and premature acceptance is refused. Use a
+fresh evidence directory on the governed volume and an isolated recipe Root.
+
+
+T4.06 : `recipes/t406-last-use-matrix.json` exerce les 768 verdicts du
+catalogue BLP de fixture (quatre niveaux, deux compartiments et trois parcours),
+le refus d'engagement Trust à l'échéance ou après changement de révision, et
+l'invalidation de l'accord Git après changement de révision. Le témoin Trust
+observe un connecteur simulé. Utiliser une cible Cargo de test admise et un
+répertoire de preuves neuf.
+
+T4.06: `recipes/t406-last-use-matrix.json` checks all 768 verdicts for the BLP
+fixture catalogue (four levels, two compartments and three operations),
+Trust commit refusal at expiry or after revision change, and Git agreement
+invalidation after revision change. The Trust control uses a simulated
+connector. Use an admitted Cargo test target and a fresh evidence directory.
+
 Recette capture PAEA : `recipes/paea-capture-reader.json` vérifie les gardes
 `paea_capture_*` du témoin approval-web (27 noms attendus dans la recette ;
 ce compte est une attente, pas une preuve d'exécution). Le refus d'attente du
@@ -1144,6 +1182,30 @@ cover a positive witness, ignored tools, failed components and exclusive history
 This is PATH observation plus declared dependency checking, not a hermetic process
 graph against absolute nested tool paths. No model, deployment or watchdog right
 is created. Historical archive tests remain a separate explicit legacy target.
+
+Manual native admission fixtures prepare the team through public Work mutations.
+When a CLI case runs a provider, it gives the provider a workspace below the
+fixture Root and observes process readiness and termination with workspace FIFOs
+and a CLI pidfd. The catalogue entry for the team stays frozen when a case
+changes the worker provider. The retained integration results distinguish
+admission, process execution, budget settlement and task acceptance.
+
+Les fixtures d’admission manuelle native déclarent l’équipe par les opérations
+publiques Work. Les essais CLI qui démarrent un fournisseur lui réservent un
+espace sous la racine de la fixture. Ils observent sa disponibilité par des
+FIFO dans cet espace et la fin de la CLI par pidfd. Modifier le fournisseur
+worker conserve l’entrée de catalogue de l’équipe. Les preuves distinguent
+admission, exécution, règlement budgétaire et acceptation de la tâche.
+
+The engine admission recipe uses the same team setup. Summary source, preview
+and admission checks include a valid selected dialogue and a cross-scope
+refusal. The parent-death witness binds the provider PID reported from its
+workspace FIFO to the saved session identity before observing actual reap.
+
+La recette moteur reprend la même déclaration d’équipe. Les contrôles des
+sources, de la prévisualisation et de l’admission couvrent le dialogue autorisé
+et le refus interbranche. La recette de mort du superviseur lie le PID annoncé
+dans la FIFO à l’identité enregistrée avant d’observer l’arrêt du processus.
 
 Native141 follow-up: five generator guards now use the versioned32-type wire
 contract and exact rustfmt-normalized Rust regeneration, with .go reads denied.
@@ -3272,6 +3334,16 @@ compilation, ni la provenance de livraison du fichier, ni l'installation du
 service, la séparation UID ou une mission vivante acceptée.
 
 
+For the controlled delivered-settlement recipe, `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`
+requires the private `TMPDIR` effective in the test process. The supported
+Cargo launcher may replace the recipe runner's initial temporary directory
+with its admitted scratch. Both fixture allocators validate the private
+parent before allocation and emit placement witnesses. Missing or invalid
+scratch fails before allocation in this mode. Direct test invocations with
+the mode unset keep the historical private fallback. The launcher owns
+volume admission and descriptor retention. Select the Cargo target through
+the launcher's existing configuration or an admitted target override.
+
 Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
 runs the second domain (separate fictitious ledger) through the same one
 designated delivered ELF. With fresh isolated owned project/ledger roots and the
@@ -3321,6 +3393,15 @@ fail the test — and the public reconciliation journal stays `consistent` with
 `effectCount=1`, the exact provisioned terms and the debt settled once, also
 read through SQLite connections opened read-only separately from the CLI. No
 UID separation, real payment or independent acceptance is claimed by this case.
+
+La recette contrôlée du règlement livré fixe `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`.
+Les deux allocateurs vérifient le `TMPDIR` privé effectif du processus de test
+avant allocation et consignent leur parent. Le lanceur Cargo pris en charge
+peut remplacer le répertoire initial de la recette par son aire temporaire
+admise. En mode contrôlé, un parent absent ou invalide bloque l’allocation.
+L’appel direct sans ce mode conserve le repli privé historique. Le lanceur
+assure l’admission du volume et la conservation du descripteur. La cible Cargo
+vient de la configuration du lanceur ou d’une cible explicite admise.
 
 Chaîne de règlement fictif sur binaire livré : la recette
 `recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine
@@ -5092,6 +5173,101 @@ arbitraire. Cette fixture unitaire ne prouve ni fournisseur natif, ni approbatio
 E2E, ni acceptation indépendante. Garder le rouge original et un vert frais ;
 `recipe.py verify` contrôle l’intégrité, pas la livraison. Publication source
 complète et approbation protégée restent des vérifications distinctes.
+
+## Recette locale P02
+
+Linux, Python 3.11 ou ultérieur et Cargo hors ligne verrouillé. Exécuter depuis
+la racine du dépôt avec une cible Cargo admise et un répertoire de preuves neuf
+dont le parent existe. La recette compile un exemple réservé au banc, observe
+son empreinte, puis rejoue la qualification et le pilote sur des factures
+fictives dans deux racines isolées. Le résultat contient les décisions
+simulées et le contrôle de clôture. Les empreintes et le reçu sont des preuves
+locales de recette. Aucune mission ni aucun fournisseur n’est lu ou appelé.
+
+Linux, Python 3.11 or later and locked, offline Cargo are required. Run from
+the repository root with an admitted Cargo target and a fresh evidence
+directory whose parent exists. The recipe builds and hashes a fixture-only
+example, then runs qualification and the pilot with fictional invoices in two
+isolated Roots. Its output includes simulated decisions and closure checks.
+The receipt and hashes are local fixture evidence. The recipe reads no mission
+and calls no provider.
+
+```sh
+python3 tools/verification/recipe.py run --recipe tools/verification/recipes/p02-pilot-simulated.json --output /CHEMIN/NEUF
+python3 tools/verification/recipe.py verify --evidence /CHEMIN/NEUF
+python3 -B tests/p02_pilot/run.py --verify-output /CHEMIN/NEUF/step-0001.stdout
+```
+
+Le contrôle automatique P02 appelle `make check-p02-pilot`. Cette cible
+exécute la recette, contrôle les empreintes et recalcule la décision de clôture
+depuis le dossier conservé. La CI conserve ce dossier comme artefact. Pour
+refaire le même contrôle en local, indiquer un chemin neuf. Pour relire
+seulement un dossier existant, utiliser `make verify-p02-pilot`.
+
+The automatic P02 check calls `make check-p02-pilot`. It executes the recipe,
+verifies evidence hashes and recomputes closure from the retained output. CI
+retains the evidence directory as an artifact. Use a fresh path to run the same
+check locally, or `make verify-p02-pilot` to check existing evidence only.
+
+```sh
+make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
+```
+
+### Validation humaine depuis le détail / Human approval from task details
+
+La recette `task-detail-human-review` utilise le binaire natif de production
+fourni par `SWARM_STATUS_CONTRACT_BINARY` et un nouveau répertoire de fixture
+sur le volume admis, fourni par `SWARM_TASK_REVIEW_FIXTURE`. Elle crée une
+tâche isolée via la CLI. Le navigateur vérifie le motif visible lorsque la preuve
+de livraison manque, pendant le blocage artificiel de la lecture annexe.
+Il vérifie aussi l’aide du cockpit en FR/EN, le retour du focus par Échap,
+le raccourci Conduite et l’absence d’écriture à l’ouverture de l’aide.
+Le contrôle GitHub `checks` utilise la même recette sur le cockpit embarqué.
+La recette historique du cockpit inclut le lecteur dans son inventaire strict de scripts.
+Les réponses d’inventaire et du rapport sont des doubles explicites dans le
+navigateur pour vérifier le rapport ouvert en premier dans Monaco, la recherche,
+le lecteur mobile et la reprise d’une lecture indisponible. Les sondes HTTP
+de refus et les écritures de validation restent natives.
+Le premier affichage doit réutiliser le rapport fourni par l’inventaire.
+Une réouverture explicite relit le fichier. Un rapport en erreur laisse les
+autres pièces accessibles.
+Le contrôle unitaire `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+vérifie séparément la comparaison de la révision et des octets de la mission.
+Il vérifie aussi que deux lectures identiques réutilisent le même décodage et
+qu’une divergence à révision égale impose un nouveau décodage. Les lectures de
+fichiers et leurs contrôles ne sont pas mis en cache.
+Sur le parcours français, la sélection d’une autre pièce déclenche uniquement
+sa lecture et conserve l’inventaire. Le navigateur utilise une réponse contrôlée.
+Avec la preuve rattachée, il valide la tâche et relit le
+nouvel état après un seul enregistrement. La recette vérifie aussi le refus
+d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
+projet, ou son chemin via `NODE_PATH` dans un worktree sans dépendances locales.
+
+The `task-detail-human-review` recipe uses the production native binary supplied
+via `SWARM_STATUS_CONTRACT_BINARY` and a new fixture directory on the admitted
+volume supplied via `SWARM_TASK_REVIEW_FIXTURE`. It creates an isolated task via
+the CLI. The browser checks the reason shown when delivery evidence is missing while an auxiliary read is
+held. Explicit browser doubles for the file list and report exercise the default
+Monaco report, search, the mobile reader and recovery from a failed read.
+It checks that the inventory response supplies the initial report without a
+second request, that explicit reopening revalidates it, and that a report
+error leaves the rest of the inventory available.
+The unit test `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+separately checks the mission revision and body comparison.
+It also checks reuse of an identical decoded record and a fresh decode when bytes
+change at the same revision. File data and evidence checks remain uncached.
+The French browser path selects a different item and checks that only its
+original is requested, using a controlled response.
+The browser also checks cockpit help in FR/EN, Escape and focus return,
+the Dispatch shortcut and opening help without a write.
+The GitHub `checks` job runs this recipe against the embedded cockpit.
+The existing cockpit recipe includes the reader in its strict script inventory.
+HTTP refusal probes and approval writes use the native service.
+With evidence attached, it approves the task and reads back the resulting state
+after one recorded operation. The recipe checks stale revision and missing CSRF
+refusals. Node uses the project's Puppeteer installation, or its path through
+`NODE_PATH` in a worktree without local dependencies.
 
 
 ### C3-P — observation Python du résolveur et du placement / Python resolution and placement observation

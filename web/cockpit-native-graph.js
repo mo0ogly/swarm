@@ -3,7 +3,248 @@
   const t = (source) => globalThis.SwarmI18n?.t ? globalThis.SwarmI18n.t(source) : source;
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const VIEW_PREFIX = 'swarm-native-graph-view:v1:';
+  const ACTIVITY_LABELS = {
+    paused: 'En pause',
+    stopped: 'Arrêtée',
+    running: 'En action',
+    unconfirmed: 'Activité à confirmer',
+  };
   let refreshWork = null;
+
+  const ACTION_FAMILIES = {read:'Lecture', write:'Modification', command:'Commande',
+    search:'Recherche', tool:'Outil'};
+  const ACTION_RESULTS = {pending:'Résultat non observé', succeeded:'Succès observé',
+    failed:'Échec observé'};
+
+  /** Open a read-only modal and restore focus to the invoking control.
+   * Native dialog isolation also works above the fullscreen graph.
+   */
+  function actionsDialog(id, title, opener) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'native-graph-editor native-task-actions';
+    dialog.setAttribute('aria-labelledby', id);
+    const header = document.createElement('header');
+    const heading = document.createElement('h2');
+    heading.id = id;
+    heading.textContent = title;
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = t('Fermer');
+    close.addEventListener('click', () => dialog.close());
+    header.append(heading, close);
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    dialog.append(header, body);
+    document.body.append(dialog);
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      if (opener.isConnected) opener.focus({preventScroll:true});
+    }, {once:true});
+    dialog.showModal();
+    close.focus();
+    return {dialog, body};
+  }
+
+  /** Append one labeled observation as text. Missing values keep their label
+   * out of the view. Captured content never enters markup or an executable URL.
+   */
+  function journalField(parent, label, value) {
+    if (value == null || value === '') return;
+    const line = document.createElement('p');
+    const name = document.createElement('strong');
+    name.textContent = t(label);
+    line.append(name, document.createTextNode(' · ' + value));
+    parent.append(line);
+  }
+
+  /** Append a notice whose label is the complete translated text. */
+  function journalNote(parent, label) {
+    const line = document.createElement('p');
+    line.textContent = t(label);
+    parent.append(line);
+  }
+
+  /** Show the attributed, provider-declared details of one recorded action.
+   * The modal does not run or repeat actions and issues no request.
+   */
+  function showAction(action, attempt, opener) {
+    const {body} = actionsDialog('native-task-action-title', t('Action') + ' ' + action.number, opener);
+    journalField(body, 'Tentative', attempt.id);
+    journalField(body, 'Type', t(ACTION_FAMILIES[action.family] ?? 'Outil'));
+    journalField(body, 'Résultat observé', t(ACTION_RESULTS[action.outcome] ?? 'Résultat non observé'));
+  }
+
+  /** Display and export the same authenticated task journal. Invalid or denied
+   * reads keep their safe code visible. Closing aborts the pending read.
+   * Nothing is written to the mission or to browser storage.
+   */
+  async function showTaskActions(work, task, opener) {
+    const {dialog, body} = actionsDialog('native-task-actions-title', t('Fichier d’actions') + ' · ' + task.id, opener);
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.textContent = t('Chargement…');
+    body.append(status);
+    const controller = new AbortController();
+    dialog.addEventListener('close', () => controller.abort(), {once:true});
+    try {
+      const query = new URLSearchParams({work:work.id, task:task.id});
+      const response = await fetch('/api/v1/agent-logs/task-actions?' + query, {
+        credentials:'same-origin', headers:{Accept:'application/json'}, signal:controller.signal
+      });
+      const file = await response.json();
+      if (!response.ok) {
+        const code = file?.failure?.code ?? file?.error;
+        throw new Error(typeof code === 'string' && /^[a-z0-9_.-]+$/.test(code) ? code : 'task-actions-read-refused');
+      }
+      if (file?.schema_version !== 1 || file.work !== work.id || file.task !== task.id ||
+          !Array.isArray(file.plan?.criteria) || !Array.isArray(file.plan?.depends) ||
+          typeof file.review?.awaiting_human !== 'boolean' || !Array.isArray(file.attempts) ||
+          !Array.isArray(file.adjustments?.instructions) || !Array.isArray(file.adjustments?.restarts)) {
+        throw new Error('task-actions-response-invalid');
+      }
+      if (controller.signal.aborted || !dialog.open) return;
+      status.remove();
+      const section = label => {
+        const heading = document.createElement('h3');
+        heading.textContent = t(label);
+        body.append(heading);
+      };
+      const download = document.createElement('a');
+      download.textContent = t('Télécharger le fichier JSON');
+      const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2) + '\n'], {type:'application/json'}));
+      download.href = url;
+      download.download = task.id + '-actions.json';
+      dialog.addEventListener('close', () => URL.revokeObjectURL(url), {once:true});
+      body.append(download);
+      if (file.review.awaiting_human) {
+        const notice = document.createElement('p');
+        notice.className = 'notice info';
+        notice.textContent = t('En attente de votre revue humaine.');
+        body.append(notice);
+      }
+      section('Plan de la tâche');
+      journalField(body, 'Titre', file.plan.title);
+      journalField(body, 'Livrable', file.plan.deliverable);
+      journalField(body, 'Critères', file.plan.criteria.join(' · '));
+      journalField(body, 'Prérequis', file.plan.depends.join(' · '));
+      journalField(body, 'Instruction de départ enregistrée', file.plan.planned_next);
+      journalField(body, 'Prochaine action', file.plan.next);
+      for (const [key, label] of [['entry', 'Condition de départ'], ['proof', 'Preuve'], ['validation', 'Validation'], ['stop', 'Condition d’arrêt']]) {
+        journalField(body, label, file.plan.approved?.step?.[key]);
+      }
+      section('Actions exécutées');
+      if (file.attempts.length === 0) journalNote(body, 'Aucune tentative enregistrée.');
+      for (const attempt of file.attempts) {
+        const group = document.createElement('section');
+        journalField(group, 'Tentative', attempt.id);
+        if (attempt.source === 'last_heartbeat') journalNote(group, 'Dernier relevé enregistré.');
+        if (attempt.observation == null) {
+          journalNote(group, 'Détail des actions indisponible pour cette tentative.');
+        } else {
+          if (attempt.observation.partial || attempt.output_complete === false) {
+            journalNote(group, 'Observations partielles.');
+          }
+          if (attempt.observation.actions.length === 0) journalNote(group, 'Aucune action d’outil observée.');
+          const list = document.createElement('ul');
+          for (const action of attempt.observation.actions) {
+            const row = document.createElement('li');
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = t('Action') + ' ' + action.number + ' · ' + t(ACTION_FAMILIES[action.family] ?? 'Outil') +
+              ' · ' + t(ACTION_RESULTS[action.outcome] ?? 'Résultat non observé');
+            button.addEventListener('click', () => showAction(action, attempt, button));
+            row.append(button);
+            list.append(row);
+          }
+          group.append(list);
+        }
+        body.append(group);
+      }
+      section('Ajustements');
+      const changes = [...file.adjustments.instructions, ...file.adjustments.restarts,
+        ...(file.adjustments.decisions ?? [])];
+      if (changes.length === 0) journalNote(body, 'Aucun ajustement enregistré.');
+      for (const change of changes) {
+        journalField(body, 'Date', change.at);
+        journalField(body, 'Motif', change.reason);
+        journalField(body, 'Consigne', change.instruction);
+        const state = {applied:'Appliquée', rejected:'Rejetée'}[change.state];
+        if (state) journalField(body, 'État', t(state));
+        journalField(body, 'Tentative', change.attempt);
+      }
+    } catch (cause) {
+      if (controller.signal.aborted || !dialog.open) return;
+      body.replaceChildren(status);
+      status.className = 'notice alert';
+      status.textContent = t('Fichier d’actions indisponible.') + ' (' +
+        (cause instanceof Error && /^[a-z0-9_.-]+$/.test(cause.message) ? cause.message : 'task-actions-read-failed') + ')';
+    }
+  }
+
+  const SIGNAL_LABELS = {
+    scope_closed:'Périmètre clôturé',
+    scope_authority_refused:'Arbitrage demandé',
+    attempt_ended:'Fin de tentative',
+    handoff:'Rapport remis',
+  };
+
+  /** Show one read-only timeline. A prepared context and an applied decision
+   * have separate evidence. Closing cancels the outstanding observation.
+   */
+  async function showOrchestrationSignals(work, opener) {
+    const {dialog, body} = actionsDialog('native-orchestration-signals-title', t('Remontées de statut'), opener);
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.textContent = t('Chargement…');
+    body.append(status);
+    const controller = new AbortController();
+    dialog.addEventListener('close', () => controller.abort(), {once:true});
+    try {
+      const response = await fetch('/api/v1/agent-logs/orchestration-signals?' + new URLSearchParams({work:work.id}), {
+        credentials:'same-origin', headers:{Accept:'application/json'}, signal:controller.signal
+      });
+      const value = await response.json();
+      if (!response.ok) {
+        const code = value?.failure?.code ?? value?.error;
+        throw new Error(typeof code === 'string' && /^[a-z0-9_.-]+$/.test(code) ? code : 'orchestration-signals-refused');
+      }
+      if (value?.schema_version !== 1 || value.work !== work.id || !Array.isArray(value.signals)) {
+        throw new Error('orchestration-signals-invalid');
+      }
+      if (controller.signal.aborted || !dialog.open) return;
+      status.remove();
+      journalField(body, 'Révision', value.revision);
+      if (value.signals.length === 0) journalNote(body, 'Aucune remontée enregistrée.');
+      for (const event of value.signals) {
+        const section = document.createElement('section');
+        section.className = 'orchestration-signal';
+        const heading = document.createElement('h3');
+        const label = Object.hasOwn(SIGNAL_LABELS, event.kind) ? SIGNAL_LABELS[event.kind] : 'Remontée';
+        heading.textContent = t(label) + ' · ' + (event.from || t('Source non établie')) + ' → ' + event.to;
+        section.append(heading);
+        journalField(section, 'Transmis', event.at);
+        journalField(section, 'Reçu dans le contexte', event.received?.at || t('Réception non établie'));
+        journalField(section, 'Traité', event.processed?.at || t('Décision non établie'));
+        const proof = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = t('Voir les preuves');
+        proof.append(summary);
+        journalField(proof, 'Événement', event.id);
+        journalField(proof, 'Message', event.message);
+        journalField(proof, 'Activation', event.received?.claim);
+        journalField(proof, 'Décision', event.processed?.decision);
+        journalField(proof, 'Motif', event.processed?.reason);
+        section.append(proof);
+        body.append(section);
+      }
+    } catch (cause) {
+      if (controller.signal.aborted || !dialog.open) return;
+      body.replaceChildren(status);
+      status.className = 'notice alert';
+      status.textContent = t('Remontées indisponibles.') + ' (' +
+        (cause instanceof Error && /^[a-z0-9_.-]+$/.test(cause.message) ? cause.message : 'orchestration-signals-read-failed') + ')';
+    }
+  }
 
   /** Copy only the editable definition of a recorded/staged task. Never copy
    * status, review, model, authority, instructions or consumption into a clone.
@@ -405,12 +646,14 @@
    * @param {SVGElement} svg validated Dagre layout, dimensions in SVG units
    * @param {object} work recorded Work with validated tasks/dependencies
    * @param {'LR'|'TB'} orientation displayed layout direction
+   * @param {HTMLElement} orchestration read-only role hierarchy
+   * @param {Function} rerender rebuild the same Work with its original observation
    * @param {object|null} initial same-Work view from memory or validated local storage
    * @param {string} viewError safe preference diagnostic, never raw stored content
    * @param {string} viewErrorCode safe browser/validation family for inspection
    * @returns {void} installs listeners, view capture and cleanup; storage refusals stay visible
    */
-  function navigation(host, canvas, svg, work, orientation, initial=null, viewError='', viewErrorCode='') {
+  function navigation(host, canvas, svg, work, orientation, orchestration, rerender, initial=null, viewError='', viewErrorCode='') {
     const studio=document.createElement('section');studio.id='graph-studio';studio.className='graph-studio native-graph-studio';
     const toolbar=document.createElement('div');toolbar.className='pilot-actions';
     const status=document.createElement('p');status.className='graph-studio-hint';status.setAttribute('role','status');
@@ -430,6 +673,23 @@
     if(initial?.orientation===orientation&&Number.isFinite(initial.zoom)&&initial.positions){zoom=initial.zoom;positions=copyPositions(initial.positions)}
     const base={width:Number(svg.getAttribute('width')),height:Number(svg.getAttribute('height'))},units=new Map();
     const extent={width:base.width,height:base.height};
+    const roleCards = [...svg.querySelectorAll('[data-workflow-scope]')];
+    const rolesByScope = new Map(roleCards.map(card => [card.dataset.workflowScope, card]));
+    const roleScopes = new Set(rolesByScope.keys());
+    const delegationLinks = [...svg.querySelectorAll('[data-relation="delegation"]')];
+    const overviewPaths = new Map(delegationLinks.map(link => [link,link.getAttribute('d')]));
+    const parents = new Map(delegationLinks.map(link => [link.dataset.toRole,link.dataset.fromRole]));
+    const reviewerCard = svg.querySelector('[data-agent-role="reviewer"]');
+    const reviewLink = svg.querySelector('[data-relation="review"]');
+    const reviewPath = reviewLink?.getAttribute('d');
+    const roleOffsets = new Map();
+    let scopeHeight = Number(svg.dataset.roleHeight);
+    const hasDrill = roleScopes.size > 0;
+    const scopeOffsets = new Map();
+    const assignmentBus = svgNode('g',{class:'graph-assignment-bus','aria-hidden':'true'});
+    svg.querySelector('.graph-workflow-relations')?.prepend(assignmentBus);
+    let drillLevel = initial?.drillLevel === '*' || roleScopes.has(initial?.drillLevel)
+      ? initial.drillLevel : '';
     const map=svgNode('svg',{class:'graph-minimap',role:'group',tabindex:0,'aria-label':t('Naviguer avec la mini-carte')});canvas.append(map);
     const viewport=svgNode('rect',{class:'graph-minimap-viewport','aria-hidden':'true'});
     canvas.id='pilot-canvas';canvas.classList.add('native-graph-canvas');
@@ -481,26 +741,93 @@
      * @param {number} dx requested horizontal displacement in SVG units
      * @param {number} dy requested vertical displacement in SVG units
      */
-    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
+    function translateGroup(snapshot,ids,dx,dy){for(const id of ids){dx=Math.max(dx,-units.get(id).x-Math.min(0,scopeOffsets.get(id)?.x ?? 0)-(snapshot[id]?.x??0));dy=Math.max(dy,-units.get(id).y-Math.min(0,scopeOffsets.get(id)?.y ?? 0)-(snapshot[id]?.y??0))}for(const id of ids)positions[id]={x:(snapshot[id]?.x??0)+dx,y:(snapshot[id]?.y??0)+dy}}
     /** Selected cards move together; an unselected handle moves only itself. */
     function movementIds(id){return selectedIds.has(id)?[...selectedIds].filter(isVisible):[id]}
     /** Project native scroll bounds into unscaled SVG coordinates, clamped to
      * the graph extent. Only the minimap viewport marker changes; no IO/layout.
      */
     function updateViewport(){const x=Math.min(extent.width,canvas.scrollLeft/zoom),y=Math.min(extent.height,canvas.scrollTop/zoom);for(const [key,value]of Object.entries({x,y,width:Math.max(0,Math.min(canvas.clientWidth/zoom,extent.width-x)),height:Math.max(0,Math.min(canvas.clientHeight/zoom,extent.height-y))}))viewport.setAttribute(key,value)}
+    /** Combine saved task motion and the current scope's display translation.
+     * The scope translation never enters saved positions or undo history. */
+    function displayedOffset(id) {
+      const offset = scopeOffsets.get(id);
+      return {x:(positions[id]?.x ?? 0)+(offset?.x ?? 0),y:(positions[id]?.y ?? 0)+(offset?.y ?? 0)};
+    }
     /** Recompute moved curves/extent and mirror zoom/undo/redo availability.
      * Presentation only; this helper performs no storage or engine operation. */
     function update(){
-      let width=base.width,height=base.height;
-      for(const [id,u]of units){const p=positions[id]||{x:0,y:0};u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}
-      for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=positions[edge.dataset.from]||{x:0,y:0},bp=positions[edge.dataset.to]||{x:0,y:0},vertical=orientation==='TB';
+      const overview = hasDrill && drillLevel === '';
+      const scoped = hasDrill && roleScopes.has(drillLevel);
+      let width=scoped ? Number(svg.dataset.scopeWidth) : overview ? Number(svg.dataset.roleWidth) : base.width;
+      let height=scoped ? scopeHeight : overview ? Number(svg.dataset.roleHeight) : base.height;
+      for(const [id,u]of units){const p=displayedOffset(id);u.group.setAttribute('transform',`translate(${p.x} ${p.y})`);if(!overview && (!scoped || isVisible(id))){width=Math.max(width,u.x+p.x+u.w+30);height=Math.max(height,u.y+p.y+u.h+30)}}
+      const scopedDependencyLane = width+8;
+      for(const edge of svg.querySelectorAll('.graph-arete')){const a=units.get(edge.dataset.from),b=units.get(edge.dataset.to);if(!a||!b)continue;const ap=displayedOffset(edge.dataset.from),bp=displayedOffset(edge.dataset.to),vertical=orientation==='TB';
         const x1=a.x+ap.x+(vertical?a.w/2:a.w),y1=a.y+ap.y+(vertical?a.h:a.h/2),x2=b.x+bp.x+(vertical?b.w/2:0),y2=b.y+bp.y+(vertical?0:b.h/2),d=Math.max(60,Math.abs(vertical?y2-y1:x2-x1)/2);
+        if (scoped && isVisible(edge.dataset.from) && isVisible(edge.dataset.to)) {
+          const from = a.x+ap.x+a.w/2, to = b.x+bp.x+b.w;
+          const startY = a.y+ap.y+a.h, endY = b.y+bp.y+b.h/2;
+          const lane = scopedDependencyLane;
+          edge.setAttribute('d',roundedResponsibilityPath([[from,startY],[from,startY+16],
+            [lane,startY+16],[lane,endY],[to,endY]]));
+          width = Math.max(width,lane+20);
+          continue;
+        }
         edge.setAttribute('d',vertical?`M${x1},${y1} C${x1},${y1+d} ${x2},${y2-d} ${x2},${y2}`:`M${x1},${y1} C${x1+d},${y1} ${x2-d},${y2} ${x2},${y2}`);
+      }
+      assignmentBus.replaceChildren();
+      const assignmentEnds = new Map();
+      const firstRowByScope = new Map();
+      for (const link of svg.querySelectorAll('[data-assigned-task]')) {
+        const id = link.dataset.assignedTask, unit = units.get(id);
+        if (!unit) continue;
+        const visible = isVisible(id);
+        link.classList.toggle('graph-analysis-hidden', !visible);
+        const delta = displayedOffset(id);
+        const end = {x:unit.x + delta.x + unit.w/2, y:unit.y + delta.y};
+        assignmentEnds.set(link, end);
+        const scope = link.dataset.assignmentScope;
+        if (visible) firstRowByScope.set(scope, Math.min(firstRowByScope.get(scope) ?? Infinity, end.y));
+      }
+      const scopeRows = new Map();
+      if (scoped) {
+        for (const [link,end] of assignmentEnds) {
+          if (!isVisible(link.dataset.assignedTask) || !link.hasAttribute('data-visible-assignment')) continue;
+          scopeRows.set(end.y,Math.max(scopeRows.get(end.y) ?? 0,end.x));
+        }
+        if (scopeRows.size) {
+          const link = [...assignmentEnds.keys()].find(item => isVisible(item.dataset.assignedTask));
+          const owner = roleOffsets.get(drillLevel);
+          const x = Number(link.dataset.originX)+owner.x, y = Number(link.dataset.originY)+owner.y;
+          const endY = Math.max(...scopeRows.keys())-22;
+          assignmentBus.append(svgNode('path', {
+            d:roundedResponsibilityPath([[x,y],[x,y+12],[16,y+12],[16,endY]]),
+            class:'graph-workflow-edge','data-relation':'assignment-trunk'
+          }));
+          for (const [row,right] of scopeRows) {
+            assignmentBus.append(svgNode('path', {
+              d:roundedResponsibilityPath([[16,row-22],[right,row-22]]),
+              class:'graph-workflow-edge','data-relation':'assignment-trunk'
+            }));
+          }
+        }
+      }
+      for (const [link, end] of assignmentEnds) {
+        const offset = roleOffsets.get(link.dataset.assignmentScope);
+        const x = Number(link.dataset.originX) + (offset?.x ?? 0);
+        const y = Number(link.dataset.originY) + (offset?.y ?? 0);
+        const first = firstRowByScope.get(link.dataset.assignmentScope) ?? end.y;
+        const bend = (y + first)/2;
+        const route = scoped
+          ? [[end.x,end.y-22],[end.x,end.y]]
+          : [[x,y],[x,bend],[end.x,bend],[end.x,end.y]];
+        link.setAttribute('d', roundedResponsibilityPath(route));
       }
       extent.width=width;extent.height=height;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width*zoom);svg.setAttribute('height',height*zoom);
       map.setAttribute('viewBox',`0 0 ${width} ${height}`);map.replaceChildren();
       for(const edge of svg.querySelectorAll('.graph-arete'))if(isVisible(edge.dataset.from)&&isVisible(edge.dataset.to))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
-      for(const [id,u]of units){if(!isVisible(id))continue;const p=positions[id]||{x:0,y:0};map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node','data-task':id}))}
+      for(const [id,u]of units){if(!isVisible(id))continue;const p=displayedOffset(id);map.append(svgNode('rect',{x:u.x+p.x,y:u.y+p.y,width:u.w,height:u.h,rx:8,class:'graph-minimap-node','data-task':id}))}
       map.append(viewport);updateViewport();undo.disabled=previousPositions===null;redo.disabled=redoPositions===null;zoomOut.disabled=zoom<=.15;zoomIn.disabled=zoom>=2;
       zoomText.textContent=Math.round(zoom*100)+' %';
     }
@@ -528,7 +855,7 @@
      * viewport gutter. Existing zoom clamps remain unchanged. No path count,
      * task or operator limit is introduced; only local zoom/scroll are saved.
      */
-    function fitProjection(){update();let left=0,top=0,right=extent.width,bottom=extent.height;if(visibleIds?.size){left=Infinity;top=Infinity;right=0;bottom=0;for(const [id,u]of units){if(!isVisible(id))continue;const x=u.x+(positions[id]?.x??0),y=u.y+(positions[id]?.y??0);left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+u.w);bottom=Math.max(bottom,y+u.h)}left=Math.max(0,left-12);top=Math.max(0,top-12);right+=12;bottom+=12}const required=Math.min(1,(canvas.clientWidth-24)/(right-left),(canvas.clientHeight-24)/(bottom-top));zoom=Math.max(.15,required);update();canvas.scrollTo(left*zoom,top*zoom);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()}
+    function fitProjection(){update();let left=0,top=0,right=extent.width,bottom=extent.height;if(visibleIds?.size&&!roleScopes.has(drillLevel)){left=Infinity;top=Infinity;right=0;bottom=0;for(const [id,u]of units){if(!isVisible(id))continue;const x=u.x+(positions[id]?.x??0),y=u.y+(positions[id]?.y??0);left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+u.w);bottom=Math.max(bottom,y+u.h)}left=Math.max(0,left-12);top=Math.max(0,top-12);right+=12;bottom+=12}const required=Math.min(1,(canvas.clientWidth-24)/(right-left),(canvas.clientHeight-24)/(bottom-top));zoom=Math.max(.15,required);update();canvas.scrollTo(left*zoom,top*zoom);if(required<.15)status.textContent=t('Zoom minimum atteint. Rapprochez les cartes pour tout voir.');save()}
     button('pilot-fit','Vue d’ensemble',fitProjection);
     const full=button('pilot-fullscreen','Plein écran',()=>{resumeFullscreen=false;if(modal.open){modal.close();return}modal.showModal();modal.append(studio);studio.classList.add('is-fullscreen');document.body.classList.add('graph-studio-open');actionLabel(full,'Quitter le plein écran');full.setAttribute('aria-expanded','true');full.focus()});full.setAttribute('aria-expanded','false');
     button('pilot-layout-reset','Ranger les cartes',()=>{const before=copyPositions();positions=Object.create(null);rememberPlacement(before);update();save()});
@@ -539,7 +866,7 @@
      * view; successful reset preserves an explicitly open full screen only in
      * memory. Cleanup must not rewrite the deleted preference.
      */
-    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});render(work)}
+    function resetNavigation(){finish(true);try{localStorage.removeItem(viewKey)}catch(cause){const code=storageErrorFamily(cause);preferenceStatus.dataset.viewError=code;preferenceStatus.textContent=t('Réinitialisation de navigation non confirmée.')+' ('+code+')';return}resetting=true;host.dataset.orientation='LR';host.graphView=()=>({work:work.id,orientation:'LR',left:0,top:0,studioLeft:0,studioTop:0,fullscreen:modal.open,toolsOpen:media.matches});rerender()}
     button('pilot-view-reset','Réinitialiser la navigation',resetNavigation);
     button('pilot-add-task','Ajouter une tâche',()=>editTask(work)).className='primary';
     button('pilot-business-draft','Brouillon multi-tâches',()=>openBusinessDraft(work));
@@ -593,7 +920,145 @@
      * gesture and clear selection so hidden cards cannot move unexpectedly.
      * No-path requests never call this helper and retain the current view.
      */
-    function setProjection(ids,label){finish(true);connection=null;visibleIds=ids;selectedIds.clear();for(const [id,u]of units){const hidden=!isVisible(id);u.group.classList.toggle('graph-analysis-hidden',hidden);u.group.setAttribute('aria-hidden',String(hidden));for(const control of u.group.querySelectorAll('[tabindex]'))control.setAttribute('tabindex',hidden?'-1':'0')}for(const edge of svg.querySelectorAll('.graph-arete')){const hidden=!isVisible(edge.dataset.from)||!isVisible(edge.dataset.to);edge.classList.toggle('graph-analysis-hidden',hidden);edge.setAttribute('aria-hidden',String(hidden));edge.setAttribute('tabindex',hidden?'-1':'0')}analysis.open=false;analysisToggle.focus({preventScroll:true});showAll.disabled=ids===null;analysisStatus.textContent=ids?label+' · '+ids.size+' / '+work.tasks.length+' · '+t('Vue filtrée ; les autres tâches sont masquées.'):'';updateSelection();findMatches();update()}
+    function setProjection(ids, label, fromDrill=false) {
+      finish(true);
+      connection = null;
+      if (!fromDrill && hasDrill) {
+        drillLevel = '*';
+        scopeOffsets.clear();
+      }
+      visibleIds = ids;
+      selectedIds.clear();
+      for (const [id, unit] of units) {
+        const hidden = !isVisible(id);
+        unit.group.classList.toggle('graph-analysis-hidden', hidden);
+        unit.group.setAttribute('aria-hidden', String(hidden));
+        for (const control of unit.group.querySelectorAll('[tabindex]')) control.setAttribute('tabindex', hidden ? '-1' : '0');
+      }
+      for (const edge of svg.querySelectorAll('.graph-arete')) {
+        const hidden = !isVisible(edge.dataset.from) || !isVisible(edge.dataset.to);
+        edge.classList.toggle('graph-analysis-hidden', hidden);
+        edge.setAttribute('aria-hidden', String(hidden));
+        edge.setAttribute('tabindex', hidden ? '-1' : '0');
+      }
+      for (const element of svg.querySelectorAll('[data-agent-role="reviewer"],[data-relation="review"],[data-graph-branch]')) {
+        const branchLabel = element.hasAttribute('data-graph-branch');
+        const hidden = hasDrill && (branchLabel ? drillLevel !== '*' : drillLevel === '');
+        element.classList.toggle('graph-analysis-hidden', hidden);
+      }
+      projectRolePath(ids);
+      analysis.open = false;
+      if (!fromDrill) analysisToggle.focus({preventScroll:true});
+      showAll.disabled = ids === null;
+      analysisStatus.textContent = !fromDrill && ids
+        ? label + ' · ' + ids.size + ' / ' + work.tasks.length + ' · ' + t('Vue filtrée ; les autres tâches sont masquées.') : '';
+      if (hasDrill) {
+        drillStatus.textContent = drillLevel === '' ? t('Orchestrateurs seuls') :
+          drillLevel === '*' ? t('Tous les agents et tâches') : t('Périmètre') + ' · ' + drillLevel;
+        drillUp.hidden = drillLevel === '';
+        drillBar.dataset.level = drillLevel;
+        map.classList.toggle('graph-analysis-hidden', drillLevel !== '*');
+        for (const card of roleCards) card.setAttribute('aria-pressed', String(card.dataset.workflowScope === drillLevel));
+      }
+      updateSelection();
+      findMatches();
+      update();
+    }
+
+    /** Lay out only the selected scope and its ancestors in a compact column.
+     * Restore all original role geometry outside a scope. Task offsets are
+     * local display translations, never writes to saved placement or the plan. */
+    function projectRolePath(ids) {
+      const scoped = roleScopes.has(drillLevel);
+      const lineage = [];
+      if (scoped) {
+        for (let id = drillLevel; id; id = parents.get(id)) lineage.unshift(id);
+      }
+      roleOffsets.clear();
+      scopeOffsets.clear();
+      scopeHeight = Number(svg.dataset.roleHeight);
+      const top = new Map(lineage.map((id,index) => [id,22+index*116]));
+      for (const [id,card] of rolesByScope) {
+        const hidden = scoped && !top.has(id);
+        card.classList.toggle('graph-analysis-hidden',hidden);
+        card.setAttribute('tabindex',hidden ? '-1' : '0');
+        card.removeAttribute('transform');
+        if (!scoped || hidden) continue;
+        const rect = card.querySelector('rect');
+        const x = 20 - Number(rect.getAttribute('x')), y = top.get(id) - Number(rect.getAttribute('y'));
+        const height = Number(rect.getAttribute('height'));
+        roleOffsets.set(id,{x,y});
+        card.setAttribute('transform',`translate(${x} ${y})`);
+        if (id === drillLevel) scopeHeight = top.get(id) + height + 32;
+      }
+      reviewerCard?.removeAttribute('transform');
+      if (reviewLink) reviewLink.setAttribute('d',reviewPath);
+      if (scoped && reviewerCard && reviewLink && svg.dataset.stackReview === 'true') {
+        const box = reviewerCard.querySelector('rect');
+        const width = Number(box.getAttribute('width')), height = Number(box.getAttribute('height'));
+        const right = 20+width, center = scopeHeight+height/2;
+        const to = 22+height/2;
+        reviewerCard.setAttribute('transform',`translate(${20-Number(box.getAttribute('x'))} ${scopeHeight-Number(box.getAttribute('y'))})`);
+        reviewLink.setAttribute('d',roundedResponsibilityPath([[right,center],[right+28,center],[right+28,to],[right,to]]));
+        scopeHeight += height+24;
+
+      }
+      if (scoped && ids?.size) {
+        const ranks = new Map();
+        for (const id of ids) {
+          const rank = Number(units.get(id).group.dataset.taskRank);
+          if (!ranks.has(rank)) ranks.set(rank,[]);
+          ranks.get(rank).push(id);
+        }
+        const columns = Number(svg.dataset.taskColumns);
+        let rowTop = scopeHeight+30;
+        for (const [,members] of [...ranks].sort(([a],[b]) => a-b)) {
+          members.forEach((id,index) => {
+            const unit = units.get(id);
+            const left = 48+(index%columns)*(unit.w+76);
+            const top = rowTop+Math.floor(index/columns)*(unit.h+65);
+            scopeOffsets.set(id,{x:left-unit.x,y:top-unit.y});
+          });
+          rowTop += Math.ceil(members.length/columns)*(units.get(members[0]).h+65);
+        }
+      }
+      for (const link of delegationLinks) {
+        const parent = link.dataset.fromRole, child = link.dataset.toRole;
+        const hidden = scoped && (!top.has(parent) || !top.has(child));
+        link.classList.toggle('graph-analysis-hidden',hidden);
+        if (!scoped || hidden) {
+          link.setAttribute('d',overviewPaths.get(link));
+          continue;
+        }
+        const rect = rolesByScope.get(parent).querySelector('rect');
+        const x = 20 + Number(rect.getAttribute('width'))/2;
+        const y = top.get(parent) + Number(rect.getAttribute('height'));
+        link.setAttribute('d',roundedResponsibilityPath([[x,y],[x,top.get(child)]]));
+      }
+    }
+
+    /** Open an observed scope, show all tasks, or return to the hierarchy.
+     * Only presentation changes. Unknown scopes are never selected by callers. */
+    function setDrill(level) {
+      drillLevel = level;
+      const ids = level === '*' ? null : new Set(work.tasks.filter(task => level && task.scope_id === level).map(task => task.id));
+      setProjection(ids, '', true);
+    }
+
+    /** Reveal a task through its recorded scope, then use its existing opener.
+     * Callers can be outside the graph. Unknown IDs leave the projection intact. */
+    function revealTask(id) {
+      const unit = units.get(id);
+      if (!unit) return;
+      if (!isVisible(id)) {
+        const scope = work.tasks.find(task => task.id === id)?.scope_id;
+        if (hasDrill) setDrill(roleScopes.has(scope) ? scope : '*');
+        else setProjection(null, '', true);
+      }
+      const opener = unit.group.querySelector('.graph-task-open');
+      opener?.scrollIntoView({block:'nearest',inline:'center'});
+      opener?.focus({preventScroll:true});
+    }
 
     /** Download a standalone SVG of the current recorded layout. Resolve the
      * local palette into presentation attributes, strip controls/active content
@@ -609,7 +1074,7 @@
         const copy=svg.cloneNode(true),originals=[svg,...svg.querySelectorAll('*')],copies=[copy,...copy.querySelectorAll('*')];
         const properties=['fill','stroke','stroke-width','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline','paint-order','vector-effect'];
         for(let i=0;i<copies.length;i++){const node=copies[i],style=getComputedStyle(originals[i]);for(const attribute of [...node.attributes])if(attribute.name==='style'||attribute.name==='tabindex'||attribute.name==='role'||attribute.name.startsWith('aria-')||attribute.name.startsWith('on')||attribute.localName==='href')node.removeAttributeNode(attribute);for(const property of properties){const value=style.getPropertyValue(property);if(value&&!/url\s*\(/i.test(value))node.setAttribute(property,value)}}
-        for(const node of copy.querySelectorAll('.graph-analysis-hidden,.graph-drag,.graph-copy,.graph-port,.graph-link-ghost,script,foreignObject,image,use,a,style,animate,animateTransform,set'))node.remove();
+        for(const node of copy.querySelectorAll('.graph-analysis-hidden,.graph-drag,.graph-copy,.graph-task-actions,.graph-port,.graph-link-ghost,script,foreignObject,image,use,a,style,animate,animateTransform,set'))node.remove();
         for(const node of copy.querySelectorAll('*'))for(const attribute of [...node.attributes])if(/url\s*\(/i.test(attribute.value)&&!/^url\(#[A-Za-z0-9_-]+\)$/.test(attribute.value))node.removeAttributeNode(attribute);
         copy.setAttribute('xmlns',SVG_NS);copy.setAttribute('width',extent.width);copy.setAttribute('height',extent.height);copy.setAttribute('role','img');copy.setAttribute('aria-label',work.title);
         const background=svgNode('rect',{x:0,y:0,width:extent.width,height:extent.height,fill:getComputedStyle(canvas).backgroundColor});copy.prepend(background);
@@ -619,7 +1084,7 @@
     button('pilot-export','Exporter le SVG',exportGraph);
     const direction=document.createElement('select');direction.id='pilot-orientation';direction.setAttribute('aria-label',t('Orientation'));
     for(const [value,label]of [['LR','Gauche → droite'],['TB','Haut → bas']]){const option=document.createElement('option');option.value=value;option.textContent=t(label);direction.append(option)}direction.value=orientation;
-    direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;render(work)});toolbar.append(direction);
+    direction.addEventListener('change',()=>{host.dataset.orientation=direction.value;rerender()});toolbar.append(direction);
     const search=document.createElement('div');search.className='native-graph-search';search.setAttribute('role','search');search.setAttribute('aria-label',t('Rechercher une tâche'));
     const searchLabel=document.createElement('label');searchLabel.htmlFor='pilot-search';searchLabel.textContent=t('Rechercher une tâche');
     const searchInput=document.createElement('input');searchInput.id='pilot-search';searchInput.type='search';searchInput.autocomplete='off';searchInput.setAttribute('aria-controls','pilot-canvas');searchInput.placeholder=t('Rechercher une tâche ou un identifiant');
@@ -681,9 +1146,9 @@
       'Ctrl + molette garde le point sous le curseur. La vue est conservée après l’enregistrement sur le même travail.',
       'Repérer les dépendances distingue prérequis et dépendants sans masquer de carte.',
       'Analyser et sélectionner isole une branche ou tous les chemins orientés entre deux tâches. Voir tout le graphe restaure la vue.',
-      'En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une poignée pour déplacer le groupe. Annuler le placement restaure tout le groupe.',
+      'En mode sélection, cliquez ou appuyez sur Entrée sur chaque carte, puis déplacez une carte du groupe. Annuler le placement restaure tout le groupe.',
       'L’export SVG télécharge le placement affiché ; les boutons ne sont pas exportés.',
-      'Déplacez le fond pour naviguer. Glissez le cadre lui-même ou sa poignée pour le placer ; un clic sans déplacement ouvre la tâche. Annuler le placement restaure le dernier déplacement ou rangement.',
+      'Glissez le fond pour naviguer. Glissez la carte pour la déplacer, ou utilisez les flèches du clavier quand elle a le focus. Un clic sans déplacement ouvre la tâche.',
       'Ajouter une tâche ouvre le formulaire : choisissez un identifiant, un titre, un livrable et des critères, puis enregistrez. Le brouillon multi-tâches permet de préparer plusieurs changements avant application.',
       'Cliquez sur une flèche pour changer son prérequis ou préparer son retrait. Le formulaire confirme le changement. Suppr sur un lien prépare directement son retrait.',
       'Mini-carte : cliquez pour centrer ; utilisez les flèches, Début et Fin au clavier.',
@@ -721,13 +1186,41 @@
       open.addEventListener('pointerdown',e=>{if(e.button!==0)return;finish(true);suppressCardClick=false;open.focus({preventScroll:true});gesture={id,ids:movementIds(id),card:true,moved:false,suppressClick:()=>{suppressCardClick=true},target:open,pointer:e.pointerId,snapshot:copyPositions(),start:point(e),screen:{x:e.clientX,y:e.clientY}};open.setPointerCapture(e.pointerId)});
       open.addEventListener('pointermove',e=>{if(gesture?.target!==open)return;const g=gesture;if(!g.moved&&Math.hypot(e.clientX-g.screen.x,e.clientY-g.screen.y)<=4)return;g.moved=true;e.preventDefault();const p=point(e);translateGroup(g.snapshot,g.ids,p.x-g.start.x,p.y-g.start.y);update()});
       open.addEventListener('pointerup',()=>{if(gesture?.target===open)finish()});open.addEventListener('pointercancel',()=>{if(gesture?.target===open)finish(true)});
-      open.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();activateCard()});
-      const handle=svgNode('g',{class:'graph-drag',role:'button',tabindex:0,'aria-label':t('Déplacer la carte')+' '+id});handle.dataset.task=id;handle.append(svgNode('rect',{x:x+w-34,y:y+4,width:30,height:30,rx:6}),svgNode('text',{x:x+w-30,y:y+25},'⠿'));group.append(handle);
-      handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();finish(true);const before=copyPositions();translateGroup(before,movementIds(id),e.key==='ArrowLeft'?-16:e.key==='ArrowRight'?16:0,e.key==='ArrowUp'?-16:e.key==='ArrowDown'?16:0);rememberPlacement(before);update();save()});
-      handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();finish(true);handle.focus();gesture={id,ids:movementIds(id),target:handle,pointer:e.pointerId,snapshot:copyPositions(),start:point(e)};handle.setPointerCapture(e.pointerId)});
-      handle.addEventListener('pointermove',e=>{if(gesture?.id!==id)return;const p=point(e);translateGroup(gesture.snapshot,gesture.ids,p.x-gesture.start.x,p.y-gesture.start.y);update()});
-      handle.addEventListener('pointerup',()=>finish());handle.addEventListener('pointercancel',()=>finish(true));
-      const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-82,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-68,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
+      // The card is the keyboard movement control and still opens on Enter/Space.
+      open.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown');
+      open.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activateCard();
+          return;
+        }
+        const offsets = {ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]};
+        if (!Object.hasOwn(offsets,event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        finish(true);
+        const before = copyPositions();
+        translateGroup(before,movementIds(id),...offsets[event.key]);
+        rememberPlacement(before);
+        update();
+        save();
+      });
+      const copy=svgNode('g',{class:'graph-copy',role:'button',tabindex:0,'aria-label':t('Copier l’identifiant')+' '+id});copy.dataset.task=id;copy.append(svgNode('title',{},t('Copier l’identifiant')+' '+id),svgNode('rect',{x:x+w-54,y:y+2,width:44,height:44,rx:6}),svgNode('text',{x:x+w-40,y:y+28},'ID'));group.append(copy);copy.addEventListener('pointerdown',e=>e.stopPropagation());copy.addEventListener('click',e=>{e.stopPropagation();copyId(id,copy)});copy.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();copyId(id,copy)}});
+      const actions=svgNode('g',{class:'graph-task-actions',role:'button',tabindex:0,
+        'aria-label':t('Fichier d’actions')+' · '+id,'aria-haspopup':'dialog'});
+      actions.dataset.task=id;
+      actions.append(svgNode('rect',{x:x+w-86,y:y+h-46,width:76,height:44,rx:5}),
+        svgNode('text',{x:x+w-48,y:y+h-20,'text-anchor':'middle'},t('Actions')));
+      group.append(actions);
+      const openActions=()=>showTaskActions(work,work.tasks.find(task=>task.id===id),actions);
+      actions.addEventListener('pointerdown',event=>event.stopPropagation());
+      actions.addEventListener('click',event=>{event.stopPropagation();openActions()});
+      actions.addEventListener('keydown',event=>{
+        if (!['Enter',' '].includes(event.key)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openActions();
+      });
       for(const side of ['in','out']){
         const vertical=orientation==='TB',port=svgNode('circle',{class:'graph-port',role:'button',tabindex:0,r:9,cx:vertical?x+w/2:side==='in'?x:x+w,cy:vertical?(side==='in'?y:y+h):y+h/2,'aria-label':t(side==='out'?'Relier cette sortie':'Relier cette entrée')+' '+id});port.dataset.task=id;port.dataset.side=side;port.append(svgNode('title',{},t(side==='in'?'Entrée : prérequis':'Sortie : dépendants')+' — '+id));let suppressClick=false;group.append(port);
         port.addEventListener('keydown',e=>{if(!['Enter',' '].includes(e.key))return;e.preventDefault();e.stopPropagation();activatePort(id,side)});
@@ -753,7 +1246,19 @@
     canvas.addEventListener('wheel',zoomAtCursor,{passive:false});
     for(const edge of svg.querySelectorAll('.graph-arete')){edge.setAttribute('role','button');edge.setAttribute('tabindex','0');edge.setAttribute('aria-label',t('Modifier un lien')+' '+edge.dataset.from+' → '+edge.dataset.to);const remove=()=>{const target=work.tasks.find(t=>t.id===edge.dataset.to);editTask(work,target,(target.depends||[]).filter(id=>id!==edge.dataset.from))};edge.addEventListener('click',()=>inspectLink(work,edge.dataset.from,edge.dataset.to));edge.addEventListener('keydown',e=>{if(['Enter',' ','Delete','Backspace'].includes(e.key)){e.preventDefault();if(['Delete','Backspace'].includes(e.key))remove();else inspectLink(work,edge.dataset.from,edge.dataset.to)}})}
     studio.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(gesture||connection){e.preventDefault();e.stopPropagation();finish(true);connection=null;status.textContent=''}else if(selectionMode){e.preventDefault();e.stopPropagation();selectionMode=false;selectedIds.clear();updateSelection()}else if(modal.open){e.preventDefault();modal.close()}});
-    modal.addEventListener('close',()=>{if(disposed)return;finish(true);host.insertBefore(studio,modal);studio.classList.remove('is-fullscreen');document.body.classList.remove('graph-studio-open');actionLabel(full,'Plein écran');full.setAttribute('aria-expanded','false');full.focus()});
+    /** Return the graph to its host after closing fullscreen. Preserve focus
+     * on the switch when the team is selected. No engine operation. */
+    function restoreFromFullscreen() {
+      if (disposed || modal.open || studio.parentNode !== modal) return;
+      finish(true);
+      host.insertBefore(studio,modal);
+      studio.classList.remove('is-fullscreen');
+      document.body.classList.remove('graph-studio-open');
+      actionLabel(full,'Plein écran');
+      full.setAttribute('aria-expanded','false');
+      (teamSelected ? teamView : full).focus();
+    }
+    modal.addEventListener('close',restoreFromFullscreen);
     const viewportObserver=new ResizeObserver(()=>{if(disposed)return;host.graphRestoreView?.();updateViewport();persistView()});viewportObserver.observe(canvas);
     for(const id of ['pilot-layout-reset','pilot-layout-undo','pilot-layout-redo','pilot-view-reset','pilot-neighbors','pilot-neighbors-clear','pilot-export','pilot-orientation']){const control=toolbar.querySelector('#'+id);if(control)toolsBody.append(control===neighborSelect?neighbors:control)}
     const closeTools=document.createElement('button');closeTools.type='button';closeTools.id='pilot-tools-close';closeTools.textContent=t('Fermer les outils');toolsBody.append(closeTools);
@@ -771,19 +1276,732 @@
     const legend=document.createElement('div');legend.id='pilot-graph-colors';legend.className='native-graph-color-key';legend.setAttribute('aria-label',t('Couleurs des états'));// Legend reuses the shared state badges (label + shape + tone) so it no longer
     // reads as checkboxes; the plain swatches remain only if the workbench is absent.
     const keyBadge=globalThis.SwarmWorkbench?.statusBadge;for(const [tone,label,state]of [['attente','à faire','todo'],['active','en cours','running'],['attention','à vérifier','submitted'],['alerte','bloquée','blocked'],['validee','acceptée','accepted']]){if(keyBadge){legend.append(keyBadge(state,state));continue}const item=document.createElement('span');item.className='graph-teinte';item.dataset.etat=tone;item.textContent=t(label);legend.append(item)}
-    const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez un cadre pour le déplacer. Cliquez pour ouvrir la tâche ; cliquez sur une flèche pour modifier le lien.');
-    studio.append(toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,canvas);host.replaceChildren(studio,modal,help);
+    const activityLegend = document.createElement('div');
+    activityLegend.className = 'native-graph-color-key';
+    activityLegend.setAttribute('role', 'group');
+    activityLegend.setAttribute('aria-label', t('Activité des tâches'));
+    for (const state of Object.keys(ACTIVITY_LABELS)) activityLegend.append(activityBadge(state));
+    let motionPaused=initial?.motionPaused === true;
+    const motion=document.createElement('button');
+    motion.type='button';
+    motion.id='pilot-activity-motion';
+    motion.textContent=t('Suspendre l’animation');
+    const syncMotion=()=>{
+      studio.dataset.motionPaused=String(motionPaused);
+      motion.setAttribute('aria-pressed',String(motionPaused));
+    };
+    syncMotion();
+    motion.addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion()});
+    activityLegend.append(motion);
+    const drillBar = document.createElement('div');
+    drillBar.className = 'pilot-actions';
+    const drillStatus = document.createElement('output');
+    drillStatus.setAttribute('role', 'status');
+    const drillUp = button('pilot-drill-up', 'Remonter aux orchestrateurs', () => {
+      const previousScope = drillLevel;
+      setDrill('');
+      canvas.scrollTo(0, 0);
+      (roleCards.find(card => card.dataset.workflowScope === previousScope) ?? drillAll).focus({preventScroll:true});
+    });
+    const drillAll = button('pilot-drill-all', 'Afficher tous les agents et tâches', () => setDrill('*'));
+    if (hasDrill) {
+      drillBar.append(drillStatus, drillUp, drillAll);
+      for (const card of roleCards) {
+        const activate = () => {
+          const scope = card.dataset.workflowScope;
+          setDrill(drillLevel === scope ? '' : scope);
+          canvas.scrollTop = 0;
+        };
+        card.addEventListener('pointerdown', event => event.stopPropagation());
+        card.addEventListener('click', activate);
+        card.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        });
+      }
+    }
+    let assignmentScope = '*';
+    if(svg.querySelector('.graph-workflow-role')){
+      const relationKey=document.createElement('p');
+      relationKey.className='graph-workflow-key';
+      relationKey.textContent=t('Dépendances en bleu, délégations en ambre, affectations en gris, revue en vert.');
+      legend.append(relationKey);
+      const assignments = [...svg.querySelectorAll('[data-assignment-scope]')];
+      const scopes = new Set(assignments.map(link => link.dataset.assignmentScope));
+      if (scopes.size) {
+        const label = document.createElement('label');
+        label.className = 'native-graph-neighbors';
+        label.textContent = t('Voir les affectations');
+        const select = document.createElement('select');
+        select.id = 'pilot-assignment-scope';
+        label.htmlFor = select.id;
+        select.append(new Option(t('Toutes les affectations'), '*'), new Option(t('Masquer les affectations'), ''));
+        for (const scope of scopes) select.append(new Option(scope, scope));
+        if ([...scopes, ''].includes(initial?.assignmentScope)) select.value = initial.assignmentScope;
+        /** Show all or one scope’s assignment links. An empty selection hides
+         * them. This presentation control performs no writes. */
+        const showAssignments = () => {
+          assignmentScope = select.value;
+          for (const link of assignments) {
+            link.toggleAttribute('data-visible-assignment', assignmentScope === '*' || link.dataset.assignmentScope === assignmentScope);
+          }
+          if (host.graphView === captureView) update();
+        };
+        select.addEventListener('change', showAssignments);
+        showAssignments();
+        label.append(select);
+        legend.append(label);
+      }
+    }
+
+    const dependencyLinks = Array.from(svg.querySelectorAll('.graph-arete'));
+    if (dependencyLinks.length) {
+      let dependencyIndex = 0;
+      const locate = button('pilot-find-dependency', 'Localiser une dépendance', () => {
+        const link = dependencyLinks[dependencyIndex];
+        if (link.classList.contains('graph-analysis-hidden')) {
+          if (hasDrill) setDrill('*');
+          else setProjection(null, '', true);
+        }
+        dependencyIndex = (dependencyIndex + 1) % dependencyLinks.length;
+        const bounds = link.getBoundingClientRect(), viewport = canvas.getBoundingClientRect();
+        canvas.scrollLeft += bounds.left + (bounds.width - viewport.width) / 2 - viewport.left;
+        canvas.scrollTop += bounds.top + (bounds.height - viewport.height) / 2 - viewport.top;
+        canvas.scrollIntoView({block:"nearest",inline:"nearest"});
+        canvas.focus({preventScroll:true});
+      });
+      legend.append(locate);
+    }
+
+    const gestureHint=document.createElement('p');gestureHint.className='native-graph-gesture-hint';gestureHint.textContent=t('Glissez une carte pour la déplacer. Cliquez sur la tâche pour l’ouvrir, ou sur une flèche bleue pour modifier un prérequis.');
+    const workflowHeader = document.createElement('div');
+    workflowHeader.className = 'native-graph-color-key';
+    const hasHierarchy = svg.querySelector('[data-agent-role="subplanner"]');
+    if (hasHierarchy) {
+      const shape = document.createElement('strong');
+      shape.textContent = t('Organisation agentique') + ' · ' + t('Hiérarchique');
+      workflowHeader.append(shape);
+    }
+    workflowHeader.append(orchestration.workflowArchitectureSummary);
+    studio.append(workflowHeader,drillBar,toolbar,analysis,tools,status,analysisStatus,selectionStatus,preferenceStatus,neighborStatus,copyStatus,copyFallback,gestureHint,legend,activityLegend,canvas);
+    orchestration.id = 'conduite-team-validation';
+    const views = document.createElement('div');
+    views.className = 'pilot-actions conduite-view-switch';
+    views.setAttribute('role', 'group');
+    views.setAttribute('aria-label', t('Vues de Conduite'));
+    const graphView = document.createElement('button');
+    const teamView = document.createElement('button');
+    graphView.type = teamView.type = 'button';
+    graphView.id = 'conduite-show-graph';
+    teamView.id = 'conduite-show-team';
+    graphView.textContent = t('Graphe des tâches');
+    teamView.textContent = t('Équipe et validation');
+    graphView.setAttribute('aria-controls', studio.id);
+    teamView.setAttribute('aria-controls', orchestration.id);
+    views.append(graphView, teamView);
+    let teamSelected = false;
+    /** Keep the same switch with the visible panel, including the modal graph.
+     * The team view exits fullscreen. Restore the viewport when the graph
+     * becomes visible again. The architecture reader makes a revision-bound
+     * read for the rendered graph and when opening team details. */
+    function showTeam(selected) {
+      if (selected && !teamSelected) {
+        pendingScroll ??= {left: canvas.scrollLeft, top: canvas.scrollTop};
+        pendingStudio ??= {left: studio.scrollLeft, top: studio.scrollTop};
+      }
+      teamSelected = selected;
+      studio.hidden = selected;
+      orchestration.hidden = !selected;
+      if (selected) orchestration.loadWorkflowArchitecture?.();
+      if (selected) {
+        if (views.parentNode !== host) host.insertBefore(views, orchestration);
+        if (modal.open) {
+          modal.close();
+          restoreFromFullscreen();
+        }
+      } else if (views.parentNode !== studio) {
+        studio.prepend(views);
+      }
+      graphView.setAttribute('aria-pressed', String(!selected));
+      teamView.setAttribute('aria-pressed', String(selected));
+      if (!selected) host.graphRestoreView?.();
+    }
+    graphView.addEventListener('click', () => {showTeam(false);graphView.focus()});
+    teamView.addEventListener('click', () => {showTeam(true);teamView.focus()});
+    host.replaceChildren(views,studio,orchestration,modal,help);
+    showTeam(initial?.teamSelected === true);
+    if (!teamSelected && Number.isSafeInteger(work.revision)) orchestration.loadWorkflowArchitecture();
     /** Capture completed same-Work presentation, including deferred modal/scroll.
      * In-progress card movement and canvas panning are excluded, as on cancel.
      * Memory only; callers must compare Work IDs before restoring this object.
      */
-    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
+    function captureView(){return{work:work.id,zoom,positions:committedPositions(),...viewRecord(),motionPaused,assignmentScope,drillLevel,teamSelected,fullscreen:modal.open||resumeFullscreen,preferenceError:preferenceStatus.textContent,preferenceErrorCode:preferenceStatus.dataset.viewError||''}}
     host.graphView=captureView;
+    host.graphRevealTask = id => {
+      showTeam(false);
+      revealTask(id);
+    };
     /** Restore after rerender, or after an editor closes. Never open a graph
      * modal above a task editor; scroll is retained until its geometry is ready.
      */
     host.graphRestoreView=()=>{if(disposed||resumeFullscreen&&document.querySelector('.native-graph-editor[open]'))return;if(!resumeFullscreen&&(!canvas.clientWidth||!canvas.clientHeight))return;if(resumeFullscreen){resumeFullscreen=false;if(!modal.open)full.click()}if(pendingScroll){canvas.scrollTo(pendingScroll.left,pendingScroll.top);pendingScroll=null}if(pendingStudio){studio.scrollTo(pendingStudio.left,pendingStudio.top);pendingStudio=null}updateViewport()};
-    host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};updateSelection();update();host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
+    host.graphCleanup=()=>{if(help.open)help.close();finish(true);persistView();disposed=true;viewportObserver.disconnect();media.removeEventListener('change',resizeTools);if(exportUrl)URL.revokeObjectURL(exportUrl);if(modal.open)modal.close();document.body.classList.remove('graph-studio-open')};
+    if (hasDrill) {
+      if (!drillLevel) {
+        pendingScroll = {left:0, top:0};
+        if (!initial?.work) zoom = Math.max(zoom, .8);
+      }
+      setDrill(drillLevel);
+    } else {
+      updateSelection();
+      update();
+    }
+    host.graphRestoreView();lastViewAttempt=JSON.stringify(viewRecord());if(initial&&initial.orientation!==orientation)persistView(true);
+  }
+
+  /**
+   * Classify execution separately from the recorded task status. A saved pause
+   * holds unstarted tasks; it does not stop a process. A recorded running task
+   * requires a current running observation to be shown as active. A stopped
+   * attempt can be shown from a current result or a terminal attempt in history.
+   * Returns no activity label for unrelated task states. No requests or writes.
+   */
+  function taskActivity(task, result, paused, readMode) {
+    if (readMode !== 'history') {
+      if (result?.state === 'in_progress' && result.process_state === 'running') return 'running';
+      if (result?.state === 'stopped_early') return 'stopped';
+    }
+    if (readMode === 'history' && task.status === 'blocked' &&
+        ['failed', 'interrupted'].includes(task.attempts?.at(-1)?.status)) return 'stopped';
+    if (task.status === 'todo' && paused) return 'paused';
+    if (task.status === 'running') return 'unconfirmed';
+    return '';
+  }
+
+  /** Build a labeled marker with the same colors as the graph cards. A role
+   * label describes an observation or a control without implying a live process.
+   */
+  function activityBadge(state, label = ACTIVITY_LABELS[state]) {
+    const item = document.createElement('span');
+    item.className = 'graph-activity-key';
+    item.dataset.activity = state;
+    item.textContent = t(label);
+    return item;
+  }
+
+  /**
+   * Describe recorded checks and review beside the current result, when supplied.
+   * An older receipt may refer to a different policy. Only named control IDs and
+   * recorded verdicts are shown. This renderer does not evaluate freshness.
+   */
+  function taskControlSummary(task, result) {
+    const summary = document.createDocumentFragment();
+    const policy = task.validation_policy?.controls;
+    if (Array.isArray(policy) && policy.length) {
+      const configured = document.createElement('p');
+      configured.textContent = t('Contrôles configurés') + ' · ' + policy.map(control => control.id).join(', ');
+      summary.append(configured);
+    }
+    const receipt = task.automatic_validation?.controls;
+    if (Array.isArray(receipt) && receipt.length) {
+      const recorded = document.createElement('p');
+      recorded.dataset.orchestrationControls = '';
+      const verdicts = receipt.map(control => {
+        let label = 'Exécution non enregistrée';
+        if (control.executed === true && typeof control.passed === 'boolean') {
+          label = control.passed ? 'Réussite enregistrée' : 'Échec enregistré';
+        }
+        return control.id + ' — ' + t(label);
+      });
+      recorded.textContent = t('Reçu des contrôles') + ' · ' + verdicts.join(' · ');
+      summary.append(recorded);
+    }
+    const reviewState = task.independent_review?.state;
+    if (reviewState) {
+      const labels = {
+        __proto__: null,
+        running: 'Examen en cours',
+        passed: 'Avis favorable',
+        changes_requested: 'Corrections ou preuves demandées',
+        error: 'Vérification interrompue',
+        stale: 'Avis périmé',
+      };
+      const review = document.createElement('p');
+      review.dataset.orchestrationReview = '';
+      review.textContent = t('Avis indépendant enregistré') + ' · ' +
+        t(labels[reviewState] ?? 'Avis indisponible');
+      summary.append(review);
+    }
+    if (result?.validation_label) {
+      const validation = document.createElement('p');
+      validation.dataset.orchestrationValidation = '';
+      validation.textContent = globalThis.SwarmI18n?.engine?.(result.validation_label) ?? result.validation_label;
+      summary.append(validation);
+    }
+    return summary;
+  }
+
+  /**
+   * Return a role label with a decorative icon styled by its containing row.
+   * The supplied label stays plain text and provides the accessible name.
+   */
+  /** Show the current structural advice and its explicit, revision-bound receipt.
+   * Share one protected read and its status with both views. Approvals remain
+   * in team details. A detached panel cannot paint a stale graph. */
+  function workflowArchitecture(work) {
+    const section = document.createElement('section');
+    section.className = 'native-workflow-architecture';
+    const title = document.createElement('h4');
+    title.textContent = t('Avis d’architecture du workflow');
+    const summary = document.createElement('span');
+    summary.id = 'pilot-workflow-advice';
+    summary.setAttribute('role', 'status');
+    summary.textContent = t('Avis d’architecture indisponible.');
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    const facts = document.createElement('div');
+    const approve = document.createElement('button');
+    approve.type = 'button';
+    approve.textContent = t('Valider cet avis');
+    approve.hidden = true;
+    section.append(title, status, facts, approve);
+
+    const url = '/api/v1/planning/workflow-architecture?' + new URLSearchParams({work:work.id});
+    const labels = {sequential:'Séquentiel', hierarchical:'Hiérarchique', insufficient:'Preuves insuffisantes'};
+    let shown;
+    let loading = false;
+    let pending = false;
+
+    /** Treat failures as explicit refusals; a valid reply must bind the graph's
+     * exact Work revision. Credentials remain confined to the same origin. */
+    async function request(options) {
+      const reply = await fetch(url, {credentials:'same-origin', ...options});
+      const value = await reply.json();
+      if (!reply.ok) throw Error(value?.failure?.reason || value?.failure?.code || 'workflow-architecture-unavailable');
+      if (value.schema_version !== 1 || value.work !== work.id || !Number.isSafeInteger(work.revision) ||
+          value.revision !== String(work.revision) || !/^[0-9a-f]{64}$/.test(value.proposal) ||
+          !Object.hasOwn(labels, value.assessment?.recommendation) || typeof value.approved !== 'boolean') {
+        throw Error('workflow-architecture-stale');
+      }
+      return value;
+    }
+
+    /** Render literal evidence and the saved receipt. Unknown or stale approval
+     * cannot enable a mutation on a different graph revision. */
+    function paint(value) {
+      if (!section.isConnected) return;
+      shown = value;
+      const criteria = value.assessment;
+      status.textContent = t(labels[criteria.recommendation]);
+      facts.replaceChildren();
+      journalField(facts, 'Révision', value.revision);
+      journalField(facts, 'Tâches', criteria.tasks);
+      journalField(facts, 'Dépendances', criteria.dependencies);
+      journalField(facts, 'Périmètres délégués', criteria.delegated_scopes);
+      const reason = document.createElement('p');
+      const reasons = {
+        sequential:'Les dépendances imposent un ordre unique.',
+        hierarchical:'Le graphe montre du travail parallèle et un prérequis entre périmètres délégués.',
+        insufficient:'Le graphe seul ne permet pas de trancher entre séquence et hiérarchie.'
+      };
+      reason.textContent = t(reasons[criteria.recommendation]);
+      const receipt = document.createElement('p');
+      receipt.textContent = value.approved ? t('Avis validé pour cette révision.') :
+        value.approval ? t('La validation précédente concerne une autre révision.') :
+        t('Avis en attente de validation.');
+      const limit = document.createElement('p');
+      limit.textContent = t('Valider l’avis enregistre votre décision. La réorganisation du plan est une opération distincte.');
+      facts.append(reason, receipt, limit);
+      summary.textContent = t('Workflow recommandé') + ' · ' + status.textContent + ' · ' + receipt.textContent;
+      if (value.approved) journalField(facts, 'Validation enregistrée', value.approval?.approved_at);
+      approve.hidden = value.approved || criteria.recommendation === 'insufficient';
+      approve.disabled = pending;
+    }
+
+    /** Read again after any uncertain submission. The previous receipt is never
+     * inferred from a browser response error. */
+    async function load() {
+      if (loading || pending || !section.isConnected) return;
+      loading = true;
+      approve.hidden = true;
+      status.textContent = t('Chargement…');
+      summary.textContent = t('Workflow recommandé') + ' · ' + status.textContent;
+      try {
+        paint(await request());
+      } catch (error) {
+        if (!section.isConnected) return;
+        shown = null;
+        facts.replaceChildren();
+        status.textContent = error.message === 'workflow-architecture-stale'
+          ? t('Le plan a changé. Actualisez Conduite pour examiner le nouvel avis.')
+          : t('Avis d’architecture indisponible.');
+        summary.textContent = status.textContent;
+      } finally {
+        loading = false;
+      }
+    }
+
+    approve.addEventListener('click', async () => {
+      if (pending || !shown || approve.hidden) return;
+      const {revision, proposal} = shown;
+      pending = approve.disabled = true;
+      try {
+        const session = await fetch('/api/v1/native-session', {credentials:'same-origin'});
+        const value = await session.json();
+        if (!session.ok || typeof value.csrf_token !== 'string') throw Error('workflow-architecture-session');
+        if (!section.isConnected) return;
+        const result = await request({
+          method:'POST',
+          headers:{'Content-Type':'application/json', 'X-Swarm-CSRF':value.csrf_token},
+          body:JSON.stringify({revision, proposal})
+        });
+        if (!result.approved) throw Error('workflow-architecture-approval-unconfirmed');
+        paint(result);
+      } catch {
+        if (!section.isConnected) return;
+        pending = false;
+        await load();
+        if (shown && !shown.approved) {
+          status.textContent = t('Validation de l’avis indisponible. Vérifiez vos droits et la révision.');
+        }
+      } finally {
+        pending = false;
+        approve.disabled = false;
+      }
+    });
+
+    return {section, summary, load};
+  }
+
+  function orchestrationRoleLabel(label) {
+    const name = document.createElement('strong');
+    name.className = 'orchestration-role-label';
+    const icon = document.createElement('span');
+    icon.className = 'orchestration-role-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    name.append(icon, document.createTextNode(label));
+    return name;
+  }
+
+  /**
+   * Project the Work's default root role and the recorded scope hierarchy.
+   * An unconfigured root has no provider or assigned tasks. Configured scopes
+   * use stored parentage. Only current mission status describes the conductor.
+   * Rendering does not mutate Work, dispatch a provider, or grant a launch.
+   * @param {object} work recorded Work with validated tasks
+   * @param {object|null} mission optional current observation
+   * @param {string} readMode "history" suppresses current observations
+   * @param {boolean|undefined} expanded same-Work disclosure state, if known
+   * @param {boolean} paused whether the mission holds new starts
+   * @returns {{panel: HTMLElement, assignments: Set<string>, reasons: Map<string,string>, results: Map<string,object>}}
+   */
+  function renderOrchestration(work, mission, readMode, expanded, paused) {
+    const panel = document.createElement('section');
+    panel.className = 'native-graph-orchestration';
+    panel.setAttribute('aria-labelledby', 'graph-orchestration-title');
+    const heading = document.createElement('h3');
+    heading.id = 'graph-orchestration-title';
+    heading.textContent = t('Orchestration');
+    const conductor = document.createElement('p');
+    conductor.dataset.orchestrationRole = 'driver';
+    const observation = readMode === 'history' ? null : mission?.supervision;
+    let driverState = 'État du conducteur indisponible.';
+    if (observation?.state === 'absent') driverState = 'Aucun conducteur Swarm actif observé.';
+    if (observation?.state === 'error') driverState = 'Conducteur Swarm observé, dernière vérification en erreur.';
+    if (observation?.state === 'active') {
+      driverState = observation.late ? 'Conducteur Swarm observé, mais vérification en retard.' : 'Conducteur Swarm observé.';
+    }
+    const driverActivity = observation?.state === 'error' ? 'error'
+      : observation?.state === 'active' && !observation.late ? 'running' : 'unconfirmed';
+    conductor.append(activityBadge(driverActivity, driverState));
+    panel.append(heading, conductor);
+
+    const reasons = new Map();
+    const results = new Map();
+    const workerIds = new Map();
+    if (readMode !== 'history' && Array.isArray(mission?.tasks)) {
+      for (const task of mission.tasks) {
+        if (typeof task?.id !== 'string') continue;
+        if (task.result) results.set(task.id, task.result);
+        if (typeof task.attempt?.agent_id === 'string' && task.attempt.agent_id) workerIds.set(task.id,task.attempt.agent_id);
+        if (typeof task.reason === 'string' && task.reason) {
+          reasons.set(task.id, globalThis.SwarmI18n?.engine?.(task.reason) ?? task.reason);
+        }
+      }
+    }
+    const assignments = new Set();
+    const planning = work.planning;
+    const rootId = mission?.organization?.root_scope ?? 'root';
+    const configuredReviewer = document.createElement('p');
+    configuredReviewer.dataset.orchestrationRole = 'reviewer';
+    const reviewer = planning?.reviewer;
+    const reviewActivity = [...results.values()].some(result => result.state === 'review_in_progress')
+      ? ['running', 'Revue indépendante en cours'] : reviewer?.failure
+        ? ['error', 'Vérification interrompue'] : paused ? ['paused', 'Départs en pause']
+          : ['unconfirmed', ACTIVITY_LABELS.unconfirmed];
+    configuredReviewer.append(orchestrationRoleLabel(t('Validateur indépendant') + ' · ' +
+      (reviewer?.provider
+        ? [reviewer.provider, reviewer.model_route?.model].filter(Boolean).join(' · ')
+        : t('Non configuré'))));
+    if (reviewer?.provider) {
+      configuredReviewer.append(' ', activityBadge(...reviewActivity));
+    }
+    panel.append(configuredReviewer);
+    const architecture = workflowArchitecture(work);
+    panel.append(architecture.section);
+    panel.loadWorkflowArchitecture = architecture.load;
+    panel.workflowArchitectureSummary = architecture.summary;
+
+    const scopes = planning ? (Array.isArray(planning.scopes) ? planning.scopes : []) : [{id: rootId}];
+    const byId = new Map();
+    const byParent = new Map();
+    for (const scope of scopes) {
+      if (!scope || typeof scope.id !== 'string' || !scope.id || byId.has(scope.id)) continue;
+      byId.set(scope.id, scope);
+      if (!byParent.has(scope.parent)) byParent.set(scope.parent, []);
+      byParent.get(scope.parent).push(scope);
+    }
+    const tasksByScope = new Map();
+    for (const task of planning ? work.tasks : []) {
+      if (!tasksByScope.has(task.scope_id)) tasksByScope.set(task.scope_id, []);
+      tasksByScope.get(task.scope_id).push(task);
+    }
+    const tree = document.createElement('details');
+    tree.dataset.orchestrationTree = '';
+    tree.open = expanded ?? true;
+    const treeTitle = document.createElement('summary');
+    treeTitle.textContent = t('Équipe et périmètres');
+    tree.append(treeTitle);
+    const root = byId.get(rootId);
+    const visited = new Set();
+    if (root && !root.parent) {
+      const hierarchy = document.createElement('ul');
+      const pending = [{ scope: root, list: hierarchy }];
+      while (pending.length) {
+        const { scope, list } = pending.pop();
+        if (visited.has(scope.id)) continue;
+        visited.add(scope.id);
+        const item = document.createElement('li');
+        item.dataset.orchestrationRole = scope === root ? 'root' : 'subplanner';
+        item.dataset.scope = scope.id;
+        item.append(orchestrationRoleLabel(scope === root
+          ? [t('Orchestrateur principal'), planning?.provider || t('À configurer'), planning?.model_route?.model].filter(Boolean).join(' · ')
+          : [t('Sous-orchestrateur'), scope.id, scope.model_selection?.provider,
+              scope.model_selection?.route?.model].filter(Boolean).join(' · ')));
+        if (planning) {
+          const scopeStatus = scope.state === 'closed' ? activityBadge('unconfirmed', 'Périmètre terminé')
+            : paused || planning.paused ? activityBadge('paused', 'Départs en pause')
+            : activityBadge('unconfirmed');
+          item.append(' ', scopeStatus);
+        }
+        const tasks = tasksByScope.get(scope.id) || [];
+        if (tasks.length) {
+          const details = document.createElement('details');
+          const summary = document.createElement('summary');
+          summary.textContent = t('Tâches rattachées') + ' · ' + tasks.length;
+          const members = document.createElement('ul');
+          for (const task of tasks) {
+            assignments.add(task.id);
+            const entry = document.createElement('li');
+            entry.textContent = task.title;
+            const activity = taskActivity(task, results.get(task.id), paused, readMode);
+            if (activity) entry.append(' ', activityBadge(activity));
+            if (reasons.has(task.id)) {
+              const explanation = document.createElement('span');
+              explanation.textContent = ' — ' + reasons.get(task.id);
+              entry.append(explanation);
+            }
+            entry.append(taskControlSummary(task, results.get(task.id)));
+            members.append(entry);
+          }
+          details.append(summary, members);
+          item.append(details);
+        }
+        const children = byParent.get(scope.id);
+        if (children?.length) {
+          const branch = document.createElement('ul');
+          item.append(branch);
+          for (const child of children.slice().reverse()) pending.push({ scope: child, list: branch });
+        }
+        list.append(item);
+      }
+      tree.append(hierarchy);
+    }
+    if (!visited.has(rootId) || visited.size !== scopes.length) {
+      const warning = document.createElement('p');
+      warning.textContent = t('Hiérarchie incomplète : certains périmètres sont introuvables.');
+      tree.append(warning);
+    }
+    if (assignments.size !== work.tasks.length) {
+      const missing = document.createElement('p');
+      missing.textContent = t('Tâches sans rattachement affichable') + ' · ' + (work.tasks.length - assignments.size);
+      tree.append(missing);
+    }
+    if (planning) {
+      const signals = document.createElement('button');
+      signals.type = 'button';
+      signals.id = 'conduite-status-signals';
+      signals.textContent = t('Remontées de statut');
+      signals.setAttribute('aria-haspopup', 'dialog');
+      signals.addEventListener('click', () => showOrchestrationSignals(work, signals));
+      panel.append(signals);
+    }
+    panel.append(tree);
+    return { panel, assignments, reasons, results, workerIds, reviewActivity };
+  }
+
+  /** Lay out recorded responsibility nodes above the same task canvas. Scope
+   * references and reviewer configuration come from this Work only. There is no
+   * placeholder actor, inferred task dependency, or execution state. */
+  function workflowRoles(work, assignments, paused, reviewActivity, columns) {
+    const roles = new Map();
+    const planning = work.planning;
+    const scopes = planning?.scopes ?? [];
+    const root = scopes.find(scope => scope?.id === 'root' && !scope.parent);
+    if (!root) return {roles, reviewer:null, height:0, width:0};
+    const dimensions = {width:218, height:82};
+    const register = (scope, kind, x, y, label, detail) => {
+      const state = scope?.state === 'closed' ? 'unconfirmed' : paused || planning.paused ? 'paused' : 'unconfirmed';
+      const activityLabel = scope?.state === 'closed' ? 'Périmètre terminé' :
+        state === 'paused' ? 'Départs en pause' : ACTIVITY_LABELS[state];
+      const [activity, activityText] = kind === 'reviewer' ? reviewActivity : [state, activityLabel];
+      const node = {scope, kind, x, y, label, detail, state:activity, activityLabel:activityText, ...dimensions};
+      if (scope) roles.set(scope.id, node);
+      return node;
+    };
+    register(root, 'root', 20, 22, t('Orchestrateur principal'),
+      [root.id, planning.provider].filter(Boolean).join(' · '));
+    const reviewer = planning.reviewer?.provider
+      ? register(null, 'reviewer', 258, 22, t('Validateur indépendant'),
+        [planning.reviewer.provider, planning.reviewer.model_route?.model].filter(Boolean).join(' · '))
+      : null;
+    const counts = new Map();
+    for (const task of work.tasks.filter(task => assignments.has(task.id))) {
+      counts.set(task.scope_id, (counts.get(task.scope_id) ?? 0) + 1);
+    }
+    const byParent = new Map();
+    for (const scope of scopes) {
+      if (!scope?.parent || typeof scope.id !== 'string') continue;
+      if (!byParent.has(scope.parent)) byParent.set(scope.parent, []);
+      byParent.get(scope.parent).push(scope);
+    }
+    const seen = new Set([root.id]), children = [], pending = [root.id];
+    for (let index = 0; index < pending.length; index++) {
+      for (const scope of byParent.get(pending[index]) ?? []) {
+        if (seen.has(scope.id)) continue;
+        seen.add(scope.id);
+        children.push(scope);
+        pending.push(scope.id);
+      }
+    }
+    let slot = 0, previousDepth = 0;
+    const depths = new Map([[root.id,0]]);
+    for (const scope of children) {
+      const depth = depths.get(scope.parent)+1;
+      depths.set(scope.id,depth);
+      if (depth !== previousDepth && slot % columns) slot += columns - slot % columns;
+      previousDepth = depth;
+      register(scope, 'subplanner', 62 + (slot % columns) * 270, 148 + Math.floor(slot / columns) * 112,
+        t('Sous-orchestrateur'), scope.id + ' · ' + (counts.get(scope.id) ?? 0));
+      slot++;
+    }
+    const roleWidth = Math.max(260, children.length ? 82 + (Math.min(columns,slot)-1)*270 + dimensions.width : 0);
+    return {
+      roles, reviewer, height: children.length ? 148 + Math.ceil(slot / columns) * 112 : 115,
+      width: Math.max(roleWidth,reviewer ? 496 : 0),
+      overviewWidth: roleWidth,
+      scopeWidth: reviewer ? 496 : 260,
+    };
+  }
+
+  /** Route a responsibility arrow through its existing junctions, using the
+   * same corner rounding as the dependency layout. Coincident points collapse
+   * to a straight segment. This controls geometry only. */
+  function roundedResponsibilityPath(points) {
+    return graphEdgePath(points.filter(([x,y], index) =>
+      index === 0 || x !== points[index-1][0] || y !== points[index-1][1]
+    ).map(([x,y]) => ({x,y})));
+  }
+
+  /** Draw delegations, review and assignments as separate read-only relations.
+   * Assignment endpoints are updated with the existing task movement controls.
+   * No edge here is accepted by the dependency editor. */
+  function drawWorkflowRoles(svg, roles, reviewer, assignments, tasks, graph) {
+    if (!roles.size) return;
+    const root = roles.get('root');
+    const colors = {delegation:'graph-workflow-delegation-marker', review:'graph-workflow-review-marker', assignment:'graph-workflow-assignment-marker'};
+    const defs = svg.querySelector('defs');
+    for (const [kind, color] of Object.entries(colors)) {
+      const marker = svgNode('marker', {id:'recorded-workflow-'+kind,viewBox:'0 0 8 8',
+        refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
+      marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:color}));
+      defs.append(marker);
+    }
+    const layer = svgNode('g', {class:'graph-workflow-relations'});
+    const edge = (kind, label, d) => {
+      const path = svgNode('path', {d,class:'graph-workflow-edge',role:'img','aria-label':label,'data-relation':kind,
+        'marker-end':'url(#recorded-workflow-'+kind+')'});
+      path.append(svgNodeTitle(label));
+      layer.append(path);
+      return path;
+    };
+    for (const node of roles.values()) {
+      const parent = roles.get(node.scope.parent);
+      if (!parent || parent === node) continue;
+      const fromX = parent.x + parent.width / 2, fromY = parent.y + parent.height;
+      const toX = node.x + node.width / 2, toY = node.y;
+      const lane = parent === root ? 36 : parent.x - 14;
+      const route = [[fromX,fromY],[fromX,fromY+12],[lane,fromY+12],
+        [lane,toY-16],[toX,toY-16],[toX,toY]];
+      const path = roundedResponsibilityPath(route);
+      const link = edge('delegation',t('Délégation')+' · '+parent.scope.id+' → '+node.scope.id,
+        path);
+      link.dataset.fromRole = parent.scope.id;
+      link.dataset.toRole = node.scope.id;
+    }
+    if (reviewer) {
+      const y = reviewer.y + reviewer.height/2;
+      const end = root.x + root.width;
+      edge('review',t('Revue indépendante configurée'),
+        `M${reviewer.x},${y} Q${(reviewer.x+end)/2},${y-12} ${end},${y}`);
+    }
+    for (const task of tasks) {
+      if (!assignments.has(task.id)) continue;
+      const owner = roles.get(task.scope_id);
+      if (!owner || !graph.node(graphNodeKey(task.id))) continue;
+      const link = edge('assignment',t('Affectation')+' · '+task.scope_id+' → '+task.id,'');
+      link.dataset.assignedTask = task.id;
+      link.dataset.assignmentScope = task.scope_id;
+      link.dataset.originX = String(owner.x+owner.width/2);
+      link.dataset.originY = String(owner.y+owner.height);
+    }
+    svg.append(layer);
+    for (const node of [...roles.values(),...(reviewer ? [reviewer] : [])]) {
+      const tone = {root:'info', subplanner:'attention', reviewer:'succes'}[node.kind];
+      const icon = {root:'◆', subplanner:'↳', reviewer:'✓'}[node.kind];
+      const name = node.scope?.id ?? node.detail;
+      const group = svgNode('g',{class:'graph-responsibility graph-workflow-role',role:node.scope ? 'button' : 'img',
+        'aria-label':[node.label,name,t(node.activityLabel),node.scope ? t('Ouvrir ou fermer ce périmètre') : ''].filter(Boolean).join(' · '),
+        'data-agent-role':node.kind,'data-tone':tone});
+      if (node.scope) {
+        group.dataset.workflowScope = node.scope.id;
+        group.setAttribute('tabindex','0');
+      }
+      group.append(svgNodeTitle([node.label,node.detail,t(node.activityLabel),node.scope ? t('Ouvrir ou fermer ce périmètre') : ''].filter(Boolean).join(' · ')),svgNode('rect',
+        {x:node.x,y:node.y,width:node.width,height:node.height,rx:9}));
+      const title = svgNode('text',{x:node.x+12,y:node.y+24,'data-role-line':0});
+      title.textContent = icon + ' ' + node.label;
+      const detail = svgNode('text',{x:node.x+12,y:node.y+45});
+      appendTruncated(detail,node.detail);
+      const indicator = svgNode('circle',{cx:node.x+17,cy:node.y+65,r:5,
+        class:'graph-activity-mark','data-activity':node.state,'aria-hidden':'true'});
+      const state = svgNode('text',{x:node.x+29,y:node.y+69,class:'graph-role-activity'});
+      state.textContent = t(node.activityLabel);
+      group.append(title,detail,indicator,state);
+      svg.append(group);
+    }
   }
 
   /**
@@ -793,15 +2011,21 @@
    * Saving an editor uses protected engine operations; another Work restores only
    * its own validated preference and never inherits full screen or undo history.
    * Side effect: replaces the container's children (scrollable canvas + svg).
-   * @param {object} work Work {id,title,tasks:[{id,title,status,depends?:string[]}]}
+   * @param {object} work Work including recorded planning and tasks
+   * @param {object|null} mission current mission observation when available
+   * @param {string} readMode distinguishes current from historical observations
+   * @param {boolean} controlPaused saved mission pause if no current observation
    * @throws {Error} on invalid Work, duplicate ids, unknown-shaped dependencies or cycles
    */
-  function render(work) {
+  function render(work, mission=null, readMode='current', controlPaused=false) {
     const host = container();
     const { tasks, depPairs, unknown } = validateWork(work);
     const previous=host.graphView?.(),initial=previous?.work===work.id?previous:null;
+    const expanded=initial ? host.querySelector('[data-orchestration-tree]')?.open : undefined;
+    const paused = (readMode === 'history' ? controlPaused : mission?.paused ?? controlPaused) === true;
+    const orchestration=renderOrchestration(work,mission,readMode,expanded,paused);
     const recovered=initial?{view:null,error:''}:readStoredView(work.id);
-    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;host.graphRevealTask=null;
     const orientation=initial?(host.dataset.orientation==='TB'?'TB':'LR'):(recovered.view?.orientation||'LR');host.dataset.orientation=orientation;
     if (typeof graphNodeKey !== 'function' || typeof svgNode !== 'function' || typeof graphEdgePath !== 'function' || typeof graphTonalites !== 'object' || !globalThis.dagre || !globalThis.dagre.graphlib || !globalThis.dagre.layout) {
       throw new Error(t('Graphe : moteur dagre indisponible.'));
@@ -817,7 +2041,7 @@
     };
     const tonalites = graphTonalites;
 
-    const nodeWidth = 260, nodeHeight = 72;
+    const nodeWidth = 260, nodeHeight = 92;
     const g = new globalThis.dagre.graphlib.Graph();
     g.setGraph({ rankdir: orientation, ranker: 'tight-tree', nodesep: 28, ranksep: 70, marginx: 20, marginy: 20 });
     g.setDefaultEdgeLabel(() => ({}));
@@ -832,10 +2056,59 @@
     } else {
       globalThis.dagre.layout(g);
     }
-    const totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
-    const totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
+    let totalWidth = depPairs.length ? g.graph().width : orientation==='LR'?Math.max(nodeWidth+40,tasks.length*(nodeWidth+28)+12):nodeWidth+40;
+    let totalHeight = depPairs.length ? g.graph().height : orientation==='TB'?Math.max(nodeHeight+40,tasks.length*(nodeHeight+28)+12):nodeHeight+40;
+    const rankAxis = orientation === 'TB' ? 'y' : 'x';
+    const taskRanks = new Map(tasks.map(task => [task.id,depPairs.length ? g.node(graphNodeKey(task.id))[rankAxis] : 0]));
+    // Preserve dependency ranks while packing tasks into their recorded branch.
+    const bands = new Map();
+    if (orchestration.assignments.size) {
+      for (const task of tasks) {
+        const scope = orchestration.assignments.has(task.id) ? task.scope_id : '';
+        if (!bands.has(scope)) bands.set(scope, []);
+        bands.get(scope).push(task);
+      }
+    }
+    const branchLabels = [];
+    if (bands.size > 1) {
+      const vertical = orientation === 'TB';
+      const along = vertical ? nodeHeight : nodeWidth;
+      const across = vertical ? nodeWidth : nodeHeight;
+      const rankOf = task => depPairs.length ? g.node(graphNodeKey(task.id))[vertical ? 'y' : 'x'] : 0;
+      const ranks = [...new Set(tasks.map(rankOf))].sort((a, b) => a - b);
+      const offsets = new Map(ranks.map((rank, index) => [rank, (vertical ? 36 : 20) + index * 3 * (along + 28)]));
+      let bandStart = 20, alongEnd = 0;
+      for (const [scope, members] of bands) {
+        const counts = new Map();
+        let rows = 1;
+        branchLabels.push({ scope, start: bandStart });
+        for (const task of members) {
+          const rank = rankOf(task), index = counts.get(rank) || 0;
+          counts.set(rank, index + 1);
+          const a = offsets.get(rank) + (index % 3) * (along + 28) + along / 2;
+          const b = bandStart + 30 + Math.floor(index / 3) * (across + 28) + across / 2;
+          Object.assign(g.node(graphNodeKey(task.id)), { x: vertical ? b : a, y: vertical ? a : b });
+          alongEnd = Math.max(alongEnd, a + along / 2 + 20);
+          rows = Math.max(rows, Math.floor(index / 3) + 1);
+        }
+        bandStart += 30 + rows * (across + 28);
+      }
+      totalWidth = vertical ? bandStart : alongEnd;
+      totalHeight = vertical ? alongEnd : bandStart;
+    }
 
+    const workflow = workflowRoles(work, orchestration.assignments, paused, orchestration.reviewActivity,
+      host.clientWidth > 0 && host.clientWidth < 630 ? 1 : 2);
+    for (const task of tasks) g.node(graphNodeKey(task.id)).y += workflow.height;
+    totalHeight += workflow.height;
+    totalWidth = Math.max(totalWidth,workflow.width);
     const svg = svgNode('svg', {});
+    svg.dataset.roleWidth = String(workflow.overviewWidth ?? 0);
+    svg.dataset.roleHeight = String(workflow.height);
+    const stackReview = host.clientWidth > 0 && host.clientWidth < 510;
+    svg.dataset.scopeWidth = String(stackReview ? 300 : workflow.scopeWidth ?? 0);
+    svg.dataset.stackReview = String(stackReview);
+    svg.dataset.taskColumns = host.clientWidth > 0 && host.clientWidth < 700 ? '1' : '2';
     svg.setAttribute('width',String(totalWidth));svg.setAttribute('height',String(totalHeight));
     const defs=svgNode('defs',{}),marker=svgNode('marker',{id:'recorded-dependency-arrow',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
     marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:'graph-fleche'}));defs.append(marker);svg.append(defs);
@@ -843,6 +2116,13 @@
     svg.setAttribute('class', 'graph-svg');
     svg.setAttribute('role', 'group');
     svg.setAttribute('aria-label', t('Dépendances : du prérequis vers la tâche'));
+
+    for (const { scope, start } of branchLabels) {
+      const label = svgNode('text', { x: orientation === 'TB' ? start : 20,
+        y: workflow.height + (orientation === 'TB' ? 16 : start + 18), class: 'graph-titre', 'data-graph-branch': scope });
+      label.textContent = scope || t('Sans périmètre');
+      svg.append(label);
+    }
 
     for (const e of depPairs) {
       const data = g.edge(graphNodeKey(e.from), graphNodeKey(e.to));
@@ -857,18 +2137,42 @@
       svg.append(edge);
     }
 
+    drawWorkflowRoles(svg,workflow.roles,workflow.reviewer,orchestration.assignments,tasks,g);
+
+    // Repeated project prefixes stay in the accessible full title and search.
+    // The compact card shows its subject so adjacent cards can be distinguished.
+    const titles = new Map();
+    const prefixCounts = new Map();
+    for (const task of tasks) {
+      const separator = task.title.indexOf(' · ');
+      if (separator <= 0 || separator + 3 >= task.title.length) continue;
+      const prefix = task.title.slice(0,separator);
+      titles.set(task.id,{prefix,subject:task.title.slice(separator+3)});
+      prefixCounts.set(prefix,(prefixCounts.get(prefix) ?? 0)+1);
+    }
+
     for (const task of tasks) {
       const pos = g.node(graphNodeKey(task.id));
       const left = pos.x - nodeWidth / 2, top = pos.y - nodeHeight / 2;
       const stateLabel = labels[task.status] || task.status;
+      const activity = taskActivity(task, orchestration.results.get(task.id), paused, readMode);
+      const activityLabel = activity ? t(ACTIVITY_LABELS[activity]) : '';
       const group = document.createElementNS(SVG_NS, 'g');
       group.setAttribute('class', 'graph-noeud');
       group.setAttribute('role', 'img');
-      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + stateLabel);
+      const scope = orchestration.assignments.has(task.id)
+        ? ' · ' + t('Périmètre') + ' ' + task.scope_id : '';
+      const reason = orchestration.reasons.get(task.id);
+      const engineReason = reason ? ' · ' + reason : '';
+      const workerId = orchestration.workerIds.get(task.id);
+      const worker = workerId ? t('Agent observé') + ' · ' + workerId : t('Agent non observé');
+      const detail = [stateLabel, activityLabel].filter(Boolean).join(' · ') + scope + ' · ' + worker + engineReason;
+      group.setAttribute('aria-label', t('Tâche : ') + task.title + t(' — identifiant : ') + task.id + t(' — état : ') + detail);
       group.dataset.task = task.id;
+      group.dataset.taskRank = String(taskRanks.get(task.id));
       group.dataset.etat = tonalites[task.status] || 'neutre';
       group.append(document.createElementNS(SVG_NS, 'title'));
-      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + stateLabel;
+      group.lastChild.textContent = task.title + ' (' + task.id + ') — ' + detail;
       const rect = document.createElementNS(SVG_NS, 'rect');
       rect.setAttribute('x', String(left));
       rect.setAttribute('y', String(top));
@@ -877,23 +2181,38 @@
       rect.setAttribute('rx', '12');
       rect.setAttribute('class', 'graph-cadre');
       group.append(rect);
+      if (activity === 'running') {
+        // The inset frame travels with the card and leaves its focus stroke clear.
+        group.append(svgNode('rect', {
+          x: left + 2, y: top + 2, width: nodeWidth - 4, height: nodeHeight - 4,
+          rx: 10, pathLength: 100, class: 'graph-activity-frame',
+          'data-activity': activity, 'aria-hidden': 'true',
+        }));
+      }
       const title = document.createElementNS(SVG_NS, 'text');
       title.setAttribute('x', String(left + 14));
       title.setAttribute('y', String(top + 28));
       title.setAttribute('class', 'graph-titre');
-      appendTruncated(title, task.title);
+      const compact = titles.get(task.id);
+      appendTruncated(title, compact && prefixCounts.get(compact.prefix)>1 ? compact.subject : task.title);
       group.append(title);
+      group.append(svgNode('circle', {
+        cx: left + 18, cy: top + 48, r: 5,
+        class: 'graph-activity-mark', 'data-activity': activity || 'idle', 'aria-hidden': 'true',
+      }));
       const sub = document.createElementNS(SVG_NS, 'text');
-      sub.setAttribute('x', String(left + 14));
+      sub.setAttribute('x', String(left + 29));
       sub.setAttribute('y', String(top + 52));
       sub.setAttribute('class', 'graph-sous-titre');
-      appendTruncated(sub, task.id + ' · ' + stateLabel);
-      group.append(sub);
+      appendTruncated(sub, activityLabel || stateLabel);
+      const workerLabel = svgNode('text',{x:left+14,y:top+77,class:'graph-sous-titre','data-task-agent':''});
+      appendTruncated(workerLabel, worker);
+      group.append(sub,workerLabel);
       svg.append(group);
     }
 
     canvas.append(svg);
-    if(!tasks.length){const empty=document.createElement('p');empty.textContent=t('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.');canvas.append(empty)}
+    canvas.hidden = tasks.length === 0 && workflow.roles.size === 0;
     if (unknown.length) {
       const warning = document.createElement('p');
       warning.setAttribute('role', 'alert');
@@ -901,7 +2220,8 @@
         unknown.map(u => u.dep + ' → ' + u.taskId).join(', ');
       canvas.append(warning);
     }
-    navigation(host,canvas,svg,work,orientation,initial||recovered.view,recovered.error,recovered.errorCode);
+    navigation(host,canvas,svg,work,orientation,orchestration.panel,
+      () => render(work,mission,readMode,controlPaused),initial||recovered.view,recovered.error,recovered.errorCode);
   }
 
   /** Display at most 24 UTF-16 code units including the ellipsis to leave room
@@ -937,7 +2257,7 @@
    */
   function clear(message) {
     const host = container();
-    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;
+    host.graphCleanup?.();host.graphCleanup=null;host.graphView=null;host.graphRestoreView=null;host.graphRevealTask=null;
     const p = document.createElement('p');
     p.textContent = typeof message === 'string' ? message : '';
     host.replaceChildren(p);

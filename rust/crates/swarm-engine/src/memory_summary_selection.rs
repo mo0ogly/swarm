@@ -164,9 +164,10 @@ pub(crate) fn memory_summary_extract(
 /// Go `memorySummaryAttachment` (admission side of
 /// `internal/engine/agents_store.go:496`): validate the extractive selection
 /// against the branch restrictions and the stored Work, rebuild the
-/// attachment text from persisted sources, and stamp the receipt with the
-/// prepared work/task/revision. Returns `(None, None)` without a selection;
-/// the receipt is otherwise a complete prepared receipt (no queue fields).
+/// attachment text from persisted sources in the selected task's scope, and
+/// stamp the receipt with the prepared work/task/revision. This supports the
+/// first operator worker attempt and the historical standalone projection.
+/// Returns `(None, None)` without a selection and performs no mutation.
 pub(crate) fn memory_summary_attachment(
     root: &std::path::Path,
     w: &crate::Work,
@@ -175,8 +176,7 @@ pub(crate) fn memory_summary_attachment(
     let Some(choice) = r.summary_selection.as_deref() else {
         return Ok((None, None));
     };
-    if w.planning.is_some()
-        || w.tasks
+    if w.tasks
             .as_deref()
             .unwrap_or_default()
             .iter()

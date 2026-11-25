@@ -125,6 +125,8 @@ both purposes when its capabilities allow it.
 
 ## 3. Prepare a mission
 
+In the preparation conversation, open **Choose a workflow architecture** to [request or revisit an AI assessment](NATIVE-AGENT-EXCHANGES.md#audit-and-reassess-the-choice-with-ai). Review and send the draft. Plan adoption remains your decision.
+
 Choose **Prepare a project**. Describe the result, target directory, boundaries
 and success criteria. For example:
 
@@ -174,6 +176,47 @@ After the single team authorization, open management. Only eligible missions may
 start; dependency, budget, pause and workspace checks still apply. Review the
 provider, directory, concurrency and limits before any manual start.
 
+Every Work opens on its principal orchestrator’s canvas. Its `root` scope
+exists from creation. The canvas marks roles as pending while the team is
+being configured. Creating the Work and adding tasks trigger no provider.
+
+The engine requires a configured team for every launch. An automatic start
+refuses before consent is recorded. A manual start refuses before reservation
+and the team is checked again before execution. Reviewer capacity and task
+controls are still required.
+
+### Attach a team to existing work
+
+For ordinary work with no start consent or active execution,
+`swarm-rust planning attach ID --root ROOT --input CONFIG.json --json` attaches a
+team while retaining the existing Work. Supply the expected revision, planner and
+reviewer provider, planning budgets, and `task_scopes` mapping every existing task
+to a branch planner. Each task needs existing criteria and an authorized
+validation policy. Human and automatic policies can coexist. Each saved policy
+covers the identical criteria assigned to its child task while that task remains
+in the plan. Supply `checks` for root and other uncovered requirements. Future
+tasks may inherit these explicit controls under the planning rules. Attachment preserves dependencies, statuses, attempts and
+results. Missing assignments or active execution reject the entire change.
+
+The optional `task_workspaces` map selects existing directories within the
+project. Distinct workspaces let the conductor progress independent branches
+subject to dependencies, current authorizations and available slots.
+For a managed repository, supply `repository` with a local path and
+`committed_only: true`. Swarm pins the existing commit. It refuses custom
+workspaces or a request to include uncommitted modifications with this option.
+Per-attempt copies are prepared at launch.
+A verifiable failed or interrupted native worker completion is delivered to
+the newly assigned scope. The historical attempt and task state stay intact.
+This evidence handoff grants no retry.
+The cockpit reads ordinary attempts that ended before attachment from their
+native receipts, including zero-exit attempts. The task retains its state and
+requires its configured validation. Missing or inconsistent historical
+evidence leaves operational status unavailable.
+Attachment records no start consent. Start and validation use their usual
+operations. If the revision changes during launch preview, the conductor rereads
+the Work on its next cycle once the engine confirms that no admission was
+attempted. The previously synchronized queue is retained.
+
 Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready
 now; use the mission with an observed driver for ongoing automatic progression.
@@ -222,9 +265,123 @@ In the session, read timestamps, event types and messages. Received output shows
 observable activity, not the model's private reasoning. Detailed capture is
 optional; without it, not all raw provider output is retained.
 
+### Follow status updates between orchestrators
+
+In the Dispatch summary, **View** under **Needs review** or **Blocked**
+opens the task details over the current view. **Escape** or **Close** returns
+focus to the button.
+
+In the Dispatch **Task details** panel, a deliverable link in the format
+`codex://threads/<UUID>` opens the chat through the Codex app if the device
+handles this link type. The remaining deliverable text stays visible.
+
+In **Dispatch → Team and validation**, open **Status updates** with Logs access.
+**Sent** records the entry into the recipient’s inbox. **Received in context**
+identifies the recorded activation containing the signal. **Processed** links
+to an applied decision that cites it. Open **Show evidence** for references.
+A decision may acknowledge the signal without an operation. Reading has no
+execution effect.
+
+### Approve a submitted task
+
+In the **Dispatch** summary, use **View** under **Needs review** to open the
+task details. A submitted task in human review shows **Approve**. The engine
+checks the revision and the required evidence. For a planned task, this
+includes the original independent review and current delivery evidence.
+The details show the reason for a block.
+
+Click **Approve** after reviewing the deliverable. The action requires
+permission to modify the mission. The details confirm the state after reading
+it back from the engine. If the revision changes or recording is uncertain,
+refresh the mission before proceeding.
+
+The window opens **Report handed off** in Monaco as soon as it is available.
+The report and the file list arrive in one read. If the report cannot be read,
+the other items remain available under **Deliverables**.
+If the mission changes during the read, refresh it to open the files for its
+new revision.
+When you switch deliverables, the server verifies and reads the selected file.
+It reuses the decoded mission record while its bytes remain identical.
+On phones, **Files** expands the tree. Selecting a file closes the tree and
+returns to the viewer. **Technical details** groups the task JSON files. Monaco
+provides read-only search. Available Word, OpenDocument and PDF originals can
+be downloaded. If a read fails, **Try again** retries that read. Protected
+items use Logs view permissions. **Approve** and its status stay above the
+viewer. On a refusal, **Diagnosis** shows the engine code.
+
+In the side menu, **AI cockpit help** explains how to open a deliverable, see why
+approval is blocked, and find Logs or Resume. Shortcuts open the views you have
+access to. Press **Escape** to close help.
+
+### Open a task's action file
+
+In **Dispatch**, **Actions** on the card opens the task plan, attempts, and
+recorded adjustments. The starting instruction stays visible when submission
+changes the next step. Select an action to see its category and observed
+outcome. **Download JSON file** exports the same read. The account needs
+access to **Logs**. The file displays
+**Awaiting your human review** when the task is submitted under a human
+validation policy.
+
+Swarm matches tool events declared by the provider. The last supervisor
+observation may precede the current action. The completion receipt records
+observed outcomes. Older receipts may lack details. The file omits tool
+arguments, raw paths, and private output. Partial observations are labeled.
+Reading or exporting the file does not trigger a business action.
+
 ### Read the graph and inspect a task
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
+
+Use **Task graph** and **Team and validation** at the top of the active panel.
+The buttons remain available in fullscreen, and selecting the team exits fullscreen.
+On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
+**Task graph** shows dependencies, task states and graph controls. Role cards
+show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
+configured independent reviewer in green ✓. The legend distinguishes prerequisites,
+delegation, assignment and configured review. An organized plan opens on the orchestrators.
+Delegations are aligned by level. Activate a card to isolate the path from the
+principal orchestrator to its scope, or use **Show all agents and tasks** for the
+full view. Gray assignment arrows connect each orchestrator to the visible
+tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
+Clicking the same orchestrator again or choosing **Back to orchestrators**
+restores the initial view. The configured independent reviewer appears in green
+beside the principal orchestrator in an open scope or in the full view. Drag a card to move it, or use the arrow keys while the card has focus. Color dots accompany
+In a scope, tasks are arranged by dependency rank. Assignments share a line
+above each row, while prerequisites approach from the right. Repeated title
+prefixes are omitted on cards and retained in search and accessible labels.
+The minimap appears in the full view, leaving cards clear in the other levels.
+status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded
+hierarchy when sub-orchestrators report to the principal orchestrator. It also
+shows the engine recommendation and its approval status.
+**Locate a dependency** centers
+the viewport on each prerequisite arrow in turn. The blue **In action** marker
+indicates confirmed execution. The blue outline moves while that state is
+displayed. **Pause animation** holds it still, and the system preference for
+reduced motion also applies. Red
+**Stopped** indicates an interrupted or failed attempt. Amber **Paused** marks
+an unstarted task in a paused mission. Gray **Activity unconfirmed** marks a
+recorded running task without a current running observation. Assigned tasks use
+the same markers. Orchestrator markers indicate paused starts or unconfirmed
+individual activity. The reviewer marker can indicate an ongoing review. **Team and validation**
+displays the observed driver and the configured
+independent reviewer. **Team and scopes** shows the principal
+orchestrator, sub-orchestrators, and their tasks. A blue diamond marks the
+principal orchestrator, an amber branch arrow marks sub-orchestrators, and a
+green check mark identifies the independent reviewer. These icons accompany
+the role labels. Check results appear in the recorded receipt. Each sub-orchestrator has a
+parent and a scope with assigned requirements and tasks. Incidents outside
+that scope belong to the parent. Sibling scopes appear as separate
+branches. Task arrows indicate prerequisites. The task
+list within a scope and the card's accessible label show the current reason
+supplied by the engine. Each assigned task lists configured checks, recorded
+check results and the recorded independent review. It also shows the current
+validation state when the engine supplies it. History mode shows the recorded team and leaves
+operational status unavailable. The graph reports when a team is unattached.
+
+In the CLI, `swarm-rust planning graph ID --root ROOT --json` shows the scopes
+and their parents, the reviewer, prerequisites, and check IDs. A missing
+conductor observation stays `null`. This read-only command records no launch consent.
 
 Use **Edit dependencies** to open the draft inside the product graph. Choose
 add or remove, then activate the prerequisite and dependent task with the mouse,

@@ -1,5 +1,7 @@
 //! Default-profile native manual preparation, actual CLI and output failures.
 #![cfg(target_os = "linux")]
+#[path = "../../test_support/manual_launch_team.rs"]
+mod manual_launch_team;
 use std::{
     fs,
     io::{self, Write},
@@ -23,7 +25,6 @@ fn fixture() -> (tempfile::TempDir, String, std::path::PathBuf) {
     let mut store = RootStore::initialize(root.path(), &mut SystemEnvironment).unwrap();
     let work=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap().result.work.id;
     store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
-    store.close().unwrap();
     fs::write(
         root.path().join(".swarm/providers.json"),
         br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
@@ -35,8 +36,13 @@ fn fixture() -> (tempfile::TempDir, String, std::path::PathBuf) {
         fs::Permissions::from_mode(0o600),
     )
     .unwrap();
+    fs::create_dir(root.path().join("w")).unwrap();
     let input = root.path().join("launch.json");
-    fs::write(&input,br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+    let revision = manual_launch_team::attach(root.path(), &mut store, &work);
+    store.close().unwrap();
+    let launch = serde_json::json!({"schema_version":1,"event_id":"session",
+        "expected_revision":revision,"task_id":"task","provider":"fixture","workspace":"w"});
+    fs::write(&input,serde_json::to_vec(&launch).unwrap()).unwrap();
     (root, work, input)
 }
 /// Preview leaves no intention, real preparation records once, show/reconcile
@@ -44,6 +50,8 @@ fn fixture() -> (tempfile::TempDir, String, std::path::PathBuf) {
 #[test]
 fn agent_cli_manual_prepare_preview_replay_show_and_cancel() {
     let (root, work, input) = fixture();
+    let request: serde_json::Value = serde_json::from_slice(&fs::read(&input).unwrap()).unwrap();
+    let candidate_revision = request["expected_revision"].as_i64().unwrap() + 1;
     for operation in ["preview", "prepare", "prepare"] {
         let o = call(
             root.path(),
@@ -69,7 +77,7 @@ fn agent_cli_manual_prepare_preview_replay_show_and_cancel() {
         assert!(v["agent"]["prompt"]
             .as_str()
             .unwrap()
-            .contains("révision du travail 3"));
+            .contains(&format!("révision du travail {candidate_revision}")));
     }
     let show = call(root.path(), &["agent", "show", "session", "--json"]);
     assert!(show.status.success());
@@ -335,12 +343,10 @@ fn agent_cli_saved_storage_policy_refuses_then_recovers_without_duplicate() {
 fn native_manual_agent_run_has_real_input_kernel_identity_and_no_task_acceptance() {
     use sha2::{Digest, Sha256};
     let (root, work, input) = fixture();
-    let proof = root.path().join("provider-proof.json");
+    let proof = root.path().join("w").join("provider-proof.json");
     let script="import os,sys,json,hashlib; raw=sys.stdin.buffer.read(); p=sys.argv[1]; prior=json.load(open(p))['runs'] if os.path.exists(p) else 0; json.dump({'pid':os.getpid(),'ppid':os.getppid(),'input_bytes':len(raw),'input_sha256':hashlib.sha256(raw).hexdigest(),'runs':prior+1},open(p,'w')); sys.stdout.buffer.write(raw)";
     let providers = serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,proof.to_str().unwrap()]}}});
-    fs::write(
-        root.path().join(".swarm/providers.json"),
-        serde_json::to_vec(&providers).unwrap(),
+    manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&providers).unwrap(),
     )
     .unwrap();
     let prepared = call(
@@ -442,60 +448,67 @@ fn supervision_settings(
         }
     }
 }
-/// Actual independent local provider writes READY over its private test socket.
-/// Poll both listener and CLI pidfd, with no arbitrary global deadline, so a
-/// startup refusal cannot masquerade as readiness or leave a blocked accept.
-fn ready_provider(
-    listener: &std::os::unix::net::UnixListener,
-    child: &std::process::Child,
-) -> std::os::unix::net::UnixStream {
-    use rustix::{
-        event::{poll, PollFd, PollFlags},
-        process::{pidfd_open, Pid, PidfdFlags},
-    };
-    use std::io::Read;
-    listener.set_nonblocking(true).unwrap();
-    let fd = pidfd_open(
-        Pid::from_raw(i32::try_from(child.id()).unwrap()).unwrap(),
-        PidfdFlags::empty(),
-    )
-    .unwrap();
-    loop {
-        match listener.accept() {
-            Ok((mut socket, _)) => {
-                let mut marker = [0];
-                socket.read_exact(&mut marker).unwrap();
-                assert_eq!(marker, [b'R']);
-                return socket;
+/// Communicate with the local test provider within its owned workspace.
+struct ProviderChannel {
+    markers: fs::File,
+    commands: fs::File,
+    startup_writer: fs::File,
+}
+impl ProviderChannel {
+    /// Create the two private FIFOs and open test-side descriptors before spawn.
+    fn open(base: &Path) -> Self {
+        use rustix::fs::{mkfifoat, Mode, CWD};
+        let fifo = |suffix| {
+            let path = base.with_extension(suffix);
+            mkfifoat(CWD, &path, Mode::RUSR | Mode::WUSR).unwrap();
+            fs::OpenOptions::new().read(true).write(true).open(path).unwrap()
+        };
+        let startup_writer = fifo("marker");
+        let commands = fifo("command");
+        let markers = fs::File::open(base.with_extension("marker")).unwrap();
+        Self { markers, commands, startup_writer }
+    }
+
+    /// Wait for the provider's marker or the CLI's termination. Release the
+    /// temporary writer after readiness so provider EOF remains observable.
+    fn ready(self, child: &std::process::Child) -> (fs::File, fs::File) {
+        use rustix::{
+            event::{poll, PollFd, PollFlags},
+            process::{pidfd_open, Pid, PidfdFlags},
+        };
+        use std::io::Read;
+        let Self { mut markers, commands, startup_writer } = self;
+        let fd = pidfd_open(
+            Pid::from_raw(i32::try_from(child.id()).unwrap()).unwrap(),
+            PidfdFlags::empty(),
+        ).unwrap();
+        let mut fds = [PollFd::new(&markers, PollFlags::IN), PollFd::new(&fd, PollFlags::IN)];
+        loop {
+            match poll(&mut fds, None) {
+                Err(rustix::io::Errno::INTR) => continue,
+                Ok(_) => {}
+                Err(e) => panic!("provider readiness poll: {e}"),
             }
-            Err(e) if e.kind() == io::ErrorKind::WouldBlock => {}
-            Err(e) => panic!("provider handshake: {e}"),
+            if fds[0].revents().contains(PollFlags::IN) {
+                break;
+            }
+            assert!(fds[1].revents().is_empty(), "native CLI exited before actual provider READY");
         }
-        let mut fds = [
-            PollFd::new(listener, PollFlags::IN),
-            PollFd::new(&fd, PollFlags::IN),
-        ];
-        match poll(&mut fds, None) {
-            Err(rustix::io::Errno::INTR) => continue,
-            Ok(_) => {}
-            Err(e) => panic!("provider readiness poll: {e}"),
-        }
-        if fds[0].revents().contains(PollFlags::IN) {
-            continue;
-        }
-        assert!(
-            fds[1].revents().is_empty(),
-            "native CLI exited before actual provider READY"
-        );
+        let mut marker = [0];
+        markers.read_exact(&mut marker).unwrap();
+        assert_eq!(marker, [b'R']);
+        drop(startup_writer);
+        (markers, commands)
     }
 }
+
 /// Real provider death, ownership, concurrent duplicate refusal and public stop
 /// are observed for TERM and immediate configured KILL escalation. A settings
 /// update while running proves the startup lock is released; frozen policy stays
 /// unchanged. Signal exit0 never accepts or completes an interrupted task.
 #[test]
 fn native_agent_run_public_stop_term_kill_and_admin_edit_are_owned() {
-    use std::{os::unix::net::UnixListener, process::Stdio};
+    use std::process::Stdio;
     for ignore_term in [false, true] {
         let (root, work, input) = fixture();
         supervision_settings(root.path(), "configure-supervision", |v| {
@@ -504,10 +517,10 @@ fn native_agent_run_public_stop_term_kill_and_admin_edit_are_owned() {
                 v.agent_supervision_term_grace_ms = Some(swarm_engine::SettingCount(0));
             }
         });
-        let socket_path = root.path().join("ready.sock");
-        let listener = UnixListener::bind(&socket_path).unwrap();
-        let script=format!("import os,sys,socket,signal; signal.signal(signal.SIGTERM,{}); s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1]); s.sendall(b'R'); s.recv(1)",if ignore_term {"signal.SIG_IGN"}else{"lambda *_:(os.write(1,b'TERM observed\\n'),os._exit(0))"});
-        fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,socket_path.to_str().unwrap()]}}})).unwrap()).unwrap();
+        let channel_path = root.path().join("w").join("ready");
+        let channel = ProviderChannel::open(&channel_path);
+        let script=format!("import os,sys,signal; signal.signal(signal.SIGTERM,{}); commands=open(sys.argv[1]+'.command','rb',buffering=0); markers=open(sys.argv[1]+'.marker','wb',buffering=0); markers.write(b'R'); commands.read(1)",if ignore_term {"signal.SIG_IGN"}else{"lambda *_:(os.write(1,b'TERM observed\\n'),os._exit(0))"});
+        manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,channel_path.to_str().unwrap()]}}})).unwrap()).unwrap();
         let prepared = call(
             root.path(),
             &[
@@ -533,7 +546,7 @@ fn native_agent_run_public_stop_term_kill_and_admin_edit_are_owned() {
             .stderr(Stdio::from(fs::File::create(&error_path).unwrap()))
             .spawn()
             .unwrap();
-        let socket = ready_provider(&listener, &child);
+        let channel = channel.ready(&child);
         let duplicate = call(root.path(), &["agent", "run", "session", "--json"]);
         assert!(!duplicate.status.success());
         supervision_settings(root.path(), "edit-while-running", |v| {
@@ -568,7 +581,7 @@ fn native_agent_run_public_stop_term_kill_and_admin_edit_are_owned() {
                 String::from_utf8_lossy(&fs::read(&error_path).unwrap())
             );
         }
-        drop(socket);
+        drop(channel);
         let v: serde_json::Value =
             serde_json::from_slice(&fs::read(&output_path).unwrap()).unwrap();
         assert_eq!(v["task_accepted"], false);
@@ -633,7 +646,7 @@ fn native_agent_run_refuses_prior_stop_without_process_or_mutation() {
 #[test]
 fn native_agent_nonzero_exit_settles_failed_attempt_without_inventing_estimate() {
     let (root, work, input) = fixture();
-    fs::write(root.path().join(".swarm/providers.json"),br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/sh","args":["-c","exit 7"]}}}"#).unwrap();
+    manual_launch_team::replace_worker_catalogue(root.path(), br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/sh","args":["-c","exit 7"]}}}"#).unwrap();
     let p = call(
         root.path(),
         &[
@@ -685,16 +698,21 @@ fn native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate() {
     for invalid in [false, true] {
         let (root, work, input) = fixture();
         let mut store = RootStore::open(root.path(), true).unwrap();
-        store.execute_external(&work,"budget.configure",br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Private fixture","reference_date":"2026-10-19"}}"#,&mut SystemEnvironment).unwrap();
+        let revision = store.read_work(&work).unwrap().revision;
+        let mut budget: serde_json::Value = serde_json::from_slice(br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Private fixture","reference_date":"2026-10-19"}}"#).unwrap();
+        budget["expected_revision"] = revision.into();
+        store.execute_external(&work,"budget.configure",&serde_json::to_vec(&budget).unwrap(),&mut SystemEnvironment).unwrap();
         store.close().unwrap();
-        fs::write(&input,br#"{"schema_version":1,"event_id":"session","expected_revision":3,"task_id":"task","provider":"fixture"}"#).unwrap();
+        let launch = serde_json::json!({"schema_version":1,"event_id":"session",
+            "expected_revision":revision + 1,"task_id":"task","provider":"fixture","workspace":"w"});
+        fs::write(&input,serde_json::to_vec(&launch).unwrap()).unwrap();
         let executable = if invalid {
-            let file = root.path().join("invalid-executable");
+            let file = root.path().join("w").join("invalid-executable");
             fs::write(
                 &file,
                 format!(
                     "printf unexpected-shell > '{}'\n",
-                    root.path().join("unexpected-shell").display()
+                    root.path().join("w").join("unexpected-shell").display()
                 ),
             )
             .unwrap();
@@ -703,7 +721,7 @@ fn native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate() {
         } else {
             std::path::PathBuf::from("/bin/true")
         };
-        fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":executable,"args":[]}}})).unwrap()).unwrap();
+        manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":executable,"args":[]}}})).unwrap()).unwrap();
         let p = call(
             root.path(),
             &[
@@ -722,7 +740,7 @@ fn native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate() {
             "{}",
             String::from_utf8_lossy(&run.stderr)
         );
-        if invalid && root.path().join("unexpected-shell").exists() {
+        if invalid && root.path().join("w").join("unexpected-shell").exists() {
             let retained = root.keep();
             eprintln!("implicit-shell fixture retained at {}", retained.display());
             panic!("provider implicitly executed through a shell");
@@ -761,7 +779,7 @@ fn native_agent_pre_exec_refusal_releases_only_confirmed_unstarted_estimate() {
 /// signals the owned group. Zero retention never erases cumulative tool facts.
 #[test]
 fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() {
-    use std::{os::unix::net::UnixListener, process::Stdio};
+    use std::process::Stdio;
     for timeout in [false, true] {
         let (root, work, input) = fixture();
         supervision_settings(root.path(), "retention-policy", |v| {
@@ -790,12 +808,12 @@ fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() 
             request["limits"] = serde_json::json!({"silence_seconds":180,"tool_seconds":300,"max_tool_calls":1,"max_repeated_calls":4,"max_consecutive_errors":3,"observation_mode":0});
         }
         fs::write(&input, serde_json::to_vec(&request).unwrap()).unwrap();
-        let socket_path = root.path().join("ready.sock");
-        let listener = UnixListener::bind(&socket_path).unwrap();
+        let channel_path = root.path().join("w").join("ready");
+        let channel = ProviderChannel::open(&channel_path);
         let tool_events="{\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"tool_use\",\"id\":\"A\",\"name\":\"Read\",\"input\":{}},{\"type\":\"text\",\"text\":\"PUBLIC omitted\"}]}}\n{\"type\":\"user\",\"message\":{\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"A\",\"is_error\":false}]}}\n";
         let payload = serde_json::to_string(if timeout { "" } else { tool_events }).unwrap();
-        let script=format!("import os,sys,socket,signal; signal.signal(signal.SIGTERM,{}); s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1]); s.sendall(b'R'); os.write(1,({payload}).encode()); s.recv(1)",if timeout{"signal.SIG_IGN"}else{"lambda *_:os._exit(0)"});
-        fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,socket_path.to_str().unwrap()]}}})).unwrap()).unwrap();
+        let script=format!("import os,sys,signal; signal.signal(signal.SIGTERM,{}); commands=open(sys.argv[1]+'.command','rb',buffering=0); markers=open(sys.argv[1]+'.marker','wb',buffering=0); markers.write(b'R'); os.write(1,({payload}).encode()); commands.read(1)",if timeout{"signal.SIG_IGN"}else{"lambda *_:os._exit(0)"});
+        manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,channel_path.to_str().unwrap()]}}})).unwrap()).unwrap();
         let p = call(
             root.path(),
             &[
@@ -817,8 +835,9 @@ fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() 
             .stderr(Stdio::from(fs::File::create(&error_path).unwrap()))
             .spawn()
             .unwrap();
-        let socket = ready_provider(&listener, &child);
+        let channel = channel.ready(&child);
         if timeout {
+            let mut registered = false;
             loop {
                 let shown = call(root.path(), &["agent", "show", "session", "--json"]);
                 assert!(
@@ -827,10 +846,14 @@ fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() 
                     String::from_utf8_lossy(&shown.stderr)
                 );
                 let shown: serde_json::Value = serde_json::from_slice(&shown.stdout).unwrap();
+                if !registered && shown["agent"]["status"] == "starting" {
+                    continue;
+                }
                 assert_eq!(
                     shown["agent"]["status"], "running",
                     "elapsed threshold must not stop the owned provider"
                 );
+                registered = true;
                 if shown["agent"]["progress"]["time_threshold_exceeded"] == true {
                     break;
                 }
@@ -839,7 +862,7 @@ fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() 
             assert!(stop.status.success());
         }
         let status = child.wait().unwrap();
-        drop(socket);
+        drop(channel);
         assert!(
             status.success(),
             "{}",
@@ -871,11 +894,11 @@ fn native_agent_guard_stops_but_elapsed_threshold_waits_for_operator_decision() 
 /// A controlled descendant deliberately leaves the provider group and holds its
 /// output FD. The valid control closes those FDs before leader exit. A real drain
 /// refusal must preserve the active workspace/estimate, not falsely settle it.
-/// Cleanup uses only this fixture's private socket and pidfd observation, no
+/// Cleanup uses only this fixture's private FIFOs and pidfd observation, no
 /// numeric-PID signal or arbitrary verification watchdog.
 #[test]
 fn native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate() {
-    use std::{io::Read, os::unix::net::UnixListener, process::Stdio};
+    use std::{io::Read, process::Stdio};
     for hold_output in [false, true] {
         let (root, work, input) = fixture();
         supervision_settings(root.path(), "drain-policy", |v| {
@@ -884,13 +907,18 @@ fn native_agent_incomplete_drain_keeps_active_lease_and_reserved_estimate() {
             )))
         });
         let mut store = RootStore::open(root.path(), true).unwrap();
-        store.execute_external(&work,"budget.configure",br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Drain fixture","reference_date":"2026-10-19"}}"#,&mut SystemEnvironment).unwrap();
+        let revision = store.read_work(&work).unwrap().revision;
+        let mut budget: serde_json::Value = serde_json::from_slice(br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Drain fixture","reference_date":"2026-10-19"}}"#).unwrap();
+        budget["expected_revision"] = revision.into();
+        store.execute_external(&work,"budget.configure",&serde_json::to_vec(&budget).unwrap(),&mut SystemEnvironment).unwrap();
         store.close().unwrap();
-        fs::write(&input,br#"{"schema_version":1,"event_id":"session","expected_revision":3,"task_id":"task","provider":"fixture"}"#).unwrap();
-        let socket_path = root.path().join("drain.sock");
-        let listener = UnixListener::bind(&socket_path).unwrap();
+        let launch = serde_json::json!({"schema_version":1,"event_id":"session",
+            "expected_revision":revision + 1,"task_id":"task","provider":"fixture","workspace":"w"});
+        fs::write(&input,serde_json::to_vec(&launch).unwrap()).unwrap();
+        let channel_path = root.path().join("w").join("drain");
+        let channel = ProviderChannel::open(&channel_path);
         let script = format!(
-            r#"import os,sys,socket,struct
+            r#"import os,sys,struct
 r,w=os.pipe()
 pid=os.fork()
 if pid:
@@ -899,20 +927,19 @@ if pid:
  os._exit(0)
 os.close(r)
 os.setsid()
-s=socket.socket(socket.AF_UNIX)
-s.connect(sys.argv[1])
-s.sendall(b'R'+struct.pack('!I',os.getpid()))
+commands=open(sys.argv[1]+'.command','rb',buffering=0); markers=open(sys.argv[1]+'.marker','wb',buffering=0);
+markers.write(b'R'+struct.pack('!I',os.getpid()))
 if not {}:
  os.close(1)
  os.close(2)
 os.write(w,b'R')
 os.close(w)
-s.recv(1)
+commands.read(1)
 os._exit(0)
 "#,
             if hold_output { "True" } else { "False" }
         );
-        fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,socket_path.to_str().unwrap()]}}})).unwrap()).unwrap();
+        manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,channel_path.to_str().unwrap()]}}})).unwrap()).unwrap();
         let p = call(
             root.path(),
             &[
@@ -934,9 +961,9 @@ os._exit(0)
             .stderr(Stdio::from(fs::File::create(&error).unwrap()))
             .spawn()
             .unwrap();
-        let mut socket = ready_provider(&listener, &child);
+        let (mut markers, mut commands) = channel.ready(&child);
         let mut pid = [0; 4];
-        socket.read_exact(&mut pid).unwrap();
+        markers.read_exact(&mut pid).unwrap();
         let pid = u32::from_be_bytes(pid);
         let observation = swarm_engine::observe_linux_process(pid).unwrap();
         assert_eq!(observation.process_group_id(), pid);
@@ -959,10 +986,10 @@ os._exit(0)
             .unwrap();
         db.close().unwrap();
         // Complete owned fixture cleanup before any assertion can panic.
-        socket.write_all(b"X").unwrap();
+        commands.write_all(b"X").unwrap();
         let mut rest = Vec::new();
-        socket.read_to_end(&mut rest).unwrap();
-        drop(socket);
+        markers.read_to_end(&mut rest).unwrap();
+        drop((markers, commands));
         let mut fds = [rustix::event::PollFd::new(
             &pidfd,
             rustix::event::PollFlags::IN,
@@ -1013,9 +1040,14 @@ fn native_agent_declared_usage_model_invalid_and_recovery_preserve_budget() {
         let (root, work, input) = fixture();
         let verdict = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             let mut store = RootStore::open(root.path(), true).unwrap();
-            store.execute_external(&work,"budget.configure",br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Metadata fixture","reference_date":"2026-10-19"}}"#,&mut SystemEnvironment).unwrap();
+            let revision = store.read_work(&work).unwrap().revision;
+        let mut budget: serde_json::Value = serde_json::from_slice(br#"{"schema_version":1,"event_id":"budget","expected_revision":2,"budget":{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"Metadata fixture","reference_date":"2026-10-19"}}"#).unwrap();
+        budget["expected_revision"] = revision.into();
+        store.execute_external(&work,"budget.configure",&serde_json::to_vec(&budget).unwrap(),&mut SystemEnvironment).unwrap();
             store.close().unwrap();
-            fs::write(&input,br#"{"schema_version":1,"event_id":"session","expected_revision":3,"task_id":"task","provider":"fixture"}"#).unwrap();
+            let launch = serde_json::json!({"schema_version":1,"event_id":"session",
+            "expected_revision":revision + 1,"task_id":"task","provider":"fixture","workspace":"w"});
+        fs::write(&input,serde_json::to_vec(&launch).unwrap()).unwrap();
             let mut events = vec![
                 serde_json::json!({"type":"system","subtype":"init","model":" asserted-initial ","at":"1900-01-01T00:00:00Z"}),
                 serde_json::json!({"type":"turn.completed","usage":{"input_tokens":7,"output_tokens":3,"cached_input_tokens":0},"total_cost_usd":0.01}),
@@ -1040,10 +1072,10 @@ fn native_agent_declared_usage_model_invalid_and_recovery_preserve_budget() {
                 .join("\n");
             // Payload belongs to provider output, not public configured argv.
             // Raw capture is disabled so only diagnostic projection is tested.
-            let events_file = root.path().join("provider-events.jsonl");
+            let events_file = root.path().join("w").join("provider-events.jsonl");
             fs::write(&events_file, wire).unwrap();
             let script = "import sys,pathlib; sys.stdin.buffer.read(); sys.stdout.buffer.write(pathlib.Path(sys.argv[1]).read_bytes())";
-            fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,events_file.to_str().unwrap()]}}})).unwrap()).unwrap();
+            manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,events_file.to_str().unwrap()]}}})).unwrap()).unwrap();
             let p = call(
                 root.path(),
                 &[
@@ -1150,7 +1182,7 @@ fn native_agent_declared_usage_model_invalid_and_recovery_preserve_budget() {
 /// paid call, guessed model, budget reset or tool counter reset is introduced.
 #[test]
 fn native_agent_running_facts_refuse_then_recover_in_same_owned_process() {
-    use std::{io::Read, os::unix::net::UnixListener, process::Stdio};
+    use std::{io::Read, process::Stdio};
     let (root, work, input) = fixture();
     let verdict = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         supervision_settings(root.path(), "metadata-heartbeat", |v| {
@@ -1159,9 +1191,9 @@ fn native_agent_running_facts_refuse_then_recover_in_same_owned_process() {
         let phase = |model: serde_json::Value, usage: serde_json::Value, id: &str| {
             [serde_json::json!({"type":"system","subtype":"init","model":model}),serde_json::json!({"type":"result","usage":usage}),serde_json::json!({"type":"assistant","message":{"content":[{"type":"tool_use","id":id,"name":"Read","input":{"file":id}}]}}),serde_json::json!({"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":id}]}})].iter().map(|v|serde_json::to_string(v).unwrap()+"\n").collect::<String>()
         };
-        let initial = root.path().join("initial.jsonl");
-        let invalid = root.path().join("invalid.jsonl");
-        let recovered = root.path().join("recovered.jsonl");
+        let initial = root.path().join("w").join("initial.jsonl");
+        let invalid = root.path().join("w").join("invalid.jsonl");
+        let recovered = root.path().join("w").join("recovered.jsonl");
         fs::write(
             &initial,
             phase(
@@ -1189,10 +1221,10 @@ fn native_agent_running_facts_refuse_then_recover_in_same_owned_process() {
             ),
         )
         .unwrap();
-        let socket_path = root.path().join("metadata.sock");
-        let listener = UnixListener::bind(&socket_path).unwrap();
-        let script="import os,sys,socket,pathlib\nsys.stdin.buffer.read()\ndef emit(p):\n sys.stdout.buffer.write(pathlib.Path(p).read_bytes()); sys.stdout.buffer.flush()\nemit(sys.argv[2])\ns=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1]); s.sendall(b'R')\nfor p,marker in [(sys.argv[3],b'B'),(sys.argv[4],b'C')]:\n if s.recv(1)!=marker: sys.exit(0)\n emit(p); s.sendall(marker)\ns.recv(1)\n";
-        fs::write(root.path().join(".swarm/providers.json"),serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,socket_path.to_str().unwrap(),initial.to_str().unwrap(),invalid.to_str().unwrap(),recovered.to_str().unwrap()]}}})).unwrap()).unwrap();
+        let channel_path = root.path().join("w").join("metadata");
+        let channel = ProviderChannel::open(&channel_path);
+        let script="import os,sys,pathlib\nsys.stdin.buffer.read()\ndef emit(p):\n sys.stdout.buffer.write(pathlib.Path(p).read_bytes()); sys.stdout.buffer.flush()\nemit(sys.argv[2])\ncommands=open(sys.argv[1]+'.command','rb',buffering=0); markers=open(sys.argv[1]+'.marker','wb',buffering=0); markers.write(b'R')\nfor p,marker in [(sys.argv[3],b'B'),(sys.argv[4],b'C')]:\n if commands.read(1)!=marker: sys.exit(0)\n emit(p); markers.write(marker)\ncommands.read(1)\n";
+        manual_launch_team::replace_worker_catalogue(root.path(), serde_json::to_vec(&serde_json::json!({"schema_version":1,"providers":{"fixture":{"command":"/usr/bin/python3","args":["-c",script,channel_path.to_str().unwrap(),initial.to_str().unwrap(),invalid.to_str().unwrap(),recovered.to_str().unwrap()]}}})).unwrap()).unwrap();
         let p = call(
             root.path(),
             &[
@@ -1214,17 +1246,17 @@ fn native_agent_running_facts_refuse_then_recover_in_same_owned_process() {
             .stderr(Stdio::from(fs::File::create(&stderr).unwrap()))
             .spawn()
             .unwrap();
-        let mut socket = ready_provider(&listener, &child);
+        let (mut markers, mut commands) = channel.ready(&child);
         let mut observations = Vec::new();
         let mut issues = Vec::new();
         'phases: for (index, command) in [None, Some(b'B'), Some(b'C')].into_iter().enumerate() {
             if let Some(command) = command {
-                if let Err(e) = socket.write_all(&[command]) {
+                if let Err(e) = commands.write_all(&[command]) {
                     issues.push(format!("fixture phase send: {e}"));
                     break;
                 }
                 let mut marker = [0u8; 1];
-                if let Err(e) = socket.read_exact(&mut marker) {
+                if let Err(e) = markers.read_exact(&mut marker) {
                     issues.push(format!("fixture phase response: {e}"));
                     break;
                 }
@@ -1275,14 +1307,14 @@ fn native_agent_running_facts_refuse_then_recover_in_same_owned_process() {
             }
         }
         // Complete the owned fixture before assertions, even after a refusal.
-        if let Err(e) = socket.write_all(b"X") {
+        if let Err(e) = commands.write_all(b"X") {
             issues.push(format!("fixture release: {e}"));
         }
         let mut end = Vec::new();
-        if let Err(e) = socket.read_to_end(&mut end) {
-            issues.push(format!("fixture socket EOF: {e}"));
+        if let Err(e) = markers.read_to_end(&mut end) {
+            issues.push(format!("fixture marker EOF: {e}"));
         }
-        drop(socket);
+        drop((markers, commands));
         let status = child.wait().unwrap();
         fs::write(
             root.path().join("active-observations.json"),

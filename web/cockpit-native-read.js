@@ -4,6 +4,13 @@
   const t = (k) => (globalThis.SwarmI18n && typeof globalThis.SwarmI18n.t === 'function' ? globalThis.SwarmI18n.t(k) : k);
   const engine = (m) => (globalThis.SwarmI18n && typeof globalThis.SwarmI18n.engine === 'function' ? globalThis.SwarmI18n.engine(m) : String(m));
 
+  /** Localize the typed status conflict and its explicit recovery action. */
+  function missionErrorText(code) {
+    return code === 'mission-status-observation-changed'
+      ? t('La mission a évolué pendant la lecture. Cliquez sur Actualiser pour afficher le statut à jour.')
+      : engine(code);
+  }
+
   /**
    * Safe nonnegative integer check.
    * @param {*} v
@@ -74,6 +81,84 @@
     return tr;
   }
 
+  const launchExplanations = new Map([
+    ['planning-mission-paused', 'La mission est en pause.'],
+    ['mission_archived', 'La mission est archivée.'],
+    ['mission-controls-required', 'Les paramètres de conduite de la mission manquent.'],
+    ['mission-autonomy-required', 'La mission est en conduite manuelle.'],
+    ['mission-consent-required', 'Le consentement au démarrage automatique manque ou a été retiré.'],
+    ['mission-profile-required', 'Le profil de lancement de la mission manque.'],
+    ['task-dependency-not-accepted', 'Une tâche préalable attend son acceptation.'],
+    ['current-independent-review-required', 'Une preuve de revue indépendante à jour est requise.'],
+    ['agent-launch-held', 'Le lancement de cette tâche est suspendu.'],
+    ['agent-launch-plan-attempts-exhausted', 'Toutes les tentatives autorisées pour cette tâche ont été utilisées.'],
+    ['mission-agent-slots-occupied', 'Tous les créneaux de la mission sont occupés.'],
+    ['workspace-turn-fifo-blocked', 'Un tour précédent bloque le même espace de travail.'],
+    ['agent-launch-workspace-busy', 'Un agent actif occupe cet espace de travail.'],
+    ['agent-launch-integration-busy', 'Une intégration en cours occupe cet espace de travail.'],
+    ['agent-launch-preparation-not-authorized', 'La préparation de la tâche attend son autorisation.'],
+    ['budget-estimate-insufficient', 'Le budget disponible ne couvre pas la réservation du lancement.'],
+    ['mission-task-reported-cost-threshold', 'Le coût déclaré de la tâche atteint son seuil.'],
+    ['agent-provider-not-configured', 'Le fournisseur configuré pour ce lancement est introuvable.'],
+    ['agent-provider-open', 'Le moteur ne peut pas ouvrir l’exécutable du fournisseur.'],
+    ['agent-provider-not-executable', 'Le fichier du fournisseur n’est pas exécutable.'],
+    ['agent-provider-access', 'Le processus Swarm ne peut pas lire ou exécuter le programme du fournisseur.'],
+    ['agent-workspace-write-access', 'Le processus Swarm n’a pas accès en écriture à cet espace de travail.'],
+    ['agent-workspace-free-space-below-policy', 'L’espace disque disponible est inférieur au minimum configuré.'],
+    ['provider_cooldown', 'Le fournisseur est temporairement indisponible selon le délai enregistré.'],
+  ]);
+
+  /**
+   * Render scoped automatic start refusals, or the saved pause in history.
+   * Input is the protected engine projection with static codes and selected
+   * task IDs. Render as text only, with unknown codes preserved verbatim.
+   * Empty observations add no notice. This view performs no command.
+   */
+  function renderLaunchDiagnostics(data) {
+    const {work, mission, control, readMode, launchDiagnostics, launchDiagnosticError} = data;
+    const refusals = launchDiagnostics?.refusals ??
+      (readMode === 'history' && control?.paused === true
+        ? [{task: null, codes: ['planning-mission-paused']}]
+        : []);
+    const observedRevision = launchDiagnostics?.revision ?? control?.revision;
+    const workMatches = work.revision === observedRevision;
+    const driverAbsent = workMatches && launchDiagnostics && mission?.supervision?.state === 'absent' &&
+      refusals.every(r => r.task !== null) && work.tasks.some(t => ['todo', 'blocked'].includes(t.status));
+    if (!refusals.length && !launchDiagnosticError && !driverAbsent) return;
+
+    const notice = document.createElement('div');
+    notice.id = 'native-launch-diagnostics';
+    notice.className = 'notice attention';
+    const heading = document.createElement('strong');
+    heading.textContent = t('Démarrage automatique des agents');
+    notice.append(heading);
+    const list = document.createElement('ul');
+    if (driverAbsent) {
+      const row = document.createElement('li');
+      row.textContent = t('Aucun conducteur Swarm actif observé.');
+      list.append(row);
+    }
+    if (launchDiagnosticError) {
+      const row = document.createElement('li');
+      row.textContent = t('Diagnostic indisponible. Actualisez pour reprendre.') + ' (' + launchDiagnosticError + ')';
+      list.append(row);
+    }
+    const titles = workMatches ? new Map(work.tasks.map(task => [task.id, task.title || task.id])) : new Map();
+    for (const refusal of refusals) {
+      const row = document.createElement('li');
+      const scope = refusal.task === null ? (workMatches ? work.title : work.id) : (titles.get(refusal.task) || refusal.task);
+      const explanations = [...new Set(refusal.codes.map(code => launchExplanations.get(code)).filter(Boolean))];
+      row.append(document.createTextNode(scope + ' — '));
+      if (explanations.length) row.append(document.createTextNode(explanations.map(t).join(' ') + ' '));
+      const codes = document.createElement('code');
+      codes.textContent = refusal.codes.join(', ');
+      row.append(codes);
+      list.append(row);
+    }
+    notice.append(list);
+    document.getElementById('conduite-plan')?.prepend(notice);
+  }
+
   /**
    * Fill conduite plan and state sections.
    * Current mode preserves calculation failures. History mode renders public
@@ -110,7 +195,7 @@
           plan.appendChild(details);
         }
       } else if (missionError) {
-        plan.textContent = engine(missionError);
+        plan.textContent = missionErrorText(missionError);
       } else if (mission && Array.isArray(mission.tasks)) {
         for (const p of mission.tasks) {
           const div = document.createElement('div');
@@ -132,7 +217,7 @@
       state.textContent = readMode === 'history' && !missionError
         ? t('Lecture de l’historique enregistré. Les compteurs de validation actuelle et d’activité restent inconnus.')
         : missionError
-        ? engine(missionError)
+        ? missionErrorText(missionError)
         : mission && (mission.summary != null || mission.next != null)
           ? [mission.summary != null ? engine(mission.summary) : '', mission.next != null ? engine(mission.next) : ''].filter(Boolean).join(' — ')
           : t('État non disponible.');
@@ -188,11 +273,12 @@
     }
 
     renderConduite(mission, missionError, work, data.readMode);
+    renderLaunchDiagnostics(data);
     globalThis.SwarmWorkbench?.render(data);
 
-    // Reuse canonical graph helpers/CSS with actual stored dependencies only.
-    // The caller supplies an explicit Work; failures stay visible, no empty pass.
-    try { SwarmRustDependencyGraph.render(work); }
+    // The graph projects both recorded Work structure and the separate mission
+    // observation. A history read carries no current conductor or task reason.
+    try { SwarmRustDependencyGraph.render(work, mission, data.readMode, data.control?.paused === true); }
     catch (cause) { SwarmRustDependencyGraph.clear(t('Graphe indisponible : ') + String(cause.message)); }
 
   }

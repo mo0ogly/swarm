@@ -491,7 +491,7 @@ def await_provider_turn(owned,work,listener,server_fd,previous_agents):
     return connection
 
 
-def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None,pending_dependent=False,disjoint_results=False):
+def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None,pending_dependent=False,disjoint_results=False,settings_values=None,check_fifo=True):
     """Run two authentic server admissions with public pause/reopen/resume barriers.
 
     A Linux subreaper caller owns every cleanup child. Saved child task budget2
@@ -500,7 +500,8 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     Optional controls is passed to actual planning authorization; None keeps the
     historical fixture contract. Optional source_entries is committed by the
     planning fixture before workers, never injected into an existing candidate
-    or mission database. Reopening paused state must not admit anything until
+    or mission database. settings_values applies explicit fixture settings through
+    the planning setup. Reopening paused state must not admit anything until
     public resume. The provider control channel is the verified file rendezvous
     of rust_managed_file_provider and the bootstrap is socket-free: the
     conductor attaches the newly launched canonical agent through real public
@@ -532,11 +533,13 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     model-received/handoff filenames at birth (the release name keeps the
     protocol naming release-<turn>.json for every turn), preserving actual
     immutable outputs for conflict-free cumulative tests.
+    A downstream control fixture can disable the waiting-state assertion.
+    It still requires no second copy or attempt before explicit resumption.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     qualified=json.loads(profile.read_bytes())
     assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
-    prepared,f=planning.run(binary,profile,out/'planning',return_fixture=True,project_subdir=project_subdir,controls=controls,source_entries=source_entries,pending_dependent=pending_dependent)
+    prepared,f=planning.run(binary,profile,out/'planning',return_fixture=True,project_subdir=project_subdir,controls=controls,source_entries=source_entries,pending_dependent=pending_dependent,settings_values=settings_values)
     f.work=prepared['planned_work'];root=f.root;workspace=None
     current=f.ok(['work','show',f.work])['work']
     f.ok(['budget','apply',f.work],dict(schema_version=1,event_id='managed-auto-budget',expected_revision=current['revision'],budget=dict(limit_usd=10,reserve_per_launch_usd=1,estimate_source='Owned managed automatic fixture',reference_date='2026-10-24')))
@@ -627,9 +630,12 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
             if turn==0:
                 other='task-2' if agent['task_id']=='task' else 'task'
                 waiting=rows(f,'SELECT workspace,state FROM workspace_turns WHERE work_id=? AND task_id=?',(f.work,other))
-                assert waiting==[(str(storage/'copies'/(other+'-1')/project_subdir),'waiting')],waiting
                 assert not (storage/'copies'/(other+'-1')).exists()
-                passed('managed-auto-waiting-FIFO-does-not-create-second-copy')
+                if check_fifo:
+                    assert waiting==[(str(storage/'copies'/(other+'-1')/project_subdir),'waiting')],waiting
+                    passed('managed-auto-waiting-FIFO-does-not-create-second-copy')
+                else:
+                    fixture.publish(out/'other-turn-before-resume.json',waiting)
             assert rendezvous.release()==dict(nonce=nonce,release=True)
             select.select([supervisor_fd],[],[])
             waited,status=os.waitpid(supervisor['pid'],0);reaped=True

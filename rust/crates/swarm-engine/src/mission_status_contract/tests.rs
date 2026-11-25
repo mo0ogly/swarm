@@ -79,6 +79,7 @@ pub(crate) fn status() -> MissionStatus {
         provider_cooldowns: None,
         evidence_stage: "fixture-unverified".into(),
         organization: Organization {
+            root_scope: crate::ROOT_ORCHESTRATOR_SCOPE,
             ready: false,
             label: "fixture".into(),
             issues: Some(vec![]),

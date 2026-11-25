@@ -8,10 +8,11 @@ Only named rollback/silent-write fault triggers mutate isolated fixture SQL.
 import argparse, contextlib, hashlib, json, os, sqlite3, subprocess, sys, traceback
 from pathlib import Path
 import rust_native_managed_reviewer as native
+from rust_native_http_cli import Server, finish
 from rust_native_task_validation import invoke
 
 
-def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending_dependent=False,cumulative_fixture=False):
+def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending_dependent=False,cumulative_fixture=False,check_current_status=False):
     """Retain each public attempt and require atomic state, originals and no debit.
 
     pending_dependent preplans a third worker with an explicit saved fixture
@@ -25,6 +26,9 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     The provider invocation marker is read through the claim-based I0 reviewer
     leaf of the RETAINED request event id (native-review.input.json), never a
     root-level path.
+    With check_current_status, revoke automatic consent in the owned fixture
+    before measuring; a Web server also hosts the conductor. The CLI and HTTP
+    must then report the same phase before and after publication without writes.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     fixture=native.inspection.native.fixture
@@ -45,6 +49,29 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     def shown(label):
         """Read canonical Work without replacing a refusal with an empty object."""
         return call(label,['work','show',work])['work']
+    def status(label, expected_work, expected_state, accepted_count):
+        """Compare public CLI and protected HTTP observations without writes."""
+        expected_state_rows = state()
+        expected_invocation = native.read_reviewer_marker(root,retained_event)
+        cli = call(label+'-cli', ['mission','status',work])
+        expect = next(t for t in cli['tasks'] if t['id']==task['id'])
+        assert expect['result']['state']==expected_state, expect
+        assert cli['validated']==accepted_count, cli['summary']
+        server = Server(binary,root,out,label+'-server',environment=environment)
+        primary = None
+        try:
+            http = server.request('/api/v1/mission?action=status&work='+work)
+            assert http['validated']==accepted_count
+            assert next(t for t in http['tasks'] if t['id']==task['id'])['result']==expect['result']
+            server.stop()
+            assert shown(label+'-unchanged')==expected_work
+            assert state()==expected_state_rows
+            assert native.read_reviewer_marker(root,retained_event)==expected_invocation
+        except BaseException as error:
+            primary = error
+        finally:
+            finish(server,primary)
+        checks.append(label+'-cli-http')
     @contextlib.contextmanager
     def db(write=False):
         """Close the owned fixture connection, retaining operation/close failures."""
@@ -57,6 +84,14 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
             rows=connection.execute('SELECT * FROM managed_attempts ORDER BY agent_id').fetchall()
             events=connection.execute('SELECT id,revision,kind,hex(request),hex(payload) FROM events WHERE work_id=? ORDER BY revision',(work,)).fetchall()
         return dict(attempts=rows,events=events,finance=native.finance(root,work))
+    if check_current_status:
+        # Isolate the status read from work that the same web binary is otherwise
+        # authorized to start. This changes only this owned test mission.
+        for action in ('stop', 'unpause'):
+            current=shown('status-before-'+action)
+            call('status-'+action,['mission',action,work],dict(
+                schema_version=1,event_id='status-fixture-'+action,
+                expected_revision=current['revision'],reason='Isolated status observation'))
     before=shown('before');task=next(t for t in before['tasks'] if t.get('independent_review',{}).get('state')=='passed')
     review=task['independent_review'];request=dict(schema_version=1,event_id='first-publication-'+hashlib.sha256(str(out).encode()).hexdigest(),expected_revision=before['revision'],task_id=task['id'])
     baseline=state();marker=native.read_reviewer_marker(root,retained_event)
@@ -88,6 +123,8 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
             if created:mark.unlink()
     preview=call('valid-preflight',['task','publication-preview',work],request)
     assert preview['native_original_verified'] and preview['current_candidate_verified'] and preview['opinion_state']=='passed'
+    if check_current_status:
+        status('managed-opinion-awaits-publication', before, 'review_awaiting_publication', 0)
     def unchanged(label):
         """A refusal must preserve Work, all event/worker/financial rows and call marker."""
         assert shown(label)==before and state()==baseline and native.read_reviewer_marker(root,retained_event)==marker
@@ -116,6 +153,8 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     record=json.loads(event[2]);assert row==('integrated',record['result_commit'],request['event_id'])
     assert event[0]=='managed.publication' and event[1]==after['revision'] and event[2]==event[3] and record['accepted_work']==after
     checks.append('publication-acceptance-pointer-worker-and-event-atomic')
+    if check_current_status:
+        status('managed-publication-is-current', after, 'validated', 1)
     recovered=call('integrated-worker-reconcile',['agent','reconcile',review['producer']])
     assert recovered['agent']['id']==review['producer'] and shown('integrated-worker-after')==after
     checks.append('historical-integrated-worker-recovery-without-new-execution')
@@ -164,12 +203,13 @@ def main():
     """Freeze exercised binary/profile/helper hashes and retain original failures."""
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['binary','profile','output']:p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--reuse-from',type=Path);p.add_argument('--probe',type=Path);p.add_argument('--rollback-sdk',type=Path);a=p.parse_args()
+    p.add_argument('--reuse-from',type=Path);p.add_argument('--probe',type=Path);p.add_argument('--rollback-sdk',type=Path)
+    p.add_argument('--check-current-status',action='store_true');a=p.parse_args()
     fixture=native.inspection.native.fixture
     inputs=dict(binary_sha256=fixture.digest(a.binary.read_bytes()),profile_sha256=fixture.digest(a.profile.read_bytes()),helpers=native.inspection.native.helper_inputs(Path(__file__)),probe_sha256=fixture.digest(a.probe.read_bytes()) if a.probe else None,rollback_sdk_sha256=fixture.digest(a.rollback_sdk.read_bytes()) if a.rollback_sdk else None,global_watchdog=None)
     out=a.output.resolve()
     try:
-        run(a.binary.resolve(),a.profile.resolve(),out,a.reuse_from.resolve() if a.reuse_from else None,a.probe.resolve() if a.probe else None,a.rollback_sdk.resolve() if a.rollback_sdk else None)
+        run(a.binary.resolve(),a.profile.resolve(),out,a.reuse_from.resolve() if a.reuse_from else None,a.probe.resolve() if a.probe else None,a.rollback_sdk.resolve() if a.rollback_sdk else None,check_current_status=a.check_current_status)
         assert fixture.digest(a.binary.read_bytes())==inputs['binary_sha256'] and all(fixture.digest(Path(f).read_bytes())==h for f,h in inputs['helpers'].items())
         fixture.publish(out/'inputs.json',inputs)
     except BaseException:

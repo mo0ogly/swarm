@@ -46,14 +46,15 @@ def typed_cell(value):
     return ['text', value]
 
 
-def admissions(owned):
+def admissions(owned, *, busy_timeout=0):
     """Observe all Work admission requests and reservations in one readonly snapshot.
 
     Rows preserve ordering, duplicate multiplicity and cell types; no absent row
     becomes a successful empty admission. Separate costs/CLI reads are not a
     transaction with this snapshot, and no global mutation absence is claimed.
+    busy_timeout applies only to the readonly SQLite snapshot, in seconds.
     """
-    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=0)
+    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=busy_timeout)
     try:
         database.execute('BEGIN')
         agents = database.execute('SELECT id,task_id,cwd,request FROM agents WHERE work_id=? ORDER BY id', (owned.work,)).fetchall()
@@ -139,7 +140,9 @@ def seed_queue(owned, sdk, out):
     """Run the qualified real SDK producer on an explicit marker-correlated fixture.
 
     Its process must exit0 after closing the old lease/Root, without starting a
-    provider. Retain original stdout/stderr/exit before interpreting producer JSON.
+    provider. The SDK uses the same saved Root TMPDIR as the CLI worker so the
+    admission freezes the same environment. Legacy Roots without that setting
+    keep the inherited environment. Retain the channels before parsing the seed.
     """
     request = dict(schema_version=1, kind='owned-inert-mission-watch-restart-seed',
                    root=str(owned.root), work=owned.work, result=str(out / 'seed-result.json'))
@@ -150,6 +153,10 @@ def seed_queue(owned, sdk, out):
     fixture.publish(out / 'seed-command.json', dict(argv=argv, input_environment_key='SWARM_MISSION_WATCH_RESTART_SEED',
                    input_environment_path=str(path), global_watchdog=None))
     environment = dict(owned.environment, SWARM_MISSION_WATCH_RESTART_SEED=str(path))
+    saved_temporary_directory = owned.ok(['engine-settings', 'show'])['values'].get(
+        'runtime_temporary_directory')
+    if saved_temporary_directory is not None:
+        environment['TMPDIR'] = os.path.join(owned.root, saved_temporary_directory)
     result = subprocess.run(argv, env=environment, stdin=subprocess.DEVNULL, capture_output=True)
     fixture.publish(out / 'seed.stdout', result.stdout)
     fixture.publish(out / 'seed.stderr', result.stderr)
@@ -240,14 +247,15 @@ def check_adoption_api(owned, sdk, agent_id, out):
     return verify_adoption_api_result(json.loads(Path(request['result']).read_bytes()), owned.work, agent_id)
 
 
-def read_adoptions(owned, agent_id):
+def read_adoptions(owned, agent_id, *, busy_timeout=0):
     """Read every actual append-only adoption row for this owned Agent.
 
     Missing table is observed legacy absence before first adoption, never an
     authority shortcut. SQL/JSON errors refuse and original bytes are retained in
     private evidence. This observer does not validate engine rights independently.
+    busy_timeout applies only to the readonly SQLite snapshot, in seconds.
     """
-    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=0)
+    database = sqlite3.connect((owned.root / '.swarm/state.db').as_uri() + '?mode=ro', uri=True, timeout=busy_timeout)
     try:
         database.execute('BEGIN')
         exists = database.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='native_mission_worker_adoptions'").fetchall()

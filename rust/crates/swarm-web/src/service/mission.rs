@@ -27,8 +27,8 @@ fn query(raw: Option<&str>) -> Result<Query, E> {
 /// Fixed implemented read/write vocabulary, not admission or a running conductor.
 /// Default GET show returns MissionControlView; historical status may still refuse
 /// unsupported branches. This bridge acquires no lease and launches no agent.
-pub(super) fn capabilities() -> [&'static str; 10] {
-    ["show", "order", "queue", "status", "start", "pause", "unpause", "stop", "resume", "priority"]
+pub(super) fn capabilities() -> [&'static str; 11] {
+    ["show", "order", "queue", "status", "launch-diagnostics", "start", "pause", "unpause", "stop", "resume", "priority"]
 }
 
 /// Select a fixed write command and validate its actual CLI envelope before IO.
@@ -68,8 +68,10 @@ pub(super) fn retain_observation_error(mut primary: E, causes: Vec<RootStoreErro
 
 impl NativeHttpService {
     /// Read existing mission facts behind shared Host/session and Root lane.
-    /// GET/HEAD accept show/order/queue/status without a body. POST validates the
-    /// selected CLI mission document before opening the writable bound Root.
+    /// GET/HEAD accept show/order/queue/status/launch-diagnostics without a body.
+    /// Launch diagnostics observes saved automatic-start guards and returns safe
+    /// reason codes, without admitting a task or probing by writing. POST validates
+    /// the selected CLI mission document before opening the writable bound Root.
     /// Unknown operations refuse; no implicit Work, envelope or consent is supplied.
     /// A bound existing-Work read preserves its canonical not-found failure before
     /// the mission producer adds diagnostic wrappers; it grants no operation.
@@ -86,7 +88,7 @@ impl NativeHttpService {
         let query = query(request.uri().query())?;
         let action = query.action.as_deref().unwrap_or("show");
         let operation = if read {
-            if !matches!(action, "show" | "order" | "queue" | "status") { return Err(E::Refused("web-operation-unported")); }
+            if !matches!(action, "show" | "order" | "queue" | "status" | "launch-diagnostics") { return Err(E::Refused("web-operation-unported")); }
             if !request.body().is_empty() { return Err(E::Refused("mission-read-body-invalid")); }
             None
         } else { Some(write_input(query.action.as_deref(), request.body())?) };
@@ -109,6 +111,7 @@ impl NativeHttpService {
                 "show" => serde_json::to_vec(&store.mission_control_view(&query.work).map_err(mission_error)?),
                 "order" => serde_json::to_vec(&store.mission_task_order(&query.work).map_err(mission_error)?),
                 "queue" => serde_json::to_vec(&store.mission_workspace_queue(&query.work).map_err(mission_error)?),
+                "launch-diagnostics" => serde_json::to_vec(&store.mission_launch_diagnostics(&query.work).map_err(mission_error)?),
                 "status" => {
                     let operator = swarm_engine::operator_identity().map_err(|c| root("read", RootStoreError::Runtime(c)))?;
                     let observation = store.mission_status_historical(&query.work, &operator).map_err(|c| root("read", c))?;

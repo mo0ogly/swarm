@@ -113,15 +113,18 @@ pub fn decode_summary_source_request(raw: &[u8]) -> Result<MemorySummarySourceRe
 /// Go `memorySummarySourceForWork`: resolve the same source contract on a
 /// caller-owned Work snapshot. Identity, revision, task nature, exchange
 /// availability and duplicate selection are all checked against this one
-/// snapshot; the snapshot itself stays untouched. Pure over the caller's
-/// data except for the root digest.
+/// snapshot. With an attached hierarchy, every selected dialogue must belong
+/// to the target's validated scope. This also applies when the queued receipt
+/// is rebuilt before execution. Historical standalone packets keep their
+/// original source rules. Pure over the caller's data except for the root digest.
 ///
 /// # Errors
 ///
 /// `MemoryError::RevisionConflict` on a stale expected revision;
 /// `MemoryError::Refused` on identity mismatch, unknown task, brainstorm
-/// target, missing/modified exchange, empty question/answer or a duplicate
-/// dialogue selection; `MemoryError::Row` retains a serialization cause.
+/// target, invalid scope, cross-scope source, missing/modified exchange, empty
+/// question/answer or a duplicate selection; `MemoryError::Row` retains a
+/// serialization cause.
 pub fn summary_source_for_work(
     root: &std::path::Path,
     work: &Work,
@@ -148,6 +151,17 @@ pub fn summary_source_for_work(
         return Err(MemoryError::Refused(
             "project-summary-source-brainstorm-target",
         ));
+    }
+    if work.planning.is_some() {
+        crate::planning_scope_ancestors(work, &task.scope_id)
+            .map_err(MemoryError::SummaryScope)?;
+        for reference in &request.dialogues {
+            if work.tasks.iter().flatten().any(|source| {
+                source.id == reference.task && source.scope_id != task.scope_id
+            }) {
+                return Err(MemoryError::Refused("project-summary-source-dialogue-outside-scope"));
+            }
+        }
     }
     // Go hash([]byte(root)): digest of the root path string.
     let project_hash = crate::agent_launch_preflight::hash(root.to_string_lossy().as_bytes());

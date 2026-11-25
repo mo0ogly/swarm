@@ -19,6 +19,25 @@ fn mode(value: MissionAutonomy) -> &'static str {
     }
 }
 
+/// Refuse attachment under existing start consent or an unreleased conductor.
+/// Called inside the Work writer transaction before roles or policy can change.
+/// Legacy authority and observation failures remain intact.
+pub(crate) fn require_attachment_idle(db: &Connection, work: &str) -> Result<(), E> {
+    if super::mission_controls::consent(db, work)?.is_some_and(|consent| consent.enabled) {
+        return Err(E::Refused("planning-attach-mission-consent-active"));
+    }
+    let supervisor = super::mission_supervision_store::optional(
+        db,
+        "SELECT 1 FROM mission_supervision WHERE work_id=? AND stopped_at='' LIMIT 1",
+        [work],
+        |row| row.get::<_, i64>(0),
+    )?;
+    if supervisor.is_some() {
+        return Err(E::Refused("planning-attach-conductor-held"));
+    }
+    Ok(())
+}
+
 /// Start/resume delegate to the shared profile/consent transaction with the Root
 /// path; pause/stop/unpause retain their established semantics below.
 /// Priority changes only audited ordinal metadata; it preserves all execution controls.

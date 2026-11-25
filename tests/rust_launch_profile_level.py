@@ -18,7 +18,7 @@ def scenario(binary, output, name):
     Preview preserves state, admission creates one retained estimate, reopening
     and replay preserve it. This checks saved choices, not model authenticity.
     """
-    f=common.Fixture(binary,output,name)
+    f=common.configured_fixture(binary,output,name)
     expected=''
     if name=='explicit':
         expected='standard';f.request['level']=expected
@@ -26,7 +26,7 @@ def scenario(binary, output, name):
         initial=f.prepare(True)['agent']['model_route']
         common.publish(f.cache,{'models':[{'slug':'fixture-simple','visibility':'list'},
             {'slug':'fixture-standard','visibility':'list','supported_reasoning_levels':[{'effort':'fixture-medium'}]}]})
-        change=dict(schema_version=1,event_id='task-choice',expected_revision=3,
+        change=dict(schema_version=1,event_id='task-choice',expected_revision=f.request['expected_revision'],
             task_id='task',provider='fixture',level='simple',
             model_policy_hash=initial['policy_hash'],inherit=False)
         f.ok(['task-model','preview',f.work],change)

@@ -30,6 +30,29 @@ fn retain(mut error: E, causes: Vec<E>) -> E {
     }
     error
 }
+/// Classify only known status recheck changes, including joins of several
+/// stale observations. SQL, storage, material identity and cleanup failures
+/// in any branch retain their own diagnostic and block this classification.
+fn observation_changed(error: &E) -> bool {
+    match error {
+        E::Refused(
+            "mission-status-work-changed"
+            | "mission-status-settings-changed"
+            | "mission-status-inputs-changed"
+            | "mission-status-controls-changed"
+            | "mission-status-dispatch-context-changed"
+            | "mission-status-supervision-changed"
+            | "mission-status-evidence-work-changed"
+            | "mission-status-evidence-settings-changed"
+            | "mission-status-reports-changed"
+            | "mission-status-provider-cooldowns-changed",
+        ) => true,
+        E::Cleanup { primary, cleanup } => {
+            primary.as_deref().is_none_or(observation_changed) && observation_changed(cleanup)
+        }
+        _ => false,
+    }
+}
 /// Go zero strings are intermediate reduction state, filled before publication.
 fn understanding() -> MissionUnderstanding {
     MissionUnderstanding {
@@ -98,7 +121,14 @@ fn apply_provider_waits(work: &crate::Work, status: &mut MissionStatus) -> Resul
 /// probe, independent review, permission or acceptance follows from this text.
 fn organization(work: &crate::Work) -> Result<Organization, E> {
     let Some(planning) = work.planning.as_deref() else {
-        return Ok(Organization {ready:false,label:"Organisation autonome non configurée".into(),issues:Some(vec!["Responsable de mission absent : planification hiérarchique non configurée.".into()]),next:"Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.".into(),verification:"Politique incomplète ; aucune vérification de mission démontrée.".into()});
+        return Ok(Organization {
+            root_scope: crate::ROOT_ORCHESTRATOR_SCOPE,
+            ready: false,
+            label: "Organisation autonome non configurée".into(),
+            issues: Some(vec!["Orchestrateur principal à configurer.".into()]),
+            next: "Configurer l’équipe et les contrôles avant tout lancement.".into(),
+            verification: "Politique incomplète ; aucune vérification de mission démontrée.".into(),
+        });
     };
     let reviewer = planning.reviewer.as_deref()
         .ok_or(E::Refused("mission-status-reviewer-missing"))?;
@@ -108,6 +138,7 @@ fn organization(work: &crate::Work) -> Result<Organization, E> {
         "Revue humaine explicitement autorisée ; les résultats attendront votre acceptation."
     };
     Ok(Organization {
+        root_scope: crate::ROOT_ORCHESTRATOR_SCOPE,
         ready: true,
         label: "Organisation autonome configurée".into(),
         issues: Some(Vec::new()),
@@ -461,6 +492,48 @@ fn legacy_unbound_terminal(agent: &crate::Agent) -> bool {
 }
 
 impl RootStore {
+    /// Recognize an ordinary terminal native worker that ran before this Work
+    /// acquired its managed repository. The canonical launch and attachment
+    /// events must order the exact stored request, and a managed attempt row
+    /// disqualifies this path. The retained terminal journal and task attempt
+    /// must agree. This is a read-only provenance check, never a launch,
+    /// reviewer or acceptance grant.
+    fn attached_ordinary_terminal(&self, work: &crate::Work, agent: &crate::Agent) -> Result<bool, E> {
+        if agent.origin != "operateur" || agent.role != "worker" || agent.native_mission.is_some()
+            || !matches!(agent.status.as_str(), "completed" | "failed" | "interrupted")
+        {
+            return Ok(false);
+        }
+        let count = crate::agent_launch::query(
+            &self.db,
+            "SELECT count(*)
+             FROM main.agents AS a
+             JOIN main.events AS launched
+               ON launched.work_id=a.work_id AND launched.kind='agent.start' AND launched.request=a.request
+             JOIN main.events AS attached
+               ON attached.work_id=a.work_id AND attached.kind='planning.attach' AND attached.revision>launched.revision
+             WHERE a.id=?1 AND a.work_id=?2 AND a.task_id=?3
+               AND NOT EXISTS (SELECT 1 FROM main.managed_attempts AS m WHERE m.agent_id=a.id)",
+            rusqlite::params![agent.id, work.id, agent.task_id],
+            |rows| Ok(rows.next()?.ok_or(crate::AgentLaunchError::Refused("mission-status-attachment-event-count-missing"))?.get::<_, i64>(0)?),
+        ).map_err(|cause| E::Launch(Box::new(cause)))?;
+        if count == 0 {
+            return Ok(false);
+        }
+        let attempts = work.tasks.iter().flatten().filter(|task| task.id == agent.task_id)
+            .flat_map(|task| task.attempts.iter().flatten())
+            .filter(|attempt| attempt.id == agent.attempt_id && attempt.status == agent.status && !attempt.ended.is_empty())
+            .count();
+        if count != 1 || attempts != 1 {
+            return Err(E::Refused("mission-status-ordinary-attachment-identity"));
+        }
+        let original = crate::agent_completion_journal::observe_terminal(&self.db, &self.directory, &agent.id)?;
+        if original.agent != *agent {
+            return Err(E::Refused("mission-status-ordinary-attachment-original-changed"));
+        }
+        Ok(true)
+    }
+
     /// Recheck original first-worker attribution without requiring its mutable
     /// copy or invoking Git/provider operations. Errors retain launch causes;
     /// caller holds the material read and rechecks Work/Agents/settings. Observe
@@ -472,7 +545,9 @@ impl RootStore {
     /// recorded mission binding predates the mandatory binding; it can never
     /// be claimed, granted or relaunched (those paths keep the strict check),
     /// so it is reported as unverified historical provenance instead of
-    /// refusing the whole status. Returns how many were not verified.
+    /// refusing the whole status. A proven ordinary terminal attempt from
+    /// before attachment is read through its original journal. Returns how
+    /// many legacy workers were not verified.
     fn status_managed_workers(&self, work: &crate::Work, agents: &[crate::Agent], settings: &crate::EngineSettingsDocument) -> Result<usize, E> {
         // Original native provenance includes the FIFO journal, whose coherent
         // history reader requires an explicit read transaction. Close it before
@@ -482,6 +557,11 @@ impl RootStore {
             for agent in agents {
                 if legacy_unbound_terminal(agent) {
                     unverified += 1;
+                    continue;
+                }
+                if self.attached_ordinary_terminal(work, agent)
+                    .map_err(|e| crate::MissionSupervisionError::Root(Box::new(e)))?
+                {
                     continue;
                 }
                 crate::managed_repository::verify_worker(&self.root, &self.db, work, agent, settings,
@@ -499,7 +579,7 @@ impl RootStore {
     /// Actual queued/active/failed/interrupted/completed attempts are observed
     /// without launching or reconciling them. Frozen process identity/heartbeat
     /// distinguishes observed live from uncertain; SQL status alone is not live.
-    /// Submitted reports and current nonmanaged review opinions are presented
+    /// Submitted reports and supported current review opinions are presented
     /// from actual attempt/producer/contract/artifact observations. Passed is no
     /// acceptance. Accepted tasks independently recheck native originals, current
     /// gate, report and dependencies; stale evidence never becomes validated.
@@ -507,12 +587,14 @@ impl RootStore {
     /// eligibility. Hidden running/blocked Agents refuse rather than invent state.
     /// Review/validation events resolve only persisted review/attempt ownership.
     /// Managed copy paths are prospective metadata, never physical readiness.
-    /// Previous review/retry/recovery, managed submitted/accepted results and closed scopes remain
+    /// Previous review/retry/recovery and closed scopes remain
     /// explicit port boundaries. Missing policy/evidence and unknown IO refuse,
     /// preserving typed semantic/cleanup causes beyond the material guard.
     /// Work/settings/controls/Agents and selected reports are compared before and
     /// after. These sequential observations establish neither an atomic snapshot
-    /// nor ABA protection. No visit, provider, SQL, Git or ledger mutation occurs.
+    /// nor ABA protection. A change-only outcome discards the projection and
+    /// returns a typed conflict after material checks and cleanup. Ancillary
+    /// causes remain attached. No visit, provider, SQL, Git or ledger mutation.
     /// Caller must close Root and handle output/flush; observation grants nothing.
     pub fn mission_status_historical(
         &self,
@@ -594,7 +676,10 @@ impl RootStore {
                     let fact=evidence.remove(&t.id).ok_or(E::Refused("mission-status-freshness-missing"))?;
                     let agent=agents.iter().find(|a|a.task_id==t.id);
                     let dependencies:Vec<_>=t.depends.as_deref().unwrap_or(&[]).iter().map(|id|DependencyObservation {task_id:id.clone(),freshness:if dependency_current.get(id)==Some(&true) {DependencyFreshness::Current} else {DependencyFreshness::NotCurrent}}).collect();
-                    let result=super::mission_status_reports::observed_result_inputs(&self.root,&input.work,t,agent,&settings,&mut causes,fact)?;
+                    let managed_review = if managed {
+                        super::mission_status_review::observe_managed(self, &input.work, t, &settings)?
+                    } else { None };
+                    let result=super::mission_status_reports::observed_result_inputs(&self.root,&input.work,t,agent,&settings,&mut causes,(fact,managed_review))?;
                     if let ReportListing::Observed(paths)=&result.reports {report_snapshots.push((t.id.clone(),paths.clone()));}
                     let execution=if t.status=="blocked" && t.plan_max_attempts>0 && t.attempts.as_ref().map_or(0,Vec::len) as u128>=t.plan_max_attempts as u128 {
                         let admin=crate::run_limits::read_configured_runtime_limits(&self.db,&runtime_policy,work,"worker",&t.id)?;
@@ -736,6 +821,9 @@ impl RootStore {
                 }
                 Ok(MissionStatusObservation { status, causes })
             }
+            Err(error) if observation_changed(&error) => Err(E::MissionStatusChanged {
+                primary: Box::new(retain(error, causes)),
+            }),
             Err(error) => Err(retain(error, causes)),
         }
     }
@@ -743,6 +831,28 @@ impl RootStore {
 
 #[cfg(all(test, target_os = "linux"))]
 mod tests {
+    /// Exercise the exact causes observed across worker completion. The same
+    /// tree with an independent SQL or identity failure must remain an error.
+    #[test]
+    fn status_completion_changes_are_distinct_from_failed_cleanup() {
+        let changes = || {
+            let inputs: Result<(), E> = Err(E::Refused("mission-status-evidence-work-changed"));
+            finished(inputs, finished(
+                Err(E::Refused("mission-status-work-changed")),
+                Err(E::Refused("mission-status-inputs-changed")),
+            )).unwrap_err()
+        };
+        assert!(super::observation_changed(&changes()));
+        for independent in [
+            E::Sql(rusqlite::Error::InvalidQuery),
+            E::Refused("material-project-instance-changed"),
+            E::Refused("mission-status-evidence-root-changed"),
+        ] {
+            let result = finished(Err::<(), _>(changes()), Err(independent)).unwrap_err();
+            assert!(!super::observation_changed(&result));
+        }
+    }
+
     #[test]
     fn only_terminal_unbound_conductor_agents_skip_status_provenance() {
         let agent = |origin: &str, status: &str| crate::Agent { origin: origin.into(), status: status.into(), ..Default::default() };

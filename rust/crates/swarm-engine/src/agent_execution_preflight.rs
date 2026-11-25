@@ -29,6 +29,7 @@ pub(crate) struct ExecutionPreparation {
     /// this is not an enduring settings lease or execution authority.
     pub model_values: crate::EngineSettingsValues,
     pub host: HostPreparation,
+    pub effective_preflight: crate::PreflightResult,
     pub launch_policy: crate::AgentLaunchPolicy,
     pub reserved: crate::agent_execution_store::ReservationReceipt,
 }
@@ -36,7 +37,7 @@ pub(crate) struct ExecutionPreparation {
 /// Unknown original request content cannot disappear through Go projection and
 /// become an executable request. Missing/type/codec/finalization causes survive.
 pub(crate) fn retained(
-    tx: &Transaction<'_>,
+    tx: &rusqlite::Connection,
     id: &str,
 ) -> Result<(Agent, Launch, Vec<u8>), AgentLaunchError> {
     launch::query(
@@ -208,7 +209,11 @@ fn process_boundary(agent: &Agent, stage: ExecutionStage) -> Result<(), AgentLau
 /// consent/lease/profile/capacity before grant; a supplied label cannot select it.
 /// Checks run under the caller's current SQL/settings
 /// snapshot. Checks current work/attempt, headers, policy, guards, reserved budget,
-/// context/workflow, provider/environment/workspace/model-source bytes and original TTL.
+/// context/workflow, provider/environment/workspace/model-source bytes and the
+/// applicable preflight TTL. For a manual managed startup, a compatible fresh
+/// host observation can replace an expired TTL for this boundary only. The
+/// original admission and its scope remain intact. No attempt, reservation or
+/// authority is created by choosing the new observation.
 /// Task choices are rebound from current Work at every process boundary; their
 /// selected route, stored requested route and unique source receipt must match fresh resolution;
 /// this proves neither the applied model nor account availability or pricing.
@@ -335,47 +340,18 @@ pub(crate) fn inspect(
         return Err(AgentLaunchError::Refused("agent-execution-memory-paths-changed"));
     }
     launch::field_guide(root)?;
-    let (source_provider, provider_raw) = launch::provider(dir, &request, &policy)?;
-    launch::cooldown(root, &agent.provider)?;
-    let model = crate::provider_model_route::resolve(
-        &source_provider,
-        &request,
-        &settings.values,
-        &policy,
-    )?;
-    crate::task_model::check_resolved(&work, &agent.task_id, model.route())?;
-    if agent.model_route.as_deref() != model.route() {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-model-route-changed",
-        ));
-    }
-    let provider = model.provider();
-    let host = agent_launch_preflight::observe(root, &agent.provider, &model, &request, &policy)?;
-    let original = agent.preflight.as_ref().ok_or(AgentLaunchError::Refused(
-        "agent-execution-preflight-missing",
-    ))?;
-    model.check_recorded_scope(original)?;
-    let now = crate::system_timestamp()
-        .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
-    let parse = |raw: &str| {
-        swarm_wire_json::go_rfc3339::parse(raw)
-            .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))
+    let (model, host, provider_raw) = observe_retained_host(root, dir, settings, &work, &agent, &request, &policy)?;
+    let original = agent.preflight.as_deref()
+        .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
+    let effective_preflight = match mission.as_ref() {
+        Some(binding) => crate::root_store::adoption_preflight(tx, &agent, binding, settings)
+            .map_err(|e| AgentLaunchError::caused("agent-execution-adoption-preflight", e))?
+            .unwrap_or_else(|| original.clone()),
+        None if work.planning.as_deref().is_some_and(|p| p.repository.is_some())
+            && preflight_expired(original)? => host.preflight.clone(),
+        None => original.clone(),
     };
-    if parse(&now)? >= parse(&original.valid_until)? {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-preflight-expired",
-        ));
-    }
-    if host.preflight.scope != original.scope
-        || host.workspace.to_str() != Some(agent.workspace.as_str())
-        || provider.command != agent.command
-        || provider.args != agent.args
-        || agent.env_allow.as_deref() != Some(host.environment_names.as_slice())
-    {
-        return Err(AgentLaunchError::Refused(
-            "agent-execution-preflight-changed",
-        ));
-    }
+    check_expiry(&effective_preflight)?;
     let workflow = crate::read_agent_workflow(
         root,
         "worker",
@@ -421,15 +397,185 @@ pub(crate) fn inspect(
         model,
         model_values: settings.values.clone(),
         host,
+        effective_preflight,
         launch_policy: policy,
         reserved: crate::agent_execution_store::reservation(tx, id)?,
     })
+}
+
+/// Check the selected execution receipt at the current process boundary.
+/// The caller selects it from admission, verified adoption or a freshly
+/// observed manual managed startup with the unchanged original scope.
+pub(crate) fn check_expiry(receipt: &crate::PreflightResult) -> Result<(), AgentLaunchError> {
+    if preflight_expired(receipt)? {
+        return Err(AgentLaunchError::Refused("agent-execution-preflight-expired"));
+    }
+    Ok(())
+}
+
+/// Compare the receipt deadline with the local clock. Clock and timestamp
+/// errors remain refusals, including for callers that can reobserve expiry.
+fn preflight_expired(receipt: &crate::PreflightResult) -> Result<bool, AgentLaunchError> {
+    let now = crate::system_timestamp()
+        .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
+    let parse = |raw: &str| {
+        swarm_wire_json::go_rfc3339::parse(raw)
+            .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))
+    };
+    Ok(parse(&now)? >= parse(&receipt.valid_until)?)
+}
+
+/// Observe host and route under saved policy, matching the immutable original.
+/// This may perform the existing workspace write probe. No launch or grant
+/// follows. Read, model and scope failures retain their original causes.
+fn observe_retained_host(
+    root: &Path,
+    dir: &LocalDirectory,
+    settings: &EngineSettingsDocument,
+    work: &crate::Work,
+    agent: &Agent,
+    request: &Launch,
+    policy: &crate::AgentLaunchPolicy,
+) -> Result<(crate::provider_model_route::ModelRoutePreparation, HostPreparation, Vec<u8>), AgentLaunchError> {
+    let (source_provider, provider_raw) = launch::provider(dir, request, policy)?;
+    launch::cooldown(root, &agent.provider)?;
+    let model = crate::provider_model_route::resolve(
+        &source_provider, request, &settings.values, policy,
+    )?;
+    crate::task_model::check_resolved(work, &agent.task_id, model.route())?;
+    if agent.model_route.as_deref() != model.route() {
+        return Err(AgentLaunchError::Refused("agent-execution-model-route-changed"));
+    }
+    let provider = model.provider();
+    let host = agent_launch_preflight::observe(root, &agent.provider, &model, request, policy)?;
+    let original = agent.preflight.as_ref()
+        .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
+    model.check_recorded_scope(original)?;
+    if host.preflight.scope != original.scope
+        || host.workspace.to_str() != Some(agent.workspace.as_str())
+        || provider.command != agent.command
+        || provider.args != agent.args
+        || agent.env_allow.as_deref() != Some(host.environment_names.as_slice())
+    {
+        return Err(AgentLaunchError::Refused("agent-execution-preflight-changed"));
+    }
+    Ok((model, host, provider_raw))
+}
+
+/// Produce a fresh observation for an expired, still-queued automatic Agent.
+/// The adoption writer checks the current lease, consent and canonical Agent,
+/// and verifies that the reservation remains unchanged. This helper uses its
+/// Root and Work under the writer's transaction and reads the saved request.
+/// Provider, model or host drift refuses. The proposed receipt grants no
+/// process permission and this helper writes no journal.
+pub(crate) fn observe_adoption_preflight(
+    db: &rusqlite::Connection,
+    root: &Path,
+    dir: &LocalDirectory,
+    settings: &EngineSettingsDocument,
+    work: &crate::Work,
+    agent: &Agent,
+) -> Result<crate::PreflightResult, AgentLaunchError> {
+    if db.is_autocommit() {
+        return Err(AgentLaunchError::Refused("agent-adoption-preflight-transaction-required"));
+    }
+    let (actual, mut request, _) = retained(db, &agent.id)?;
+    if actual != *agent || work.id != agent.work_id
+        || request.expected_revision.checked_add(1) != Some(work.revision)
+    {
+        return Err(AgentLaunchError::Refused("agent-execution-context-stale"));
+    }
+    process_boundary(agent, ExecutionStage::Queued)?;
+    launch::execution_guards(db, &agent.work_id, &request, agent)?;
+    crate::task_model::bind_launch(work, &mut request)?;
+    crate::memory_files::check(root, db, work)?;
+    if work.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+        request.workspace = crate::managed_repository::verify_worker(
+            root, db, work, agent, settings, crate::managed_repository::WorkerCheck::BeforeExecution,
+        )?;
+    }
+    let policy = settings.values.agent_launch_policy()
+        .map_err(|e| AgentLaunchError::caused(e.reason(), e))?;
+    let (model, host, provider_raw) = observe_retained_host(root, dir, settings, work, agent, &request, &policy)?;
+    let (_, current_raw) = launch::provider(dir, &request, &policy)?;
+    if current_raw != provider_raw {
+        return Err(AgentLaunchError::Refused("agent-provider-catalogue-changed"));
+    }
+    model.recheck(&request, &settings.values, &policy)?;
+    agent_launch_preflight::recheck(root, &model, &request, &policy, &host)?;
+    Ok(host.preflight)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use rusqlite::types::Value;
+    /// Configure the fixture's reviewer and child scope using the same public
+    /// commands as operator attachment. An optional second task permits an
+    /// independent departure after cancellation of the first task.
+    fn attach_fixture_team(root: &Path, store: &mut crate::RootStore, work: &str, second: bool) -> i64 {
+        use std::os::unix::fs::PermissionsExt;
+        // The reviewer needs a recognized tool-free adapter and a saved route.
+        // Keep its catalogue entry separate from the worker artifact under test.
+        let planner = root.join("skynet_harness");
+        std::fs::write(&planner, b"#!/bin/cat\nfixture planner is never executed\n").unwrap();
+        std::fs::set_permissions(&planner, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let directory = LocalDirectory::open(&root.join(".swarm")).unwrap();
+        let mut catalogue: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(root.join(".swarm/providers.json")).unwrap()
+        ).unwrap();
+        let model = serde_json::json!({"model":"fixture-model", "effort":""});
+        catalogue["providers"]["team-fixture"] = serde_json::json!({
+            "command":planner, "args":["--model", "fixture-model"],
+            "model_policy":{
+                "version":1, "billing":"external", "work_level":"standard", "page_level":"simple",
+                "levels":{"simple":model, "standard":model, "exigeant":model}
+            }
+        });
+        directory.publish("providers.json", &serde_json::to_vec(&catalogue).unwrap()).unwrap();
+        directory.close().unwrap();
+        let mut revision = store.read_work(work).unwrap().revision;
+        if second {
+            let input = serde_json::json!({
+                "schema_version":1, "event_id":"add-second-task", "expected_revision":revision,
+                "id":"second", "title":"Second witness", "deliverable":"Report", "criteria":["Proof"]
+            });
+            revision = store.execute_external(work, "task.add", &serde_json::to_vec(&input).unwrap(),
+                &mut crate::SystemEnvironment).unwrap().result.work.revision;
+        }
+        let mut assignments = std::collections::BTreeMap::new();
+        for id in ["task", "second"].into_iter().take(if second { 2 } else { 1 }) {
+            let input = serde_json::json!({
+                "schema_version":1, "event_id":format!("authorize-{id}"), "expected_revision":revision,
+                "id":id, "validation_policy":{"mode":"human"}
+            });
+            revision = store.execute_external(work, "task.update", &serde_json::to_vec(&input).unwrap(),
+                &mut crate::SystemEnvironment).unwrap().result.work.revision;
+            assignments.insert(id, "proof");
+        }
+        let input = serde_json::json!({
+            "schema_version":1, "event_id":"team", "expected_revision":revision,
+            "provider":"team-fixture", "level":"standard", "max_activations":2, "max_decisions":3,
+            "max_review_calls":2, "max_tasks":assignments.len(), "task_scopes":assignments,
+            "checks":{"req-1":[{
+                "id":"fixture-planner-ready",
+                "command":["python3", "-c", "import os; assert os.access('skynet_harness', os.X_OK)"],
+                "inputs":["skynet_harness"],
+                "justification":"Check executable setup of the owned fixture planner"
+            }]}
+        });
+        store.execute_external(work, "planning.attach", &serde_json::to_vec(&input).unwrap(),
+            &mut crate::SystemEnvironment).unwrap().result.work.revision
+    }
+
+    /// Build the fixture's exact manual launch request at the observed revision.
+    fn fixture_launch(event: &str, task: &str, revision: i64) -> crate::Launch {
+        crate::decode_launch(&serde_json::to_vec(&serde_json::json!({
+            "schema_version":1, "event_id":event, "expected_revision":revision,
+            "task_id":task, "provider":"fixture"
+        })).unwrap()).unwrap()
+    }
+
     /// Snapshot the admission-touching rows: agents, reservations, events, logs,
     /// work attempts. Not a full-schema dump; the refusal must change none of it.
     fn admission_snapshot(db: &rusqlite::Connection) -> Vec<(String, Vec<Vec<Value>>)> {
@@ -490,7 +636,8 @@ mod tests {
             .publish("providers.json", catalogue.as_bytes())
             .unwrap();
         setup.close().unwrap();
-        let request=crate::decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, false);
+        let request = fixture_launch("session", "task", revision);
         // Valid admission precedes any mutation: the queued row exists and the
         // digest of the actual admitted artifact is frozen in its preflight scope.
         let launched = store.prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment).unwrap();
@@ -613,8 +760,8 @@ mod tests {
     /// while the stale row is still queued; cancelling settles the stale
     /// intention (agent interrupted/desired stop, task blocked with the
     /// interrupted outcome, attempt ended, work revision advanced, reservation
-    /// released); a fresh event id then re-observes the current bytes and
-    /// commits with a different preflight scope; restoring the original bytes
+    /// released); a fresh task can then re-observe the current bytes. The
+    /// original task requires a scoped retry decision. The new task commits with a different preflight scope; restoring the original bytes
     /// must then refuse the new agent's consumption (agent-execution-preflight-
     /// changed), proving the new admission bound the mutated digest, not the
     /// original one; the cancelled row itself can never be consumed (desired
@@ -664,11 +811,8 @@ mod tests {
         );
         setup.publish("providers.json", catalogue.as_bytes()).unwrap();
         setup.close().unwrap();
-        // Admission "session": work.create (+1) → task.add (+1) → admission (+1).
-        let request = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, true);
+        let request = fixture_launch("session", "task", revision);
         let launched = store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
             .unwrap();
@@ -749,10 +893,7 @@ mod tests {
         }
         // 3. A fresh admission on the same workspace is refused while the stale
         //    row is still queued: the lane is occupied, no parallel bypass.
-        let bypass = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"bypass","expected_revision":3,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        let bypass = fixture_launch("bypass", "second", revision + 1);
         {
             let mut db =
                 rusqlite::Connection::open(root.as_path().join(".swarm/state.db")).unwrap();
@@ -810,7 +951,7 @@ mod tests {
                 Value::Integer(v) => *v,
                 other => panic!("unexpected work revision cell: {other:?}"),
             };
-            assert_eq!(work_revision, 4, "settlement must advance the work revision");
+            assert_eq!(work_revision, revision + 2, "settlement must advance the work revision");
             let body = match &after[0].1[0][5] {
                 Value::Text(t) => t.clone(),
                 Value::Blob(t) => String::from_utf8(t.clone()).unwrap(),
@@ -821,12 +962,16 @@ mod tests {
                 "cancelled agent must carry the settlement activity: {body}"
             );
         }
-        // 5. A fresh event id re-observes the current (mutated) bytes and binds
-        //    them: the new admission must commit with a different scope.
-        let readmission_request = crate::decode_launch(
-            br#"{"schema_version":1,"event_id":"readmit","expected_revision":4,"task_id":"task","provider":"fixture"}"#,
-        )
-        .unwrap();
+        // 5. The cancelled task needs a new orchestrator decision. The
+        // independent task can acquire the released workspace and freeze the
+        // mutated provider bytes at its own fresh admission.
+        let retry = fixture_launch("retry-cancelled", "task", revision + 2);
+        let mut retry_store = crate::RootStore::open(root.as_path(), true).unwrap();
+        let error = retry_store.prepare_agent_launch(&work, &retry, false, &mut crate::SystemEnvironment)
+            .err().expect("cancelled task cannot restart without authorization");
+        assert!(error.to_string().contains("scoped-worker-retry-decision-required"), "{error}");
+        retry_store.close().unwrap();
+        let readmission_request = fixture_launch("readmit", "second", revision + 2);
         let readmitted = {
             let mut store = crate::RootStore::open(root.as_path(), true).unwrap();
             let outcome = store
@@ -943,7 +1088,8 @@ mod tests {
             )
             .unwrap();
         setup.close().unwrap();
-        let request=crate::decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap();
+        let revision = attach_fixture_team(root.as_path(), &mut store, &work, false);
+        let request = fixture_launch("session", "task", revision);
         store
             .prepare_agent_launch(&work, &request, false, &mut crate::SystemEnvironment)
             .unwrap();

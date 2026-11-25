@@ -969,6 +969,7 @@ fn apply<E: WorkEnvironment>(
                 .map_err(WorkEngineError::Budget)?;
         }
         "planning.enable"
+        | "planning.attach"
         | "planning.claim"
         | "planning.decide"
         | "planning.lease-renew"
@@ -1076,12 +1077,34 @@ fn apply<E: WorkEnvironment>(
                 // Keep the original request in mutation intent/replay. Only this
                 // trusted Root adapter may attach source-observed repository data.
                 let mut local_request=request.clone();
-                if action==crate::PlanningControlAction::Enable {local_request.repository=None;}
-                let provider = if action == crate::PlanningControlAction::Enable
+                let configures_repository = matches!(
+                    action,
+                    crate::PlanningControlAction::Enable | crate::PlanningControlAction::Attach
+                );
+                if configures_repository {
+                    local_request.repository = None;
+                }
+                if action == crate::PlanningControlAction::Attach {
+                    crate::planning_control::validate_planning_attach_target(&candidate, &local_request)
+                        .map_err(WorkEngineError::PlanningControl)?;
+                    #[cfg(target_os = "linux")]
+                    {
+                        crate::root_store::require_attachment_idle(tx, &candidate.id)
+                            .map_err(|error| WorkEngineError::Mission(Box::new(error)))?;
+                        for task in candidate.tasks.iter().flatten() {
+                            require_native_task_idle(tx, &candidate.id, &task.id, "planning-attach-worker-active")?;
+                        }
+                    }
+                    #[cfg(not(target_os = "linux"))]
+                    return Err(WorkEngineError::UnportedStatus);
+                }
+                let provider = if matches!(action, crate::PlanningControlAction::Enable | crate::PlanningControlAction::Attach)
                     && !request.provider.is_empty()
                 {
-                    crate::planning_control::validate_planning_enable_target(&candidate, &local_request)
-                        .map_err(WorkEngineError::PlanningControl)?;
+                    if action == crate::PlanningControlAction::Enable {
+                        crate::planning_control::validate_planning_enable_target(&candidate, &local_request)
+                            .map_err(WorkEngineError::PlanningControl)?;
+                    }
                     #[cfg(target_os = "linux")]
                     {
                         Some(
@@ -1105,7 +1128,18 @@ fn apply<E: WorkEnvironment>(
                     provider.as_ref(),
                 )
                 .map_err(WorkEngineError::PlanningControl)?;
-                if action==crate::PlanningControlAction::Enable {
+                #[cfg(target_os = "linux")]
+                if action == crate::PlanningControlAction::Attach {
+                    let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
+                    crate::planning_control::bind_attachment_workspaces(
+                        root, &mut candidate, request, &at, &actor,
+                    ).map_err(|error| WorkEngineError::PlanningBootstrap(Box::new(error)))?;
+                    crate::RootStore::attach_worker_completions(root, tx, &mut candidate)
+                        .map_err(|error| WorkEngineError::PlanningBootstrap(Box::new(
+                            crate::AgentLaunchError::caused("planning-attach-native-completion", error),
+                        )))?;
+                }
+                if configures_repository {
                     if let Some(repository)=request.repository.as_deref(){
                         #[cfg(target_os = "linux")]
                         {

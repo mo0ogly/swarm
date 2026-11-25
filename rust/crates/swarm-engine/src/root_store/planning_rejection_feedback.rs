@@ -63,6 +63,8 @@ pub(super) fn inventory(proposal: &crate::PlanningProposal) -> Result<Vec<(Strin
 /// is invented. Caller validates actual reap OR explicit unadmitted revocation.
 /// Optional safe cause/grant observations remain unknown for older receipts;
 /// structured causes are not free-form text or an authenticated identity graph.
+/// An initial child scope-authority refusal also stages one root notification
+/// in the same Work. The original proposal and its artifact stay child-scoped.
 pub(super) fn prepare(
     work: &Work,
     receipt: &Receipt,
@@ -95,6 +97,20 @@ pub(super) fn prepare(
     let key = serde_json::to_vec(&(&row.scope_id, reason, &inventory, &state))
         .map_err(|e| A::caused("planning-rejection-key-encoding", e))?;
     let key = crate::agent_launch_preflight::hash(&key);
+    let escalation_key = if proposal.is_some() && !scope.parent.is_empty()
+        && crate::planning_rejection::scope_authority_refusal(reason)
+    {
+        let key = serde_json::to_vec(&(&row.scope_id, reason, &state))
+            .map_err(|e| A::caused("planning-escalation-key-encoding", e))?;
+        Some(crate::agent_launch_preflight::hash(&key))
+    } else {
+        None
+    };
+    let escalation_key = escalation_key.filter(|key| !planning.inbox.iter().flatten().any(|event| {
+        event.scope == crate::ROOT_ORCHESTRATOR_SCOPE
+            && event.kind == crate::planning_rejection::SCOPE_ESCALATION_KIND
+            && event.rejection_key == *key
+    }));
     let effect = if proposal.is_some() {
         "Entire proposal refused. No task operation or input acknowledgement applied. Reassess the complete untrusted proposal; the actual failed operation index is not established by this receipt."
     } else if receipt.exit_code.is_some() || receipt.signal.is_some() {
@@ -162,7 +178,7 @@ pub(super) fn prepare(
     };
     let inbox = p.inbox.get_or_insert_with(Vec::new);
     inbox
-        .try_reserve(1)
+        .try_reserve(1 + usize::from(escalation_key.is_some()))
         .map_err(|e| A::caused("planning-rejection-allocation", e))?;
     let message = if proposal.is_some() {
         format!("Native proposal refused ({reason}). Complete untrusted proposal and observed diagnostic attached; reassess within authority.")
@@ -180,6 +196,21 @@ pub(super) fn prepare(
         at: at.into(),
         ..Default::default()
     });
+    if let Some(rejection_key) = escalation_key {
+        let root = p.scopes.iter_mut().flatten()
+            .find(|s| s.id == crate::ROOT_ORCHESTRATOR_SCOPE && s.state != "closed")
+            .ok_or(A::Refused("planning-escalation-root-unavailable"))?;
+        root.state = "ready".into();
+        inbox.push(crate::PlanningEvent {
+            id: format!("{}{event}", crate::planning_rejection::SCOPE_ESCALATION_PREFIX),
+            scope: root.id.clone(),
+            kind: crate::planning_rejection::SCOPE_ESCALATION_KIND.into(),
+            rejection_key,
+            message: format!("Scope {} requires root arbitration ({reason}). Review the scope boundary and acknowledge this input so the child can reassess under its existing mandate.", row.scope_id),
+            at: at.into(),
+            ..Default::default()
+        });
+    }
     candidate.revision = work
         .revision
         .checked_add(1)

@@ -2,7 +2,8 @@
 //! migration, retry, adoption, filesystem setup or authority is performed here.
 use crate::{decode_work_row, Work, WorkError};
 use rusqlite::{types::ValueRef, Connection, Params, Rows};
-use std::fmt;
+use sha2::{Digest, Sha256};
+use std::{fmt, sync::Arc};
 
 pub enum RecordedWorkError {
     Sql(rusqlite::Error),
@@ -96,6 +97,17 @@ fn query<T>(
 /// Check the persisted schema/id/revision envelope, not permission to read it.
 /// A transaction dereferences to Connection and retains its existing snapshot.
 pub fn read_recorded_work(connection: &Connection, id: &str) -> Result<Work, RecordedWorkError> {
+    read_one(connection, id, decode)
+}
+
+/// Read a single identified row on the caller's snapshot. The provided reader
+/// consumes borrowed values before statement finalization. Missing rows and
+/// statement cleanup retain the same errors for all single-row observations.
+fn read_one<T>(
+    connection: &Connection,
+    id: &str,
+    read: impl FnOnce(&rusqlite::Row<'_>) -> Result<T, RecordedWorkError>,
+) -> Result<T, RecordedWorkError> {
     if !swarm_identity_contract::name(id.as_bytes()) {
         return Err(WorkError::Identity.into());
     }
@@ -105,9 +117,61 @@ pub fn read_recorded_work(connection: &Connection, id: &str) -> Result<Work, Rec
         [id],
         |rows| {
             let row = rows.next()?.ok_or(RecordedWorkError::Missing)?;
-            decode(row)
+            read(row)
         },
     )
+}
+
+/// Validated Work row and the identity of its original encoded body. Keeps no
+/// borrowed SQLite data or authority after the caller ends its transaction.
+pub(crate) struct ObservedWork {
+    pub(crate) work: Work,
+    body_digest: sha2::digest::Output<Sha256>,
+}
+
+/// Observe the stored bytes and reuse a previous decode only for the exact ID,
+/// revision and digest. Missing or changed rows go through normal validation.
+/// The caller still owns the database binding and every authorization check.
+pub(crate) fn observe_work(
+    connection: &Connection,
+    id: &str,
+    previous: Option<&Arc<ObservedWork>>,
+) -> Result<Arc<ObservedWork>, RecordedWorkError> {
+    read_one(connection, id, |row| {
+        let raw = bytes(row, 2)?;
+        let body_digest = Sha256::digest(raw);
+        if let Some(previous) = previous {
+            let revision = crate::sqlite_value::integer(row.get_ref(1)?, 1)?;
+            if bytes(row, 0)? == previous.work.id.as_bytes()
+                && previous.work.revision == revision
+                && previous.body_digest == body_digest
+            {
+                return Ok(Arc::clone(previous));
+            }
+        }
+        Ok(Arc::new(ObservedWork {
+            work: decode(row)?,
+            body_digest,
+        }))
+    })
+}
+
+impl ObservedWork {
+    /// Observe the current row after the initial snapshot ends. Compare its
+    /// revision and exact body identity without decoding an unchanged Work.
+    /// A changed row remains invalid if its newly observed envelope is invalid.
+    /// SQL, missing row and decode errors propagate. No read lease is retained.
+    pub(crate) fn is_current(&self, connection: &Connection) -> Result<bool, RecordedWorkError> {
+        read_one(connection, &self.work.id, |row| {
+            if crate::sqlite_value::integer(row.get_ref(1)?, 1)? == self.work.revision
+                && Sha256::digest(bytes(row, 2)?) == self.body_digest
+            {
+                return Ok(true);
+            }
+            decode(row)?;
+            Ok(false)
+        })
+    }
 }
 /// Actual Go order: newest rowid first. Any invalid row rejects the whole list;
 /// a successfully read empty table is the only successful empty result.
@@ -124,4 +188,55 @@ pub fn list_recorded_works(connection: &Connection) -> Result<Vec<Work>, Recorde
             Ok(result)
         },
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn observed_work_rejects_revision_and_body_drift() {
+        let db = Connection::open_in_memory().unwrap();
+        db.execute(
+            "CREATE TABLE works (id TEXT PRIMARY KEY, revision INTEGER, body BLOB)",
+            [],
+        )
+        .unwrap();
+        let original = br#"{"schema_version":1,"id":"mission","revision":1,"title":"Original"}"#;
+        db.execute("INSERT INTO works VALUES ('mission',1,?)", [&original[..]])
+            .unwrap();
+        let observed = observe_work(&db, "mission", None).unwrap();
+        assert!(observed.is_current(&db).unwrap());
+        let reused = observe_work(&db, "mission", Some(&observed)).unwrap();
+        assert!(Arc::ptr_eq(&observed, &reused));
+
+        let changed = br#"{"schema_version":1,"id":"mission","revision":1,"title":"Changed"}"#;
+        db.execute("UPDATE works SET body=?", [&changed[..]])
+            .unwrap();
+        assert!(!observed.is_current(&db).unwrap());
+        let changed = observe_work(&db, "mission", Some(&observed)).unwrap();
+        assert!(!Arc::ptr_eq(&observed, &changed));
+        assert_eq!(changed.work.title, "Changed");
+
+        let later = br#"{"schema_version":1,"id":"mission","revision":2,"title":"Original"}"#;
+        db.execute("UPDATE works SET revision=2,body=?", [&later[..]])
+            .unwrap();
+        assert!(!observed.is_current(&db).unwrap());
+
+        db.execute("UPDATE works SET body=?", [&original[..]])
+            .unwrap();
+        assert_eq!(
+            observed.is_current(&db).unwrap_err().code(),
+            "row-incoherent"
+        );
+        assert_eq!(
+            observe_work(&db, "mission", Some(&observed))
+                .err()
+                .unwrap()
+                .code(),
+            "row-incoherent"
+        );
+        db.execute("DELETE FROM works", []).unwrap();
+        assert_eq!(observed.is_current(&db).unwrap_err().code(), "work-missing");
+    }
 }

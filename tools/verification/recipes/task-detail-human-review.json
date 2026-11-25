@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "task-detail-human-review",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_actions.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/task_actions.rs",
+    "web/cockpit-native.js",
+    "web/cockpit.css",
+    "web/swarm-workbench.js",
+    "web/swarm-workbench.css",
+    "web/task-detail-files.js",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview/file_reader.rs",
+    "rust/crates/swarm-engine/src/recorded_work.rs",
+    "tests/rust_task_detail_review.cjs",
+    "web/i18n-en.js",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/fixture_area.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_task_detail_review.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-http-and-task-detail-browser",
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS originals route rejects anonymous and malformed reads",
+        "PASS en cockpit help, keyboard return and read-only guidance",
+        "PASS en submitted report opens first, Monaco search and responsive file tree",
+        "PASS failed initial report keeps other files and retries with a fresh read",
+        "PASS blocked dialog preserves submitted revision",
+        "PASS protected read-only precheck, stale revision and CSRF refusal",
+        "PASS fr cockpit help, keyboard return and read-only guidance",
+        "PASS fr submitted report opens first, Monaco search and responsive file tree",
+        "PASS selecting another deliverable reads only that original",
+        "PASS click recorded one task.update and public readback confirmed acceptance"
+      ],
+      "required_stderr": [],
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,sys; subprocess.run([sys.executable,'tests/rust_task_detail_review.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',os.environ['SWARM_TASK_REVIEW_FIXTURE']],check=True)"
+      ]
+    }
+  ]
+}

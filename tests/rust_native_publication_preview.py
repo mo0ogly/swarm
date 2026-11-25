@@ -14,7 +14,8 @@ from rust_native_task_validation import invoke
 def run(binary,profile,out,reuse=None):
     """Require complete observations, explicit blockers and refusal/restoration.
 
-    Public calls must preserve Work, call/reservation counts and provider marker.
+    Public calls must preserve Work, call/reservation counts and the original
+    review claim’s provider marker in its engine-created I0 leaf.
     Root source reports, private originals and public context/certificate stay
     byte-identical after each owned fault. Reusing a fixture does not reauthenticate
     a provider; profile/source hashes bind the currently exercised executable.
@@ -30,14 +31,17 @@ def run(binary,profile,out,reuse=None):
         assert (code==0)==success,(label,code,wire)
         return wire
     before=call('before',['work','show',work])['work'];money=native.finance(root,work)
-    marker=(root/'managed-reviewer-invoked.json').read_bytes()
+    original_request = json.loads((reuse / 'native-review.input.json').read_bytes())
+    review_event = original_request['event_id']
+    marker = native.read_reviewer_marker(root, review_event)
     task=next(t for t in before['tasks'] if t['id']=='task');review=task['independent_review']
     request=dict(schema_version=1,event_id='publication-preview-'+uuid.uuid4().hex,
         expected_revision=before['revision'],task_id=task['id'])
     def unchanged(label):
         """Compare actual Work, reservations and the exclusive provider marker."""
         assert call(label+'-work',['work','show',work])['work']==before
-        assert native.finance(root,work)==money and (root/'managed-reviewer-invoked.json').read_bytes()==marker
+        assert native.finance(root, work) == money
+        assert native.read_reviewer_marker(root, review_event) == marker
     def valid(label):
         """Require the complete bound observation, explicit blockers and no effects."""
         value=call(label,['task','publication-preview',work],request)

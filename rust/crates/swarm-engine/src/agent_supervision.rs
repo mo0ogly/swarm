@@ -307,16 +307,17 @@ impl OwnedProcessControl for Control<'_> {
             .stop_reason
             .is_some();
         if now >= self.next {
-            let (p, facts) = {
+            let (p, facts, actions) = {
                 let stream = self.stream.try_borrow().map_err(ioe)?;
                 (
                     progress(&stream, self.agent.timeout_seconds).map_err(ioe)?,
                     stream.provider_facts(),
+                    stream.task_actions(),
                 )
             };
             let expected = self.agent.clone();
             self.agent = if self.ack_eof {
-                crate::agent_storage_retry::heartbeat(self.db, self.dir, &expected, &p, &facts)
+                crate::agent_storage_retry::heartbeat(self.db, self.dir, &expected, &p, &facts, &actions)
             } else {
                 crate::agent_storage_retry::pending_gate_owner(self.db, self.dir, &expected)
             }.map_err(ioe)?;
@@ -535,6 +536,7 @@ pub(crate) fn run(
             "output_bytes":stream.output_bytes,"output_sha256":stream.sha256(),"output_complete":process_ok&&finish_stream.is_ok(),
             "capture":capture,"capture_invalid_utf8":capture_invalid_utf8,"capture_truncated":stream.capture_truncated,
             "public_messages_truncated":stream.public_truncated,"first_event_error":stream.first_event_error.as_ref().map(|e|e.code()),
+            "task_actions":stream.task_actions(),
             "event_source":"provider_declared_unverified","provider_facts":&provider_facts,"stop_kind":control.stop_kind,"observation":stream.observation().map_err(RootStoreError::Guard)?
         });
         // Freeze the same escaped wire bytes that exact persistence/replay will

@@ -30,7 +30,7 @@ def run(binary,output):
     responses and original CLI channels privately; never log credentials. Fixture
     source faults restore exact originals and preserve primary/cleanup causes.
     """
-    output.mkdir(parents=True,exist_ok=False);f=retained.Fixture(binary,output,'model-read')
+    output.mkdir(parents=True,exist_ok=False);f=retained.configured_fixture(binary,output,'model-read')
     f.provider['args'].insert(-1,'PRIVATE_MODEL_ARGUMENT');f.save_provider()
     retained.publish(f.cache,{'models':[
         {'slug':'fixture-simple','visibility':'list'},

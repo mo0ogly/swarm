@@ -104,6 +104,10 @@ pub struct Agent {
     /// Opaque native end observations; never task acceptance or action authority.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub native_execution_result: Option<crate::GoRaw>,
+    /// Last owned heartbeat's redacted per-tool observation. Stale observations
+    /// are data only, never evidence of a currently running provider.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub native_task_actions: Option<crate::GoRaw>,
     /// Opaque current provider declarations and diagnostic quality; no model, invoice or actor authentication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub native_provider_facts: Option<crate::GoRaw>,
@@ -204,6 +208,7 @@ pub(crate) fn shape_agent() -> Fields {
         ("native_mission", Kind::Pointer(&Kind::Raw)),
         ("native_execution", Kind::Pointer(&Kind::Raw)),
         ("native_execution_result", Kind::Pointer(&Kind::Raw)),
+        ("native_task_actions", Kind::Pointer(&Kind::Raw)),
         ("native_provider_facts", Kind::Pointer(&Kind::Raw)),
     ]
 }

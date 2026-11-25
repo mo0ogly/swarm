@@ -79,6 +79,29 @@ Les méthodes répondent dans la langue de la demande.
 
 </details>
 
+## Repères du dépôt pour les agents
+
+Ce guide complète la [table des méthodes](#démarrer). Lire d’abord le
+[contrat commun](../tools/agent-workflows/CONTRACT.md), puis le producteur, les
+consommateurs et les vérifications propres au périmètre confié.
+
+| Rubrique | Parcours dans Swarm | Point à établir |
+| --- | --- | --- |
+| Vue projet et frontières | Lire la [vue du moteur Rust](architecture/OVERVIEW.md), le [manifeste Cargo](../rust/Cargo.toml) et l’[architecture des deux UX](PRODUCT-ARCHITECTURE.md). Suivre la CLI et le Web jusqu’au moteur et à l’instance Root. | Composants compilés, processus, surfaces publiques et périmètre de migration. Pour le multitâche, distinguer les créneaux d’un Work du FIFO des espaces partagé entre Work d’un Root. [Orchestration Tokio](architecture/TOKIO-ORCHESTRATION.md) |
+| Installation, compilation et style | Partir des entrées de la [CI](../.github/workflows/ci.yml), du manifeste et du [lanceur local](architecture/NATIVE-LOCAL-LAUNCHER.md). Les scripts de l’interface et de traduction sont dans [package.json](../package.json). | Toolchain, features, dépendances, profil, ressources servies, style et conventions du code local. Relever la configuration effective des contrôles au lieu de reprendre les chiffres d’un autre dépôt. |
+| Tests et recettes | Choisir le test Rust nommé et le parcours public correspondant. Les recettes, sorties et limites figurent dans le [guide de vérification](../tools/verification/README.md). | Démontrer le cas nominal, le refus et la reprise pertinents sur un Root de fixture. Distinguer fixture, appel fournisseur réel et installation. Justifier les délais ajoutés et relever les tests réellement exécutés. |
+| Fichiers et opérations | API HTTP dans [swarm-web](../rust/crates/swarm-web/src/lib.rs), commandes dans [swarm-cli](../rust/crates/swarm-cli/src/lib.rs), modèle et transitions dans [swarm-engine](../rust/crates/swarm-engine/src/lib.rs). | Retrouver le schéma et les erreurs au producteur. Vérifier la liaison de l’instance, les consommateurs et le trajet réglage persisté → validation → Admin/API/CLI → usage. [Erreurs HTTP](architecture/NATIVE-HTTP-ERRORS.md) |
+| Domaines et méthodes | Utiliser la table existante pour orienter architecture, réalisation, revue, diagnostic ou vérification. Les définitions maintenues sont sous [.claude/skills](../.claude/skills), avec [points d’entrée Codex](../.agents/skills). | Le rôle et le mandat déterminent l’autorité. Traiter une invocation payante, une délégation et une revue indépendante selon les droits et budgets applicables. |
+| Surfaces et outils | Inventorier les opérations publiques à partir des handlers CLI/HTTP et de leurs preuves. Consulter les [recettes permanentes](../tools/verification/README.md) avant de créer un contrôle. | Une commande de lecture, un aperçu et une mutation ont des effets distincts. Une éventuelle passerelle d’outils ou MCP requiert des opérations, identités et droits établis pour son propre parcours. |
+| Adaptateurs et mémoire | Suivre profil, route et contrôles du [fournisseur natif](architecture/NATIVE-PROVIDER-RESOLUTION.md). Examiner séparément le [graphe de mission](architecture/GRAPH-STUDIO.md), la [mémoire de projet](PROJECT-MEMORY.md) et le contexte remis. | Provenance, version, périmètre, droits d’usage, destinataire et preuve de réception. Un résultat de recherche ou une mémoire choisie fournit du contexte. Le droit d’agir est contrôlé au point d’usage. |
+| Sécurité et conservation | Partir des contrats [Biba](architecture/BIBA-RUST.md), [BLP](architecture/BELL-LAPADULA.md) et [identité](architecture/AGENT-IDENTITY-CONTRACT.md), puis suivre la [chaîne de traçabilité](architecture/TRACEABILITY.md). | Relever les gardes effectivement appelées, les diagnostics sûrs, les originaux conservés et la politique de rétention par circuit. Le journal d’activité, l’audit et le reçu d’effet ont chacun leur propre portée. |
+
+La structure adapte [l’AGENTS.md d’Agents-Orchestrator à sa révision de référence](https://github.com/syntax-syndicate/Agents-Orchestrator/blob/fd1f2a75aca87907cd5e510a65516d120dfd7a3c/AGENTS.md).
+Les repères Swarm ci-dessus ont été rapprochés du manifeste, de la CI, des
+entrées Rust et des contrats à la base `50f1daee655fd735c913116cd6b61314ff871bdf`.
+Ces liens documentent la provenance de la méthode. La réception par un contexte
+natif et le fonctionnement des parcours exigent leurs preuves propres.
+
 ## Depuis l'interface Swarm
 
 Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :

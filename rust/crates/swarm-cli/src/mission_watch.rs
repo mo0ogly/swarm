@@ -509,13 +509,14 @@ fn reap(
 }
 /// Observe before every dispatch/adoption without grant or cancellation. Return
 /// old-generation queued candidate IDs, whether any automatic worker retains an
-/// active context, then unowned registered IDs. The actual adoption API validates
-/// ownership, receipt and current controls. All semantic sibling refusals survive.
+/// active context, unowned registered IDs and whether a previously started worker
+/// is still crossing the revision-bound startup gate. Read failures preserve
+/// their cause. These observations authorize no work and change no state.
 fn continuation(
     store: &RootStore,
     lease: &MissionLease,
     children: &[Worker],
-) -> Result<(Vec<String>, bool, Vec<String>), RootError> {
+) -> Result<(Vec<String>, bool, Vec<String>, bool), RootError> {
     let observed = store
         .observe_mission_worker_continuation(lease)
         .map_err(|error| phase("mission-watch-continuation", *error))?;
@@ -523,9 +524,19 @@ fn continuation(
     let mut candidates = Vec::new();
     let mut registered = Vec::new();
     let mut active_context = false;
+    let mut startup_pending = false;
     for entry in observed.entries {
         active_context |= planning_context_pending(&entry.state);
         let known = children.iter().any(|child| child.agent == entry.agent_id);
+        match &entry.state {
+            State::QueuedUnregisteredObserved { .. }
+            | State::StopRequestedUnregisteredObserved { .. } if known => startup_pending = true,
+            State::RegisteredObserved => match store.read_agent(&entry.agent_id) {
+                Ok(agent) => startup_pending |= agent.status == "starting",
+                Err(error) => failure = Some(join(failure, phase("mission-watch-startup-observation", error))),
+            },
+            _ => {}
+        }
         if !known && matches!(entry.state, State::RegisteredObserved) { registered.push(entry.agent_id.clone()); }
         if adoption_candidate(known, &entry.state) {
             candidates.push(entry.agent_id.clone());
@@ -538,7 +549,7 @@ fn continuation(
             failure = Some(join(failure, error));
         }
     }
-    failure.map_or(Ok((candidates, active_context, registered)), Err)
+    failure.map_or(Ok((candidates, active_context, registered, startup_pending)), Err)
 }
 
 /// Finalize only unowned registered observations after all continuation siblings
@@ -659,6 +670,8 @@ fn planning_record(
 /// The selected planner job calls this synchronously in its owned peer, while
 /// main only uses pending=true for non-executing deferral observations. Existing
 /// cleanup joins each owned role on stop; role scheduling alone grants nothing.
+/// A verified root notification is published as a refusal with durable Work,
+/// allowing another cycle. Observation or publication failure retains both causes.
 fn planning_once(
     store: &mut RootStore,
     work: &str,
@@ -689,7 +702,21 @@ fn planning_once(
             "automatic_planner":true,"automatic_reviewer":false,"automatic_validation":false,"mission_complete":false,"observation_is_permission":false}),
         );
     }
-    let step = store.step_planning(work)?;
+    let step = match store.step_planning(work) {
+        Ok(step) => step,
+        Err(error) => match store.observe_planning_escalation(work, &error) {
+            Ok(Some((revision, event))) => {
+                *recorded = Some((work.to_owned(), revision));
+                let record = json!({"schema_version":1,"event":"mission-planning-escalated",
+                    "work":work,"work_revision":revision,"input_event":event,
+                    "causes":crate::safe_causes(&error),"decision_applied":false,
+                    "mission_complete":false,"observation_is_permission":false});
+                return emit(out, &record).map_err(|publication| join(Some(error), publication));
+            }
+            Ok(None) => return Err(error),
+            Err(observation) => return Err(join(Some(error), observation)),
+        },
+    };
     if let Some(run) = &step.run {
         *recorded = Some((run.work.id.clone(), run.work.revision));
     }
@@ -910,6 +937,32 @@ fn stale_dispatch_observation(error: &swarm_engine::MissionWorkerDispatchFailure
             if matches!(cause.as_ref(), swarm_engine::MissionSupervisionError::Refused("revision_conflict")))
 }
 
+/// Recognize the exact revision race in a read-only resource preview.
+/// The standing queue synchronization remains committed. A matching preview
+/// rolls back its temporary preparation and has not attempted admission.
+/// A stale queue, mismatched intent, uncertain cleanup or admission is fatal.
+fn stale_dispatch_preview(
+    error: &swarm_engine::MissionWorkerDispatchFailure,
+    work: &str,
+    request: &swarm_engine::MissionWorkerDispatchRequest,
+) -> bool {
+    use swarm_engine::{
+        AgentLaunchError as A, MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+        MissionDispatchQueueEffect as Q,
+    };
+    let Q::Committed(queue) = &error.queue else { return false };
+    let P::PreviewAttempted { event_id, task_id } = &error.preparation else { return false };
+    error.phase == "resource-preview"
+        && queue.work == work
+        && queue.revision == request.expected_revision
+        && queue.permission_refusal.is_none()
+        && queue.ready.contains(task_id)
+        && event_id == &request.event_id
+        && matches!(&error.cause, C::Root(root)
+            if matches!(root.as_ref(), RootError::Launch(cause)
+                if matches!(cause.as_ref(), A::Refused("revision_conflict"))))
+}
+
 /// Recognize only a clean rolled-back resource preview denied by the actual
 /// mission fence after permission withdrawal. Preserve its committed queue and
 /// original causes; no admission, replay, cleanup/commit uncertainty, generic
@@ -1014,7 +1067,12 @@ fn stop_withdrawn_report(error: RootError, work: &str, recorded: &Option<(String
 /// polled at saved cadence, joined and published by this sole shared-output
 /// writer in protocol role order. One in-flight call per role prevents duplicate
 /// owned calls; engine leases/admission and persisted budgets remain authoritative.
-/// Planner defers while active worker contexts remain. Every peer is interrupted
+/// Workers with admissible work take priority over a new planner peer. A successful
+/// dispatch rechecks readiness once the prior startup crosses the revision-bound
+/// gate, so running independent tasks can use remaining configured slots.
+/// Planning waits for a dispatch pass with no
+/// admission, a usable mission permission and no retained worker context.
+/// Every peer is interrupted
 /// and joined before conductor release, even after another peer/publisher fails.
 /// This does not establish global scheduling or mission acceptance parity.
 fn drive(
@@ -1067,7 +1125,7 @@ fn drive(
         ) {
             return stop_withdrawn_report(error, work, planning_recorded, out);
         }
-        let (candidates, active_context, registered) = continuation(store, lease, children)?;
+        let (candidates, active_context, registered, startup_pending) = continuation(store, lease, children)?;
         if recover_registered(store,lease,work,registered,&mut recovery_waiting,planning_recorded,out)? {
             // Verified settlement changed the observed context. Discard this old
             // snapshot before any planning/adoption/dispatch; same lease/IDs remain.
@@ -1078,13 +1136,12 @@ fn drive(
         if active_context {
             planning_once(store,work,true,out,planning_recorded)?;
         }
-        for role in role_job::Role::ALL {
+        if startup_pending {
+            if let Some(stop) = signals.wait(cadence)? { return Ok(stop); }
+            continue;
+        }
+        for role in [role_job::Role::Controls, role_job::Role::Reviewer] {
             if jobs.contains_key(&role) { continue; }
-            if role == role_job::Role::Planner {
-                let current = store.read_work(work)?;
-                if active_context || !current.planning.as_ref().is_some_and(|p|
-                    !p.paused && p.failure.is_empty() && !p.provider.is_empty()) { continue; }
-            }
             jobs.insert(role,role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
         }
         if !monitor.is_running() {
@@ -1093,7 +1150,7 @@ fn drive(
         if let Some(stop) = signals.ready()? {
             return Ok(stop);
         }
-        for agent_id in candidates {
+        if let Some(agent_id) = candidates.into_iter().next() {
             if !monitor.is_running() {
                 return Err(RootError::Refused("mission-watch-heartbeat-not-running"));
             }
@@ -1138,6 +1195,8 @@ fn drive(
             }
             start_worker(executable, root, &agent_id, work, children, out)?;
             last_blocked = None;
+            if let Some(stop) = signals.wait(cadence)? { return Ok(stop); }
+            continue;
         }
         let revision = store.read_work(work)?.revision;
         let request = match pending_dispatch.take() {
@@ -1154,11 +1213,12 @@ fn drive(
             Err(error) if withdrawn_dispatch_for_work(&error,work).is_some() => {
                 return stop_withdrawn_dispatch(error, work, &request.event_id, out);
             }
-            Err(error) if stale_dispatch_observation(&error) => {
+            Err(error) if stale_dispatch_observation(&error) || stale_dispatch_preview(&error, work, &request) => {
+                let preview = stale_dispatch_preview(&error, work, &request);
                 let error = phase("mission-watch-dispatch", *error);
                 let observation=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
                     "reason":"work-revision-changed","event_id":request.event_id,"expected_revision":request.expected_revision,
-                    "synchronization_committed":false,"preparation_attempted":false,"causes":crate::safe_causes(&error),
+                    "synchronization_committed":preview,"preparation_attempted":preview,"admission_attempted":false,"causes":crate::safe_causes(&error),
                     "mission_complete":false,"observation_is_permission":false});
                 if let Err(publication)=emit(out,&observation) { return Err(join(Some(error),publication)); }
                 // Keep operation identity. Only a later scheduled cycle rereads the
@@ -1208,7 +1268,19 @@ fn drive(
                     "mission-watch-unexpected-dispatch-replay",
                 ))
             }
-            Dispatch::NoAdmission { .. } => {}
+            Dispatch::NoAdmission { queue, .. } => {
+                let role = role_job::Role::Planner;
+                if !active_context && queue.permission_refusal.is_none()
+                    && !jobs.contains_key(&role)
+                {
+                    let current = store.read_work(work)?;
+                    if current.planning.as_ref().is_some_and(|p|
+                        !p.paused && p.failure.is_empty() && !p.provider.is_empty())
+                    {
+                        jobs.insert(role,role_job::start(scope,role,root.to_owned(),work.to_owned(),lease,signals.source.clone())?);
+                    }
+                }
+            }
         }
         if let Some(stop) = signals.wait(cadence)? {
             return Ok(stop);
@@ -1572,6 +1644,36 @@ mod tests {
         let mut error=clean();error.cause=C::Mission(Box::new(M::Refused("mission-lease-lost")));assert!(!super::stale_dispatch_observation(&error));
         let mut error=clean();error.resources.push(swarm_engine::MissionDispatchResourceRefusal::Occupied{task:"task".into(),cause:swarm_engine::RootStoreError::Refused("fixture-resource")});assert!(!super::stale_dispatch_observation(&error));
         assert!(super::stale_dispatch_observation(&clean()));
+    }
+    /// A planner may commit after queue synchronization and before preview.
+    /// Only the original clean preview refusal permits a fresh observation.
+    #[test]
+    fn stale_resource_preview_retains_queue_and_refuses_uncertain_admission() {
+        use swarm_engine::{
+            AgentLaunchError as A, MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+            MissionDispatchQueueEffect as Q, MissionWorkerDispatchFailure as F,
+        };
+        let request = swarm_engine::MissionWorkerDispatchRequest {
+            schema_version: 1, event_id: "event".into(), expected_revision: 7,
+        };
+        let clean = || F {
+            phase: "resource-preview",
+            queue: Q::Committed(swarm_engine::MissionQueueRegistration {
+                work: "work".into(), revision: 7, ready: vec!["task".into()],
+                refused: vec![], permission_refusal: None,
+            }),
+            preparation: P::PreviewAttempted { event_id: "event".into(), task_id: "task".into() },
+            resources: vec![],
+            cause: C::Root(Box::new(super::RootError::Launch(Box::new(A::Refused("revision_conflict"))))),
+        };
+        assert!(super::stale_dispatch_preview(&clean(), "work", &request));
+        assert!(!super::stale_dispatch_preview(&clean(), "another-work", &request));
+        let mut error = clean();
+        error.queue = Q::OutcomeUnknown;
+        assert!(!super::stale_dispatch_preview(&error, "work", &request));
+        let mut error = clean();
+        error.preparation = P::AdmissionAttempted { event_id: "event".into(), task_id: "task".into() };
+        assert!(!super::stale_dispatch_preview(&error, "work", &request));
     }
     /// A real local channel carries controller shutdown without inventing an OS
     /// signal. Valid idle/stop precedes disconnected-owner refusal and recovery.

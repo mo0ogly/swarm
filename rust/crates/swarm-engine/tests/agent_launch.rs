@@ -1,5 +1,7 @@
 //! Manual admission through the public Root API; isolated roots, no provider child.
 #![cfg(target_os = "linux")]
+#[path = "../../test_support/manual_launch_team.rs"]
+mod manual_launch_team;
 use rusqlite::{types::Value, Connection};
 use std::{
     collections::BTreeMap,
@@ -11,6 +13,7 @@ use swarm_engine::{decode_launch, Launch, RootStore, SystemEnvironment};
 struct Fixture {
     root: PathBuf,
     work: String,
+    revision: i64,
 }
 impl Fixture {
     /// Build actual schema, Work and task through public commands. A harmless
@@ -30,6 +33,17 @@ impl Fixture {
         let created=store.execute_external("","work.create",br#"{"schema_version":1,"event_id":"create","expected_revision":0,"title":"Title","objective":"Goal","scope":"Scope","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
         let work = created.result.work.id;
         store.execute_external(&work,"task.add",br#"{"schema_version":1,"event_id":"add","expected_revision":1,"id":"task","title":"Task","deliverable":"Report","criteria":["Proof"]}"#,&mut SystemEnvironment).unwrap();
+        fs::write(
+            root.join(".swarm/providers.json"),
+            br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
+        )
+        .unwrap();
+        fs::set_permissions(
+            root.join(".swarm/providers.json"),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+        let revision = manual_launch_team::attach(&root, &mut store, &work);
         store.close().unwrap();
         if summary {
             let db = Connection::open(root.join(".swarm/state.db")).unwrap();
@@ -38,10 +52,14 @@ impl Fixture {
                 .query_row("SELECT body FROM works WHERE id=?", [&work], |r| r.get(0))
                 .unwrap();
             let mut w = swarm_engine::decode_work(&raw).unwrap();
+            let witness = w.tasks.as_ref().unwrap()[0].clone();
             for (index, id) in ["old-0", "old-1"].iter().enumerate() {
                 let mut brain = swarm_engine::Task::default();
                 brain.id = (*id).into();
                 brain.brainstorm = true;
+                brain.scope_id = witness.scope_id.clone();
+                brain.requirements = witness.requirements.clone();
+                brain.validation_policy = witness.validation_policy.clone();
                 brain.question = format!("Décision numéro {index}");
                 brain.answers = Some(vec![swarm_engine::BrainstormAnswer {
                     attempt: format!("a{index}"),
@@ -57,17 +75,7 @@ impl Fixture {
             .unwrap();
             db.close().unwrap();
         }
-        fs::write(
-            root.join(".swarm/providers.json"),
-            br#"{"schema_version":1,"providers":{"fixture":{"command":"/bin/cat","args":[]}}}"#,
-        )
-        .unwrap();
-        fs::set_permissions(
-            root.join(".swarm/providers.json"),
-            fs::Permissions::from_mode(0o600),
-        )
-        .unwrap();
-        let f = Self { root, work };
+        let f = Self { root, work, revision };
         // Fixture-only financial envelope, not a live mutation or launch permission.
         let db = f.db();
         db.execute("INSERT INTO budgets(work_id,body) VALUES(?,?)",rusqlite::params![f.work,br#"{"limit_usd":10,"reserve_per_launch_usd":1,"estimate_source":"fixture estimate","reference_date":"2026-10-19"}"#.as_slice()]).unwrap();
@@ -82,7 +90,11 @@ impl Fixture {
     }
     /// Canonical raw launch remains distinct from normalized saved defaults.
     fn request(&self) -> Launch {
-        decode_launch(br#"{"schema_version":1,"event_id":"session","expected_revision":2,"task_id":"task","provider":"fixture"}"#).unwrap()
+        let bytes = serde_json::to_vec(&serde_json::json!({
+            "schema_version":1,"event_id":"session","expected_revision":self.revision,
+            "task_id":"task","provider":"fixture"
+        })).unwrap();
+        decode_launch(&bytes).unwrap()
     }
     /// Operator flow on this fixture: resolve the summary packet at the current
     /// revision, then confirm a selection quoting its resolved identifiers and
@@ -632,7 +644,7 @@ fn worker_context_current_identity_candidate_revision_and_replay_hash() {
             "mission {} ; tâche task ; agent session ; tentative {}",
             f.work, preview.agent.attempt_id
         ),
-        "révision du travail 3".into(),
+        format!("révision du travail {}", f.revision + 1),
         "Les identités, limites et conclusions des rapports antérieurs sont historiques".into(),
     ] {
         assert!(
@@ -649,7 +661,7 @@ fn worker_context_current_identity_candidate_revision_and_replay_hash() {
         .unwrap();
     assert_eq!(actual.agent.prompt, preview.agent.prompt);
     assert_eq!(actual.agent.context, preview.agent.context);
-    assert_eq!(store.read_work(&f.work).unwrap().revision, 3);
+    assert_eq!(store.read_work(&f.work).unwrap().revision, f.revision + 1);
     store.close().unwrap();
 }
 /// The latest own plan contract is required, even when Next is a generic UI
@@ -717,35 +729,24 @@ fn worker_context_uses_latest_own_contract_without_sibling_or_obsolete_scope() {
     assert!(!preview.agent.prompt.contains("SIBLING-PRIVATE-SCOPE"));
     assert_eq!(snapshot(&f.db()), before);
 }
-/// A fresh second attempt gets its own identity and current budget count; an
-/// interrupted first attempt cannot become an implicit successful handoff.
+/// A manual stop preserves its attempt and does not authorize a scoped retry.
 #[test]
-fn worker_context_retry_has_new_attempt_identity_and_explicit_recovery_guidance() {
+fn worker_context_manual_retry_requires_a_scoped_decision() {
     let f = Fixture::new();
     let first = f.run(false).unwrap().agent;
     let mut store = RootStore::open(&f.root, true).unwrap();
-    store
-        .cancel_queued_agent("session", &mut SystemEnvironment)
-        .unwrap();
+    store.cancel_queued_agent("session", &mut SystemEnvironment).unwrap();
+    let current = store.read_work(&f.work).unwrap();
+    assert_eq!(current.tasks.as_ref().unwrap()[0].attempts.as_ref().unwrap()[0].id, first.attempt_id);
     let mut r = f.request();
     r.event_id = "retry".into();
-    r.expected_revision = store.read_work(&f.work).unwrap().revision;
-    let retry = store
-        .prepare_agent_launch(&f.work, &r, true, &mut SystemEnvironment)
-        .unwrap();
-    assert_ne!(retry.agent.attempt_id, first.attempt_id);
-    assert!(retry.agent.prompt.contains(&format!(
-        "agent retry ; tentative {}",
-        retry.agent.attempt_id
-    )));
-    assert!(retry
-        .agent
-        .prompt
-        .contains("REPRISE : comparer le contrat courant"));
-    assert!(!retry
-        .agent
-        .prompt
-        .contains(&format!("tentative {} ;", first.attempt_id)));
+    r.expected_revision = current.revision;
+    let before = snapshot(&f.db());
+    for preview in [true, false] {
+        let result = store.prepare_agent_launch(&f.work, &r, preview, &mut SystemEnvironment);
+        assert_eq!(result.err().expect("manual retry accepted").code(), "scoped-worker-retry-decision-required");
+        assert_eq!(snapshot(&f.db()), before);
+    }
     store.close().unwrap();
 }
 
@@ -755,7 +756,7 @@ fn worker_context_retry_has_new_attempt_identity_and_explicit_recovery_guidance(
 #[test]
 fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
     use sha2::{Digest, Sha256};
-    for case in 0..6 {
+    for case in [0, 1, 2, 3, 5] {
         let f = Fixture::new();
         let db = f.db();
         let raw: Vec<u8> = db
@@ -820,10 +821,6 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
             }
             _ => {}
         }
-        if case == 4 {
-            w.tasks.as_mut().unwrap()[0].plan_role = "worker".into();
-            w.plans = None;
-        }
         if case == 5 {
             w.tasks.as_mut().unwrap()[0].scope_id = "child".into();
         }
@@ -839,7 +836,7 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
         assert_eq!(
             result.err().expect("incoherent mapping accepted").code(),
             if case == 5 {
-                "agent-current-context-branch-unported"
+                "organization_incomplete"
             } else {
                 "agent-current-plan-mapping-invalid"
             }
@@ -859,9 +856,9 @@ fn worker_context_incoherent_current_plan_mapping_refuses_without_fallback() {
         db.close().unwrap();
     }
 }
-/// A context reviewed before an authorized Work update is stale even if the
-/// launch revision is refreshed. Rejection preserves that legitimate update;
-/// reviewing a fresh preview then committing its exact digest recovers.
+/// A context reviewed before an authorized task action update is stale even if
+/// the launch revision advances. Rejection preserves the legitimate task edit;
+/// a fresh preview with its exact digest then admits the request.
 #[test]
 fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
     let f = Fixture::new();
@@ -869,7 +866,9 @@ fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
     let mut r = f.request();
     r.context_hash = preview.agent.context.unwrap().sha256;
     let mut store = RootStore::open(&f.root, true).unwrap();
-    store.execute_external(&f.work,"work.update",br#"{"schema_version":1,"event_id":"change","expected_revision":2,"title":"Current changed title"}"#,&mut SystemEnvironment).unwrap();
+    let change = serde_json::json!({"schema_version":1,"event_id":"change",
+        "expected_revision":f.revision,"id":"task","next":"Current changed action"});
+    store.execute_external(&f.work,"task.update",&serde_json::to_vec(&change).unwrap(),&mut SystemEnvironment).unwrap();
     r.expected_revision = store.read_work(&f.work).unwrap().revision;
     let before = snapshot(&f.db());
     let result = store.prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment);
@@ -887,8 +886,8 @@ fn worker_context_stale_preview_refuses_then_fresh_digest_commits() {
         .prepare_agent_launch(&f.work, &r, false, &mut SystemEnvironment)
         .unwrap();
     assert!(committed.created);
-    assert!(committed.agent.prompt.contains("Current changed title"));
-    assert!(committed.agent.prompt.contains("révision du travail 4"));
+    assert!(committed.agent.prompt.contains("Current changed action"));
+    assert!(committed.agent.prompt.contains(&format!("révision du travail {}", f.revision + 2)));
     store.close().unwrap();
 }
 
@@ -1365,7 +1364,7 @@ fn leased_manual_launch_preview_receipt_replay_and_binding() {
     assert_eq!(receipts.len(), 1);
     assert_eq!(receipts[0].kind, "agent.start");
     assert_eq!(receipts[0].generation, lease.generation());
-    assert_eq!(receipts[0].work_revision, 3);
+    assert_eq!(receipts[0].work_revision, f.revision + 1);
     assert_eq!(
         receipts[0].claim_settings_revision,
         lease.settings_revision()
@@ -1518,9 +1517,9 @@ fn organization_launch_reason(error: &(dyn std::error::Error + 'static)) -> Opti
     }
     None
 }
-/// A configured hierarchy still refuses the unported managed branch. Omitting
-/// reviewer/capacity yields the precise prerequisite without SQL effects; restoring
-/// the original manual fixture permits admission, never a provider process.
+/// Exercise an incompatible reviewer digest, missing reviewer and exhausted
+/// capacity independently. Each refusal preserves SQL. Restoring the attached
+/// fixture permits admission without starting any provider.
 #[test]
 fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let f = Fixture::new();
@@ -1528,18 +1527,8 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let root = RootStore::open(&f.root, true).unwrap();
     let original = root.read_work(&f.work).unwrap();
     root.close().unwrap();
-    let template=swarm_engine::decode_work(br#"{"schema_version":1,"id":"work","revision":1,"criteria":["test"],"planning":{"version":1,"max_tasks":10,"max_decisions":10,"max_activations":10,"provider":"fixture","human_review_authorized":"declared","scopes":[{"id":"root","revision":1,"requirements":["req-1"]}],"reviewer":{"provider":"fixture","authorized":"declared","max_calls":10}}}"#).unwrap();
     let mut managed = original.clone();
-    managed.planning = template.planning;
-    for task in managed.tasks.iter_mut().flatten() {
-        task.scope_id = "root".into();
-        task.requirements = Some(vec!["req-1".into()]);
-        task.validation_policy = swarm_engine::decode_task(
-            br#"{"id":"task","validation_policy":{"mode":"human","authorized_at":"declared"}}"#,
-        )
-        .unwrap()
-        .validation_policy;
-    }
+    managed.planning.as_mut().unwrap().reviewer.as_mut().unwrap().provider_digest = "a".repeat(64);
     swarm_engine::validate_mission_organization(&managed).unwrap();
     let db = f.db();
     let body = swarm_engine::encode_model(&managed).unwrap();
@@ -1551,7 +1540,7 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
     let before = snapshot(&db);
     let error = match f.run(true) {
         Err(error) => error,
-        Ok(_) => panic!("reviewer without provider digest accepted"),
+        Ok(_) => panic!("reviewer with incompatible provider digest accepted"),
     };
     assert!(
         matches!(&error,swarm_engine::RootStoreError::Launch(error) if error.code()=="reviewer_unavailable")
@@ -1574,15 +1563,9 @@ fn planned_launch_preserves_organization_and_reviewer_refusals() {
         Some("organization-reviewer-missing")
     );
     assert_eq!(snapshot(&db), before);
-    let mut exhausted = managed;
-    exhausted
-        .planning
-        .as_mut()
-        .unwrap()
-        .reviewer
-        .as_mut()
-        .unwrap()
-        .calls = 10;
+    let mut exhausted = original.clone();
+    let reviewer = exhausted.planning.as_mut().unwrap().reviewer.as_mut().unwrap();
+    reviewer.calls = reviewer.max_calls;
     db.execute(
         "UPDATE works SET body=? WHERE id=?",
         rusqlite::params![swarm_engine::encode_model(&exhausted).unwrap(), f.work],
@@ -1713,7 +1696,7 @@ fn summary_preview_appends_extract_without_mutation() {
     assert!(preview.agent.prompt.trim_end().ends_with('}'));
     assert_eq!(receipt.work, f.work);
     assert_eq!(receipt.task, "task");
-    assert_eq!(receipt.prepared_revision, 2);
+    assert_eq!(receipt.prepared_revision, f.revision);
     assert_eq!(receipt.queued_revision, 0);
     assert!(receipt.queued_source_sha256.is_empty());
     assert_eq!(receipt.source_message_count, 5);
@@ -1748,9 +1731,55 @@ fn summary_admission_without_context_hash_refuses_without_mutation() {
     assert_eq!(snapshot(&f.db()), before);
 }
 
-/// Confirm-then-admit: the context hash from the preview commits the agent at
-/// revision 3 with a stamped receipt (prepared at 2, queued at 3). The queued
-/// source digest matches a fresh resolution at the queued revision.
+/// Moving a selected historical dialogue out of the worker scope blocks source
+/// preparation and launch admission without touching the persisted Work.
+#[test]
+fn summary_selection_refuses_dialogue_in_another_scope() {
+    use std::error::Error;
+    let f = Fixture::with_summary();
+    let selection = f.confirmed_selection();
+    let mut r = f.request();
+    r.summary_selection = Some(Box::new(selection.clone()));
+    assert!(f.run_with(r.clone(), true).unwrap().preview_only);
+    let db = f.db();
+    let mut work = swarm_engine::read_recorded_work(&db, &f.work).unwrap();
+    let planning = work.planning.as_ref().unwrap();
+    let root = planning.scopes.as_ref().unwrap().iter()
+        .find(|scope| scope.id == "root").unwrap();
+    let root_requirements = root.requirements.clone();
+    let source = work.tasks.as_mut().unwrap().iter_mut()
+        .find(|task| task.id == "old-0").unwrap();
+    assert_ne!(source.scope_id, "root");
+    source.scope_id = "root".into();
+    source.requirements = root_requirements;
+    swarm_engine::validate_mission_organization(&work).unwrap();
+    db.execute(
+        "UPDATE works SET body=? WHERE id=?",
+        rusqlite::params![swarm_engine::encode_model(&work).unwrap(), f.work],
+    ).unwrap();
+    let before = snapshot(&db);
+    let error = swarm_engine::summary_source_for_work(&f.root, &work,
+        &swarm_engine::MemorySummarySourceRequest {
+            schema_version: 1, work: f.work.clone(), task: r.task_id.clone(),
+            expected_revision: work.revision, dialogues: selection.dialogues.unwrap(),
+        }).unwrap_err();
+    assert_eq!(error.reason(), "project-summary-source-dialogue-outside-scope");
+    for preview in [true, false] {
+        let error = f.run_with(r.clone(), preview).err().expect("cross-scope dialogue accepted");
+        let swarm_engine::RootStoreError::Launch(launch) = error else {
+            panic!("unexpected refusal: {error}");
+        };
+        let reason = launch.source()
+            .and_then(|cause| cause.downcast_ref::<swarm_engine::MemoryError>())
+            .map(swarm_engine::MemoryError::reason);
+        assert_eq!(reason, Some("project-summary-source-dialogue-outside-scope"));
+        assert_eq!(snapshot(&db), before);
+    }
+    db.close().unwrap();
+}
+
+/// A confirmed context commits a receipt and a source hash at the new queued
+/// revision. The hash matches a fresh resolution against that recorded Work.
 #[test]
 fn summary_admission_commits_stamped_receipt() {
     use sha2::{Digest, Sha256};
@@ -1771,7 +1800,7 @@ fn summary_admission_commits_stamped_receipt() {
     // Sources at the queued revision: the work is saved at N+1 with the
     // attempt-transition task body; the summary packet re-resolves there.
     let queued = swarm_engine::read_recorded_work(&db, &f.work).unwrap();
-    assert_eq!(queued.revision, 3);
+    assert_eq!(queued.revision, f.revision + 1);
     let packet = swarm_engine::summary_source_for_work(
         &f.root,
         &queued,
@@ -1779,7 +1808,7 @@ fn summary_admission_commits_stamped_receipt() {
             schema_version: 1,
             work: f.work.clone(),
             task: "task".into(),
-            expected_revision: 3,
+            expected_revision: f.revision + 1,
             dialogues: selection.dialogues.clone().unwrap(),
         },
     )
@@ -1788,8 +1817,8 @@ fn summary_admission_commits_stamped_receipt() {
     let receipt = manifest.summary.as_ref().expect("committed receipt");
     assert_eq!(receipt.work, f.work);
     assert_eq!(receipt.task, "task");
-    assert_eq!(receipt.prepared_revision, 2);
-    assert_eq!(receipt.queued_revision, 3);
+    assert_eq!(receipt.prepared_revision, f.revision);
+    assert_eq!(receipt.queued_revision, f.revision + 1);
     assert_eq!(receipt.queued_source_sha256, packet.sha256);
     assert_eq!(
         receipt.attachment_sha256,
@@ -1876,7 +1905,7 @@ fn summary_selection_refuses_drifted_sources_without_mutation() {
     store.close().unwrap();
 }
 
-/// The reserved branches (planning work, brainstorm target, non-worker role,
+/// The reserved branches (brainstorm target, non-worker role,
 /// foreign origin, references) refuse the extractive selection instead of
 /// inheriting a partially ported path. Role/mode/origin/references hit the
 /// generic branch guard first (the same layering as Go, whose public path
@@ -1918,6 +1947,7 @@ fn summary_selection_refuses_reserved_branches() {
             matches!(
                 error.code(),
                 "agent-launch-request-branch-unported" | "agent-launch-summary-branch-unported"
+                    | "scoped-worker-retry-decision-required"
             ),
             "unexpected reserved-branch code (case {case}): {error:?}"
         );

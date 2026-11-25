@@ -7,6 +7,174 @@
     },
     "items": [
       {
+        "fr": "La sélection d’un autre livrable réutilise le décodage de la mission si ses octets sont identiques. Le fichier sélectionné est toujours vérifié et relu.",
+        "en": "Selecting another deliverable reuses the decoded mission if its bytes match. The selected file is always verified and read again."
+      },
+      {
+        "fr": "Le lecteur de livrables vérifie l’empreinte et la révision de la mission sans décoder une seconde fois le même enregistrement.",
+        "en": "The deliverables viewer checks the mission digest and revision without decoding the same record twice."
+      },
+      {
+        "fr": "Le détail de tâche ouvre le rapport et l’arborescence avec une seule lecture protégée. Une erreur sur le rapport laisse les autres pièces accessibles.",
+        "en": "Task details open the report and the file tree with one protected read. A report error leaves the other items available."
+      },
+      {
+        "fr": "Le menu du cockpit propose une aide FR/EN pour ouvrir un livrable, comprendre la validation et retrouver les journaux ou la reprise.",
+        "en": "The cockpit menu provides FR/EN help for opening a deliverable, understanding approval, and finding Logs or Resume."
+      },
+      {
+        "fr": "Conduite ouvre directement le rapport remis. Sur téléphone, le lecteur est prioritaire et l’arborescence s’ouvre avec Fichiers. Le diagnostic de validation est repliable.",
+        "en": "Dispatch opens the submitted report directly. On phones, the viewer takes priority and Files opens the tree. Approval diagnostics are expandable."
+      },
+      {
+        "fr": "Conduite agrandit le détail de tâche et y regroupe les pièces dans une arborescence. Le lecteur Monaco offre la recherche et la validation reste visible en haut.",
+        "en": "Dispatch expands task details and groups review material in a file tree. Monaco provides search, and approval stays visible at the top."
+      },
+      {
+        "fr": "Dans Conduite, le détail d’une tâche soumise en revue humaine vérifie si elle peut être validée, indique le motif d’un blocage et relit l’état après validation.",
+        "en": "In Dispatch, details for a submitted human-review task check whether approval is available, show the reason for a block, and read back the state after approval."
+      },
+      {
+        "fr": "Le bouton Voir de la synthèse Conduite ouvre la fiche dans une fenêtre au-dessus de la vue actuelle.",
+        "en": "View in the Dispatch summary opens the task details over the current view."
+      },
+      {
+        "fr": "Dans un périmètre ouvert, les tâches sont rangées par niveau de dépendance et les affectations utilisent un trajet commun distinct des prérequis. Les cartes se déplacent directement, à la souris ou au clavier.",
+        "en": "In an open scope, tasks are arranged by dependency rank and share an assignment route separated from prerequisites. Cards can be moved directly with the pointer or keyboard."
+      },
+      {
+        "fr": "Conduite aligne la hiérarchie par niveau et regroupe le chemin du principal au périmètre ouvert avec ses tâches.",
+        "en": "Dispatch aligns the hierarchy by level and groups the route from the principal orchestrator to the selected scope and its tasks."
+      },
+      {
+        "fr": "Un second clic sur l’orchestrateur referme son périmètre. Le validateur indépendant est visible dès l’ouverture du périmètre.",
+        "en": "A second click on an orchestrator closes its scope. The independent reviewer is visible as soon as the scope opens."
+      },
+      {
+        "fr": "Conduite ouvre les plans organisés sur les orchestrateurs. Chaque périmètre donne accès à ses agents et tâches, et les cartes affichent leur activité observée. Les flèches de responsabilité suivent des courbes.",
+        "en": "Dispatch opens organized plans on the orchestrators. Each scope opens its agents and tasks, with observed activity shown on the cards and curved responsibility arrows."
+      },
+      {
+        "fr": "Conduite montre les liens des orchestrateurs vers leurs tâches dès l’ouverture et présente le workflow recommandé au-dessus du graphe.",
+        "en": "Dispatch shows links from orchestrators to their tasks on opening and displays the recommended workflow above the graph."
+      },
+      {
+        "fr": "Conduite allège le graphe : les flèches d’affectation s’affichent à la demande pour le périmètre choisi.",
+        "en": "Dispatch declutters the graph by showing assignment arrows on demand for the selected scope."
+      },
+      {
+        "fr": "Conduite affiche les orchestrateurs et le validateur dans le même graphe que les tâches, avec les liens enregistrés et une animation contrôlable des tâches actives.",
+        "en": "Dispatch shows orchestrators and the independent reviewer on the task graph, with recorded links and pausable active-task motion."
+      },
+      {
+        "fr": "L’aide de Préparer explique les workflows séquentiels, parallèles, hiérarchiques et itératifs, et le rôle du plan et de la revue indépendante.",
+        "en": "Preparation help explains sequential, parallel, hierarchical, and iterative workflows, along with plan scoping and independent review."
+      },
+      {
+        "fr": "Conduite calcule un avis d’architecture sur le graphe enregistré. La validation explicite est liée à la révision et à l’empreinte de l’avis.",
+        "en": "Dispatch assesses workflow architecture from the recorded graph. Explicit approval is bound to the revision and assessment digest."
+      },
+      {
+        "fr": "Préparer avec l’IA propose un brouillon d’avis ou de réévaluation pour choisir entre séquence et hiérarchie, avec une aide intégrée.",
+        "en": "Prepare with AI drafts an assessment or reassessment for choosing between a sequential and hierarchical workflow, with in-app help."
+      },
+      {
+        "fr": "Conduite : la vue Équipe et validation rapproche les remontées transmises, reçues dans un contexte et traitées par une décision.",
+        "en": "Dispatch: Team and validation links sent updates, receipt in planning context, and the applied decision."
+      },
+      {
+        "fr": "Conduite : ouvrez et téléchargez le fichier d’actions d’une tâche. La vue présente son plan, les résultats d’outils observés, les ajustements enregistrés et l’attente de revue humaine, selon les droits de lecture des Journaux.",
+        "en": "Dispatch: open and download a task’s action file. The view shows the plan, observed tool outcomes, recorded adjustments, and pending human review, subject to Logs access."
+      },
+      {
+        "fr": "Conduite : un contour bleu animé brièvement signale les tâches dont l’exécution est confirmée. La préférence de mouvement réduit garde ce contour fixe.",
+        "en": "Dispatch: a briefly animated blue outline marks tasks with confirmed execution. With reduced motion, the outline stays still."
+      },
+      {
+        "fr": "Conduite : les boutons Graphe des tâches et Équipe et validation restent visibles en haut de la vue, y compris en plein écran. Sur écran étroit, l’aide des gestes est accessible depuis la barre du graphe.",
+        "en": "Dispatch: the Task graph and Team and validation buttons stay visible at the top of the view, including in fullscreen. On narrow screens, graph gestures are available from the toolbar."
+      },
+      {
+        "fr": "Conduite : graphes et tâches rattachées distinguent la pause, l’arrêt, l’exécution confirmée et l’activité à confirmer. Les repères d’équipe indiquent la pause des départs et les observations de conduite ou de revue disponibles.",
+        "en": "Dispatch: graph cards and assigned tasks distinguish paused, stopped, confirmed running and unconfirmed activity. Team markers show paused starts and available driver or review observations."
+      },
+      {
+        "fr": "Statut d’un dépôt géré : après la première soumission, un avis favorable attend la publication. Après publication, le moteur vérifie les preuves courantes avant d’afficher la validation.",
+        "en": "Managed repository status: after the first submission, a favorable review awaits publication. After publication, the engine checks current evidence before displaying validation."
+      },
+      {
+        "fr": "Conduite : bascule entre le graphe des tâches et l’équipe, avec retour à la position du graphe. La vue Équipe et validation présente les contrôles, l’avis indépendant enregistré et l’état de validation fourni par le moteur.",
+        "en": "Dispatch: switch between the task graph and the team, then return to the same graph position. Team and validation shows checks, the recorded independent review and the validation state supplied by the engine."
+      },
+      {
+        "fr": "Conduite : un losange, une flèche de branche et une coche distinguent l’orchestrateur principal, les sous-orchestrateurs et le validateur indépendant.",
+        "en": "Dispatch: a diamond, branch arrow and check mark distinguish the principal orchestrator, sub-orchestrators and independent reviewer."
+      },
+      {
+        "fr": "Un worker manuel en dépôt géré peut revalider un prévol expiré sur la même tentative. La rétention de son rapport prépare les preuves pour la soumission opérateur.",
+        "en": "A manual worker in a managed repository can revalidate an expired preflight on the same attempt. Retaining its report prepares the evidence for operator submission."
+      },
+      {
+        "fr": "Conducteur : le bail peut se renouveler après une contention SQLite transitoire sous la politique enregistrée. Un bail retiré, remplacé ou expiré reste refusé.",
+        "en": "Conductor: the lease can renew after transient SQLite contention under the saved policy. A retired, replaced or expired lease remains refused."
+      },
+      {
+        "fr": "Préparations Rust : le diagnostic Trust rapproche les octets des sources. Le travailleur API lie les octets du prompt au tour détenu et, lorsqu’elle existe, à son admission.",
+        "en": "Rust preparations: Trust diagnostics match source bytes. The API worker binds prompt bytes to the owned turn and its admission when present."
+      },
+      {
+        "fr": "Factures Rust : remise locale d’un brouillon P02 sur une socket Unix connectée avec accusé lié aux octets reçus. Le récepteur fictif est réservé aux tests.",
+        "en": "Rust invoices: local P02 draft delivery over a connected Unix socket with a byte-bound acknowledgement. The fictional receiver is test-only."
+      },
+      {
+        "fr": "Factures Rust : la préparation du rapprochement P02 remplace la référence de compte par un jeton et prépare un brouillon minimal sous mandat. Le pilote reste en pause.",
+        "en": "Rust invoices: P02 reconciliation preparation substitutes an account token and prepares a minimal draft under a mandate. The pilot remains paused."
+      },
+      {
+        "fr": "Moteur Rust : coffre P02 en mémoire par lot, résolution soumise à un mandat local courant et retrait des jetons. Les diagnostics de résolution masquent les valeurs brutes. Le pilote de facture reste à décider.",
+        "en": "Rust engine: in-memory P02 vault per batch, resolution under a current local mandate, and token withdrawal. Resolution diagnostics redact raw values. The invoice pilot remains a separate decision."
+      },
+      {
+        "fr": "Reprise automatique : une adoption sous un nouveau bail peut refaire le prévol expiré d’un agent admis avant son premier démarrage, dans le même périmètre.",
+        "en": "Automatic recovery: adoption under a new lease can refresh an expired preflight for an admitted, never-started agent in the same scope."
+      },
+      {
+        "fr": "Cockpit Rust : les échanges d’une mission permettent de rejoindre une remise ou sa réponse enregistrée et indiquent la présence d’un accusé.",
+        "en": "Rust cockpit: mission exchanges link to recorded handoffs and replies and show acknowledgement status."
+      },
+      {
+        "fr": "Cockpit Rust : si une tentative change d’état pendant le calcul du statut, Conduite indique que la lecture doit être actualisée.",
+        "en": "Rust cockpit: if an attempt changes state during a status read, Dispatch shows how to refresh the observation."
+      },
+      {
+        "fr": "Cockpit Rust : Conduite affiche la cause précise du blocage d’un démarrage automatique, par mission ou par tâche. La lecture ne lance aucun agent.",
+        "en": "Rust cockpit: Dispatch shows the specific reason automatic startup is blocked, by mission or task. Reading the diagnostics does not launch agents."
+      },
+      {
+        "fr": "Orchestration Rust : les refus d’autorité d’un sous-orchestrateur remontent à la racine. La reprise du sous-périmètre attend une décision racine.",
+        "en": "Rust orchestration: a sub-orchestrator's scope-authority refusal reaches the root, and the child resumes after a root decision."
+      },
+      {
+        "fr": "Orchestration Rust : priorité aux workers admissibles et utilisation des places disponibles avant une nouvelle activation du planificateur.",
+        "en": "Rust orchestration: eligible workers use available slots before a new planner activation."
+      },
+      {
+        "fr": "Mémoire : le premier lancement manuel dans une équipe configurée peut inclure un résumé extractif des dialogues de sa branche.",
+        "en": "Memory: the first manual launch in a configured team can include an extractive summary of dialogues from its own scope."
+      },
+      {
+        "fr": "Orchestration : canevas du travail avec orchestrateur principal dès la création, hiérarchie des sous-orchestrateurs et équipe configurée obligatoire pour tout lancement manuel.",
+        "en": "Orchestration: the Work canvas opens with its principal orchestrator, shows the sub-orchestrator hierarchy, and requires a configured team for manual launches."
+      },
+      {
+        "fr": "Planificateurs et validateurs peuvent démarrer lorsque les valeurs historiques d’attente concordent avec les réglages natifs.",
+        "en": "Planners and reviewers can start when historical wait values match native settings."
+      },
+      {
+        "fr": "Le graphe du cockpit regroupe les cartes par branche de planification et conserve les dépendances entre branches.",
+        "en": "The cockpit graph groups task cards by planning branch and preserves cross-branch dependencies."
+      },
+      {
         "fr": "Vérifications PAEA et Sécurité et preuves : même habillage qu’Audit et Sécurité (rail commun, en-tête avec section, sélecteur Sombre/Clair, liens et sections en cartes). Aucun changement moteur.",
         "en": "PAEA checks and Security and evidence: same shell as Audit and Security (shared rail, sectioned header, Dark/Light switch, links and sections as cards). No engine change."
       },
