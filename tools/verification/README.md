@@ -5224,6 +5224,7 @@ de livraison manque, pendant le blocage artificiel de la lecture annexe.
 Il vérifie aussi l’aide du cockpit en FR/EN, le retour du focus par Échap,
 le raccourci Conduite et l’absence d’écriture à l’ouverture de l’aide.
 Le contrôle GitHub `checks` utilise la même recette sur le cockpit embarqué.
+La recette historique du cockpit inclut le lecteur dans son inventaire strict de scripts.
 Les réponses d’inventaire et du rapport sont des doubles explicites dans le
 navigateur pour vérifier le rapport ouvert en premier dans Monaco, la recherche,
 le lecteur mobile et la reprise d’une lecture indisponible. Les sondes HTTP
@@ -5242,6 +5243,7 @@ Monaco report, search, the mobile reader and recovery from a failed read.
 The browser also checks cockpit help in FR/EN, Escape and focus return,
 the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.
+The existing cockpit recipe includes the reader in its strict script inventory.
 HTTP refusal probes and approval writes use the native service.
 With evidence attached, it approves the task and reads back the resulting state
 after one recorded operation. The recipe checks stale revision and missing CSRF
