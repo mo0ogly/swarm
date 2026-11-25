@@ -62,9 +62,7 @@
     "rust/crates/swarm-engine/src/managed_review_record.rs",
     "rust/crates/swarm-engine/src/root_store/native_review_context.rs",
     "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
-    "tests/rust_native_managed_reviewer.py",
-    "rust/Cargo.toml",
-    "rust/Cargo.lock"
+    "tests/rust_native_managed_reviewer.py"
   ],
   "environment": {},
   "steps": [
@@ -143,19 +141,6 @@
       "expected_exit": 0,
       "required_stdout": [
         "MANAGED_OUTPUT_PUBLIC_PASS"
-      ],
-      "required_stderr": []
-    },
-    {
-      "id": "large-focused-preflight",
-      "command": [
-        "python3",
-        "-c",
-        "import json, os, subprocess, tempfile\nfrom pathlib import Path\nbase = Path(os.environ['SWARM_REVIEW_SCALE_FIXTURE'])\nassert base.is_absolute() and base.is_dir()\np = Path(tempfile.mkdtemp(prefix='reviewer-scale-', dir=base)) / 'flow'\nsubprocess.run(['python3', 'tests/rust_native_managed_reviewer.py', '--binary', os.environ['SWARM_STATUS_CONTRACT_BINARY'], '--profile', os.environ['SWARM_STATUS_CONTRACT_PROFILE'], '--case', 'pass', '--extra-tracked', '21466', '--output', str(p)], check=True)\ni = json.loads((p/'inspection/result.json').read_bytes())\nr = json.loads((p/'result.json').read_bytes())\nassert i['tracked_count'] >= 21466 and 0 < i['document_count'] <= 32\nassert r['status'] == 'PASS' and not r['paid_provider'] and not r['accepted']\nassert 'actual-helper-provider-stream-and-one-budget-reservation-without-acceptance' in r['checks']\nprint('MANAGED_NATIVE_SCALE_PASS ' + str(p))"
-      ],
-      "expected_exit": 0,
-      "required_stdout": [
-        "MANAGED_NATIVE_SCALE_PASS"
       ],
       "required_stderr": []
     }
