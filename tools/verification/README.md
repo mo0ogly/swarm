@@ -5229,6 +5229,9 @@ Les réponses d’inventaire et du rapport sont des doubles explicites dans le
 navigateur pour vérifier le rapport ouvert en premier dans Monaco, la recherche,
 le lecteur mobile et la reprise d’une lecture indisponible. Les sondes HTTP
 de refus et les écritures de validation restent natives.
+Le premier affichage doit réutiliser le rapport fourni par l’inventaire.
+Une réouverture explicite relit le fichier. Un rapport en erreur laisse les
+autres pièces accessibles.
 Avec la preuve rattachée, il valide la tâche et relit le
 nouvel état après un seul enregistrement. La recette vérifie aussi le refus
 d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
@@ -5240,6 +5243,9 @@ volume supplied via `SWARM_TASK_REVIEW_FIXTURE`. It creates an isolated task via
 the CLI. The browser checks the reason shown when delivery evidence is missing while an auxiliary read is
 held. Explicit browser doubles for the file list and report exercise the default
 Monaco report, search, the mobile reader and recovery from a failed read.
+It checks that the inventory response supplies the initial report without a
+second request, that explicit reopening revalidates it, and that a report
+error leaves the rest of the inventory available.
 The browser also checks cockpit help in FR/EN, Escape and focus return,
 the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.

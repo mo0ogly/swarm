@@ -22,9 +22,27 @@ fn kind(path: &str) -> &'static str {
     }
 }
 
+/// Read the recorded submission's report under the saved delivery size limit
+/// and compare its bytes with the submission digest. The caller must first
+/// establish task authority and check the Work revision again before replying.
+fn submitted_report(
+    root: &Path,
+    report: &crate::TaskReportRequest,
+    limits: &crate::ContextPolicyLimits,
+) -> Result<Value, E> {
+    let text = crate::read_review_delivery(root, &report.report_path, limits)
+        .map_err(E::Context)?;
+    if crate::provider_configuration::configuration_digest(text.as_bytes()) != report.report_sha256 {
+        return Err(E::Refused("task-review-file-digest-changed"));
+    }
+    Ok(json!({"id":"report","text":text}))
+}
+
 impl RootStore {
     /// List the submitted report and the selected task's declared control inputs,
-    /// or open one named original. The request is the native revision-bound review
+    /// or open one named original. An inventory caller may opt in to the report
+    /// bytes in the same observation. A file-level read error remains explicit
+    /// and does not hide the verified inventory. The request is the revision-bound review
     /// envelope. For managed work, delegation provenance and a held candidate
     /// bind the allowlist, type and SHA-256 to exact Git bytes. Current policy
     /// limits and revision checks apply. Published controls are sufficient for
@@ -34,7 +52,11 @@ impl RootStore {
         work: &str,
         raw: &[u8],
         file: Option<&str>,
+        include_report: bool,
     ) -> Result<Value, E> {
+        if include_report && file.is_some() {
+            return Err(E::Refused("task-review-files-query-invalid"));
+        }
         let request = task_validation::decode(raw).map_err(|error| E::Launch(Box::new(error)))?;
         crate::root_store::material_path::with_material_read(self, || {
             let settings = self.read_settings()?;
@@ -99,7 +121,10 @@ impl RootStore {
                     }
                 }
             }
-            let data = if let Some(path) = file {
+            let data = if file == Some("report") {
+                let limits = settings.values.context_policy_limits().map_err(E::Settings)?;
+                submitted_report(&self.root, &report, &limits)?
+            } else if let Some(path) = file {
                 let (display, hash) = files
                     .get(path)
                     .ok_or(E::Refused("task-review-file-not-declared"))?;
@@ -113,22 +138,16 @@ impl RootStore {
                     .values
                     .context_policy_limits()
                     .map_err(E::Settings)?;
-                let bytes = if path == "report" {
-                    crate::read_review_delivery(&self.root, &report.report_path, &limits)
-                        .map_err(E::Context)?
-                        .into_bytes()
-                } else {
-                    let candidate = candidate.ok_or(E::Refused("task-review-file-unavailable"))?;
-                    crate::managed_repository::read_original_blob(
-                        &self.root,
-                        &current,
-                        candidate,
-                        path,
-                        &settings,
-                        limits.review_delivery_bytes,
-                    )
-                    .map_err(|error| E::Launch(Box::new(error)))?
-                };
+                let candidate = candidate.ok_or(E::Refused("task-review-file-unavailable"))?;
+                let bytes = crate::managed_repository::read_original_blob(
+                    &self.root,
+                    &current,
+                    candidate,
+                    path,
+                    &settings,
+                    limits.review_delivery_bytes,
+                )
+                .map_err(|error| E::Launch(Box::new(error)))?;
                 if crate::provider_configuration::configuration_digest(&bytes) != *hash {
                     return Err(E::Refused("task-review-file-digest-changed"));
                 }
@@ -146,7 +165,14 @@ impl RootStore {
                     json!({"id":id,"path":path,"kind":if category == "unsupported" {"document"} else {category},
                         "readable":hash.is_some() && category != "unsupported"})
                 }).collect();
-                json!({"files":entries})
+                if include_report {
+                    let limits = settings.values.context_policy_limits().map_err(E::Settings)?;
+                    let report = submitted_report(&self.root, &report, &limits)
+                        .unwrap_or_else(|error| json!({"id":"report","error":error.code()}));
+                    json!({"files":entries,"report":report})
+                } else {
+                    json!({"files":entries})
+                }
             };
             if self.read_work(work)?.revision != current.revision {
                 return Err(E::Refused("review-revision-conflict"));

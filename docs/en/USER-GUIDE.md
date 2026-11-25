@@ -296,6 +296,8 @@ it back from the engine. If the revision changes or recording is uncertain,
 refresh the mission before proceeding.
 
 The window opens **Report handed off** in Monaco as soon as it is available.
+The report and the file list arrive in one read. If the report cannot be read,
+the other items remain available under **Deliverables**.
 On phones, **Files** expands the tree. Selecting a file closes the tree and
 returns to the viewer. **Technical details** groups the task JSON files. Monaco
 provides read-only search. Available Word, OpenDocument and PDF originals can

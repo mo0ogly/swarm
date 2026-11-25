@@ -83,6 +83,11 @@ def verify(binary, out):
         api(files, authorized=False, status=403)
         invalid = api(files + '&unexpected=1', status=400)
         assert invalid['failure']['code'] == 'task-review-files-query-invalid'
+        for invalid_query in ('include_report=0', 'include_report=1&file=report',
+                              'include_report=1&include_report=1'):
+            invalid = api(files + '&' + invalid_query, status=400)
+            assert invalid['failure']['code'] == 'task-review-files-query-invalid'
+        api(files + '&include_report=1', authorized=False, status=403)
         assert api(current)['revision'] == work['revision']
         print('PASS originals route rejects anonymous and malformed reads', flush=True)
         missing = api(preview(work['revision']), status=409)

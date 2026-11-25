@@ -17,7 +17,11 @@ async function verify(){
   const errors=[],writes=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(request.method()==='POST')writes.push(new URL(request.url()).pathname)});
-  let held,listReads=0;
+  let held,listReads=0,reportReads=0;
+  let failInterception;
+  const interceptionFailure=new Promise((_,reject)=>{failInterception=reject});
+  interceptionFailure.catch(()=>{});
+  const observe=promise=>Promise.race([promise,interceptionFailure]);
   await page.setRequestInterception(true);
   // Provide a deterministic attachment to the real served browser in the
   // human-gate fixture. Approval, revision, session and readback stay native.
@@ -36,12 +40,17 @@ async function verify(){
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
+     if(file){assert.equal(file,'report');reportReads++;}
+     else assert.equal(uri.searchParams.get('include_report'),'1');
      if(!file&&++listReads===1&&!cfg.eligible){
       await request.respond({status:503,contentType:'application/json',body:'{}'});return;
      }
-     if(file)assert.equal(file,'report');
-     const data=file?{id:'report',text:'# Review proof\n\nReadable result review-task',language:'markdown'}
-      :{files:[{id:'report',path:'Report.md',kind:'markdown',readable:true}]};
+     const report={id:'report',text:'# Review proof\n\nReadable result review-task',language:'markdown'};
+     const unavailable=!file&&!cfg.eligible&&listReads===3;
+     const data=file?{...report,text:report.text+'\n\nRevalidated'}
+      :{files:[{id:'report',path:'Report.md',kind:'markdown',readable:true},
+       {id:'support.md',path:'support.md',kind:'markdown',readable:true}],
+       report:unavailable?{id:'report',error:'task-review-file-digest-changed'}:report};
      await request.respond({contentType:'application/json',body:JSON.stringify({
       schema_version:1,work:cfg.work,task:cfg.task,revision:Number(uri.searchParams.get('revision')),data,
      })});return;
@@ -49,6 +58,7 @@ async function verify(){
     await request.continue();
    }catch(error){
     errors.push(error.message);
+    failInterception(error);
     await request.abort();
    }
   });
@@ -86,12 +96,14 @@ async function verify(){
   assert.equal(await page.$eval(button,node=>!!node.closest('.task-detail-header')),true);
   const mobileFiles=dialog+' .task-detail-mobile-files',tree=dialog+' .task-detail-file-tree';
   if(!cfg.eligible){
-   await page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true});
+   await observe(page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true}));
    assert.equal(await page.$eval(tree,node=>getComputedStyle(node).display),'none');
    await page.click(dialog+' .task-detail-file-retry');
   }
-  await page.waitForSelector(dialog+' .monaco-editor');
+  await observe(page.waitForSelector(dialog+' .monaco-editor'));
   await page.waitForFunction(()=>[...document.querySelectorAll('.monaco-editor .view-lines')].some(node=>node.textContent.includes('review-task')));
+  assert.equal(reportReads,0,'the first visible report must reuse the inventory response');
+  assert.equal(listReads,cfg.eligible?1:2,'one inventory read per attempt');
   const find=await page.$(dialog+' .task-detail-file-toolbar [data-task-file-find]');
   assert(find,'visible search command');
   await find.click();
@@ -107,6 +119,8 @@ async function verify(){
   await page.keyboard.press('Backspace');
   if(!cfg.eligible){
    await page.click(dialog+' [data-file-id="original:report"]');
+   await page.waitForFunction(()=>document.querySelector('.monaco-editor .view-lines')?.textContent.includes('Revalidated'));
+   assert.equal(reportReads,1,'a later explicit open revalidates the file');
    assert.equal(await page.$eval(mobileFiles,node=>node.getAttribute('aria-expanded')),'false');
   }
   await page.waitForFunction(()=>document.querySelector('.monaco-editor .view-lines')?.textContent.includes('Readable'));
@@ -143,8 +157,15 @@ async function verify(){
    assert.deepEqual(writes,[]);
    await held.continue();
    await page.click(see);
+   await page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true});
+   assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/task-review-file-digest-changed/);
+   assert.equal(await page.$$eval(dialog+' [data-file-id="original:support.md"]',nodes=>nodes.length),1);
+   assert.equal(reportReads,1,'the initial failure must not trigger a second automatic read');
+   await page.click(dialog+' .task-detail-file-retry');
    await page.waitForSelector(dialog+' .monaco-editor .view-lines');
    await page.waitForFunction(()=>document.querySelector('.monaco-editor .view-lines')?.textContent.includes('review-task'));
+   assert.equal(reportReads,2,'the retry must perform a fresh checked read');
+   console.log('PASS failed initial report keeps other files and retries with a fresh read');
    await page.keyboard.press('Escape');
    await page.waitForSelector(dialog,{hidden:true});
   }
