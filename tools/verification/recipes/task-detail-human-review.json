@@ -14,6 +14,9 @@
     "rust/crates/swarm-web/src/service/native_admin.rs",
     "rust/crates/swarm-engine/src/root_store/review_preview/file_reader.rs",
     "rust/crates/swarm-engine/src/recorded_work.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/journal.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/publication.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/review_evidence.rs",
     "tests/rust_task_detail_review.cjs",
     "web/i18n-en.js",
     "tests/rust_planning_activation.py",
@@ -33,6 +36,8 @@
       "expected_exit": 0,
       "required_stdout": [
         "PASS originals route rejects anonymous and malformed reads",
+        "PASS en linked mission renders independently of the catalog",
+        "PASS fr linked mission renders independently of the catalog",
         "PASS en cockpit help, keyboard return and read-only guidance",
         "PASS en submitted report opens first, Monaco search and responsive file tree",
         "PASS failed initial report keeps other files and retries with a fresh read",

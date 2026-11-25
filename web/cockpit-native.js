@@ -179,6 +179,49 @@
   }
   return selected===id&&current?.work.id===id&&current.work.revision>=observed.revision?current.work:observed;
  }
+ /** Validate the Work shape consumed by the selector and task renderer. */
+ const validWork=work=>work&&typeof work.id==='string'&&typeof work.title==='string'&&typeof work.objective==='string'
+  &&(work.tasks==null||Array.isArray(work.tasks)&&work.tasks.every(task=>task&&typeof task.id==='string'));
+ /** Build options for the observed catalog without changing the selected Work model. */
+ function renderWorkSelector(id){
+  const selector=$('work');selector.replaceChildren(new Option(tr('Choisissez une mission'),''));
+  for(const work of works)selector.append(new Option(work.title,work.id));
+  selector.value=id;
+ }
+ /** Start a linked Work from its protected record before requesting the full
+  * catalog. The catalog enriches navigation only, and cannot overwrite the
+  * mission or DOM after another selection or refresh starts. */
+ async function openLinkedWork(id){
+  let ticket=++generation,opened=false;
+  $('work').disabled=true;$('refresh').disabled=true;$('connection').textContent=tr('Lecture de la mission…');
+  try{
+   const session=await read('/api/v1/native-session');
+   if(ticket!==generation)return;
+   if(session?.schema_version!==1)throw failure('web-native-session-invalid');
+   const work=await read('/api/v1/planning?'+new URLSearchParams({work:id}));
+   if(ticket!==generation)return;
+   if(!validWork(work)||work.id!==id||!Number.isSafeInteger(work.revision)||work.revision<1)
+    throw failure('web-native-work-invalid');
+   works=[{...work,tasks:work.tasks??[]}];renderWorkSelector(id);renderManager();
+   const selection=select(id);ticket=generation;opened=true;
+   $('work').disabled=false;$('refresh').disabled=false;
+   await selection;
+   if(ticket!==generation)return;
+   const list=await read('/api/v1/works');
+   if(ticket!==generation)return;
+   if(!Array.isArray(list)||!list.every(validWork))throw failure('web-native-work-list-invalid');
+   works=[works.find(row=>row.id===id),...list.filter(row=>row.id!==id).map(row=>({...row,tasks:row.tasks??[]}))];
+   renderWorkSelector(id);renderManager();
+  }catch(cause){
+   if(ticket!==generation)return;
+   if(!opened&&cause.code==='work-missing')return load();
+   $('message').hidden=false;$('message').className='notice alert';
+   $('message').textContent=tr(opened?'Liste des missions indisponible. La mission affichée reste consultable.'
+    :'Lecture impossible. Actualisez pour reprendre.')+' ('+(cause.code||'web-native-response-invalid')+')';
+  }finally{
+   if(ticket===generation){$('refresh').disabled=false;$('work').disabled=works.length===0;}
+  }
+ }
  /** Bootstrap reads only. Empty/malformed lists and missing selected IDs are
   * distinguished; a missing explicit Work never falls back to another mission.
   * Returns true only when the selected panels were actually reread; swallowed
@@ -186,9 +229,8 @@
   * preferences contain identifiers only, never reports or credentials. */
  async function load(){const ticket=++generation;$('work').disabled=true;$('refresh').disabled=true;$('connection').textContent=tr('Chargement des missions.');
   try{const session=await read('/api/v1/native-session');if(session?.schema_version!==1)throw failure('web-native-session-invalid');const data=await read('/api/v1/works');if(ticket!==generation)return;
-   if(!Array.isArray(data)||!data.every(w=>w&&typeof w.id==='string'&&typeof w.title==='string'&&typeof w.objective==='string'&&(w.tasks==null||Array.isArray(w.tasks)&&w.tasks.every(t=>t&&typeof t.id==='string'))))throw failure('web-native-work-list-invalid');works=data.map(w=>({...w,tasks:w.tasks??[]}));$('work').replaceChildren();
-   const initial=document.createElement('option');initial.value='';initial.textContent=tr('Choisissez une mission');$('work').append(initial);for(const work of works){const option=document.createElement('option');option.value=work.id;option.textContent=work.title;$('work').append(option)}
-   const requested=new URL(location.href).searchParams.get('work')||selected;const found=works.some(w=>w.id===requested);$('work').value=found?requested:'';renderManager();await select(found?requested:'');
+   if(!Array.isArray(data)||!data.every(validWork))throw failure('web-native-work-list-invalid');works=data.map(w=>({...w,tasks:w.tasks??[]}));
+   const requested=new URL(location.href).searchParams.get('work')||selected;const found=works.some(w=>w.id===requested);renderWorkSelector(found?requested:'');renderManager();await select(found?requested:'');
    if(requested&&!found){$('message').hidden=false;$('message').className='notice alert';$('message').textContent=tr('La mission demandée ne figure pas dans la liste reçue.')}else if(!works.length){$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Aucune mission enregistrée.')}else $('message').hidden=true;
    return !!current&&current.work.id===selected&&current.panelsObserved;
   }catch(cause){$('message').hidden=false;$('message').className='notice alert';$('message').textContent=tr('Lecture impossible. Actualisez pour reprendre.')+' ('+(cause.code||'web-native-response-invalid')+')';return false}finally{$('main-content').removeAttribute('aria-busy');$('refresh').disabled=false;$('work').disabled=works.length===0}
@@ -276,7 +318,9 @@
   SwarmNativePricing.enable();
   SwarmCockpitQuotas.mount({opener:$('quotas-open'),selectedWork:()=>selected});
   budgetEditor=SwarmNativeWorkBudget.mount({reload:async()=>{if(!await load())throw Error('web-native-budget-cockpit-refresh-failed')}});
-  $('theme').textContent=tr(document.documentElement.dataset.theme==='etat'?'Passer au thème sombre':'Passer au thème clair');showView(new URL(location.href).searchParams.get('view')||'conduite');load();
+  $('theme').textContent=tr(document.documentElement.dataset.theme==='etat'?'Passer au thème sombre':'Passer au thème clair');showView(new URL(location.href).searchParams.get('view')||'conduite');
+  const linkedWork=new URL(location.href).searchParams.get('work');
+  if(linkedWork)openLinkedWork(linkedWork);else load();
  }
  setup();
 })();

@@ -403,6 +403,8 @@ depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
 actualisez la mission avant de reprendre.
 
 La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+Un lien vers une mission ouvre d’abord cette mission. Le sélecteur se complète
+ensuite avec les autres missions.
 Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
 est illisible, les autres pièces restent dans **Livrables**.
 Si la mission change pendant la lecture, actualisez-la pour ouvrir les fichiers

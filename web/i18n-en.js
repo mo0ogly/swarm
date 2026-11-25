@@ -32,6 +32,7 @@ globalThis.SwarmEnglish = {
   "Informations sur la tâche": "Task information",
   "Chargement du rapport remis…": "Loading the submitted report…",
   "Impossible de charger les livrables.": "Could not load the deliverables.",
+  "Liste des missions indisponible. La mission affichée reste consultable.": "The mission list is unavailable. You can still view the open mission.",
   "Aucun rapport à ouvrir. Choisissez un fichier dans l’arborescence.": "There is no report to open. Choose a file from the tree.",
   "Réessayer": "Try again",
   "Le résultat de la revue indépendante est requis avant validation.": "Approval requires the independent review result.",

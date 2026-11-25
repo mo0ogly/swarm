@@ -17,7 +17,9 @@ async function verify(){
   const errors=[],writes=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(request.method()==='POST')writes.push(new URL(request.url()).pathname)});
-  let held,listReads=0,reportReads=0,supportReads=0;
+  let held,heldCatalog,linkedReads=0,catalogReads=0,listReads=0,reportReads=0,supportReads=0;
+  let catalogRequested;
+  const initialCatalog=new Promise(resolve=>{catalogRequested=resolve});
   let failInterception;
   const interceptionFailure=new Promise((_,reject)=>{failInterception=reject});
   interceptionFailure.catch(()=>{});
@@ -30,13 +32,18 @@ async function verify(){
    try{
     if(!cfg.eligible&&!held&&uri.pathname==='/api/v1/mission'&&!uri.searchParams.has('action')){held=request;return;}
     if(uri.pathname==='/api/v1/works'){
+     assert.ok(linkedReads,'the linked mission must be fetched before the catalog');
+     catalogReads++;
+     if(cfg.eligible&&!heldCatalog){heldCatalog=request;catalogRequested();return;}
+    }
+    if(uri.pathname==='/api/v1/planning'&&uri.searchParams.get('work')===cfg.work&&linkedReads++===0){
      const response=await fetch(uri,{headers:{Cookie:cfg.cookie,Accept:'application/json',Origin:base}});
      assert.equal(response.status,200);
-     const works=await response.json();
-     const task=works.find(work=>work.id===cfg.work)?.tasks.find(task=>task.id===cfg.task);
+     const work=await response.json();
+     const task=work.id===cfg.work&&work.tasks.find(task=>task.id===cfg.task);
      assert(task);
      if(task.status==='submitted')task.automatic_validation={receipt:'fixture-read-only'};
-     await request.respond({contentType:'application/json',body:JSON.stringify(works)});return;
+     await request.respond({contentType:'application/json',body:JSON.stringify(work)});return;
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
@@ -67,7 +74,11 @@ async function verify(){
   });
   await page.setViewport({width:cfg.eligible?1100:390,height:900});
   await page.goto(base+'/?'+new URLSearchParams({work:cfg.work,lang:cfg.lang,theme:cfg.eligible?'etat':'sombre'}));
-  await page.waitForSelector('[data-summary=warn] button',{visible:true});
+  await observe(page.waitForSelector('[data-summary=warn] button',{visible:true}));
+  assert.equal(await page.$eval('#work',node=>node.value),cfg.work);
+  if(cfg.eligible)await observe(initialCatalog);
+  else assert.equal(catalogReads,0,'the link can render before the catalog is requested');
+  console.log('PASS '+cfg.lang+' linked mission renders independently of the catalog');
   const help='#native-cockpit-help';
   if(!cfg.eligible)await page.click('#nav-toggle');
   await page.click('#help');
@@ -149,6 +160,7 @@ async function verify(){
    assert.equal(listReads,1,'switching files does not reload the inventory');
    assert.equal(reportReads,0,'switching files does not read the submitted report again');
    console.log('PASS selecting another deliverable reads only that original');
+   await heldCatalog.continue();
    await page.waitForFunction(selector=>document.querySelector(selector)?.disabled===false,{},button);
    await page.click(button);
    await page.waitForSelector(dialog+' .task-detail-header [data-task-state=accepted]');
