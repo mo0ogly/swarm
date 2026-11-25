@@ -43,7 +43,8 @@
       "expected_exit": 0,
       "required_stdout": [
         "worker_gate_refuses_unauthorized_and_passes_bound_sends",
-        "1 passed; 0 failed"
+        "worker_gate_refuses_changed_admitted_history",
+        "2 passed; 0 failed"
       ],
       "required_stderr": []
     },

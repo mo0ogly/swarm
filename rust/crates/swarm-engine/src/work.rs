@@ -119,6 +119,9 @@ pub fn decode_work_row(id: &str, revision: i64, raw: &[u8]) -> Result<models::Wo
     }
     Ok(work)
 }
+/// Serialize with a growing stack, validate the intermediate JSON, then apply
+/// the existing Go escaping rules without serializing that raw value again.
+/// The result is the same canonical byte format used by persisted digests.
 pub fn encode_model(value: &impl Serialize) -> Result<Vec<u8>, WorkError> {
     let mut raw = Vec::new();
     let mut serializer = serde_json::Serializer::new(&mut raw);
@@ -129,7 +132,7 @@ pub fn encode_model(value: &impl Serialize) -> Result<Vec<u8>, WorkError> {
         String::from_utf8(raw).expect("JSON serializer emits UTF-8"),
     )
     .map_err(WorkError::Json)?;
-    swarm_wire_json::encode(&raw).map_err(WorkError::Json)
+    Ok(swarm_wire_json::encode_raw(&raw))
 }
 
 /// Compact public JSON for Go-compatible typed producers: HTML stays literal,

@@ -204,6 +204,8 @@ depuis la tentative terminée et le handoff encore attribuable après reprise.
 
 ### Échanges agent à agent
 
+Dans le moteur Rust livré, `swarm exchange list` et `GET/HEAD /api/v1/exchanges` lisent le journal. `exchange send` et `exchange consume` ci-dessous décrivent le contrat historique Go. Voir [Échanges entre agents](docs/architecture/NATIVE-AGENT-EXCHANGES.md#collaboration-entre-pairs).
+
 `swarm exchange send TRAVAIL --input échange.json` enregistre une `handoff`,
 `help_request` ou `help_answer`. Chaque message porte `agent_id`, `task_id`,
 `attempt_id`, `recipient_task_id` et `recipient_role`. Le rôle doit être celui

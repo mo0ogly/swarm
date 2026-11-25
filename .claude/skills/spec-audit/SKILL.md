@@ -21,6 +21,13 @@ Check:
 - Provider capabilities, model selection, budgets, quotas and bounded retries.
 - Testing and integration conditions, independent review and completion evidence.
 
+For a workflow architecture review, compare a stable sequence, scoped hierarchy,
+or a justified combination against actual dependencies, handoffs, decision rights,
+validation and recovery. Mark costs and latency unknown unless evidenced. Give a
+reasoned recommendation or insufficient evidence and state what would change it.
+On re-evaluation, identify the previous verdict, changed evidence and resulting
+decision. A recommendation grants no adoption or execution authority.
+
 For each finding provide ID, severity (blocker/major/minor), exact location or
 missing contract, concrete impact, and the smallest clarification or correction.
 Separate a confirmed contradiction from a question caused by unavailable context.

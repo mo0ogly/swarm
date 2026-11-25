@@ -33,6 +33,7 @@ pub(super) struct PreparationReceipt(pub (String,i64));
 /// authenticates a supplied in-process claim nor proves receipt/acceptance.
 #[must_use = "Observe the outcome and preserve known effects before delivering its response"]
 pub struct NativeJobOutcome {
+    pub(super) task_review_timing: Option<TaskReviewTiming>,
     /// Auxiliary SQL observations, not business completion or peer receipt.
     pub auxiliary_effects: Vec<swarm_engine::AuxiliaryEffect>,
     /// Owned manual probe result, independent of local state or peer receipt.
@@ -60,6 +61,7 @@ impl NativeJobOutcome {
         let trust_publication=reply.response.extensions_mut().remove::<TrustPublication>().map(|p|p.0).or_else(||reply.failure.as_ref().and_then(HttpServiceError::trust_publication));
         let observation_causes = reply.response.extensions_mut().remove::<ObservationCauses>()
             .map_or_else(Vec::new, |causes| causes.0);
+        let task_review_timing = reply.response.extensions_mut().remove::<TaskReviewTiming>();
         let recorded_preparation=reply.response.extensions_mut().remove::<PreparationReceipt>().map(|p|p.0).or_else(||reply.failure.as_ref().and_then(HttpServiceError::recorded_preparation).map(|(id,r)|(id.to_owned(),r)));
         let error_work = reply.failure.as_ref().and_then(|e| {
             e.recorded_work()
@@ -80,6 +82,7 @@ impl NativeJobOutcome {
                 .is_some_and(HttpServiceError::configuration_may_be_recorded);
         (
             Self {
+                task_review_timing,
                 auxiliary_effects,
                 provider_probe,
                 trust_publication,
@@ -99,6 +102,7 @@ impl NativeJobOutcome {
     /// or automatic retry is performed; transport still owes explicit delivery.
     pub fn from_error(error: HttpServiceError) -> Self {
         Self {
+            task_review_timing: None,
             auxiliary_effects:error.auxiliary_effects(),
             provider_probe:error.provider_probe().cloned(),
             trust_publication:error.trust_publication(),
@@ -119,6 +123,7 @@ impl NativeJobOutcome {
     /// persistence nor HTTP peer receipt. It is not a signed audit attestation.
     pub fn record(&self) -> NativeOutcomeRecord<'_> {
         NativeOutcomeRecord {
+            task_review_timing: self.task_review_timing.as_ref(),
             auxiliary_effects:&self.auxiliary_effects,
             provider_probe:self.provider_probe.as_ref().map(|p|ProviderProbeRecord{provider_contact_may_have_occurred:p.contact_may_have_occurred,error:p.error,latency_ms:p.latency_ms}),
             trust_publication:self.trust_publication,
@@ -179,6 +184,8 @@ impl fmt::Debug for NativeJobOutcome {
 /// The underlying in-process outcome still requires trusted service provenance.
 #[derive(serde::Serialize)]
 pub struct NativeOutcomeRecord<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    task_review_timing: Option<&'a TaskReviewTiming>,
     #[serde(skip_serializing_if="Vec::is_empty")]
     auxiliary_effects:&'a Vec<swarm_engine::AuxiliaryEffect>,
     #[serde(skip_serializing_if="Option::is_none")]
@@ -197,6 +204,11 @@ pub struct NativeOutcomeRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     recorded_configuration: Option<&'a RecordedConfiguration>,
 }
+/// Producer-owned opt-in millisecond timings. The file reader constructs this
+/// object entirely from elapsed durations. No query, path or file is logged.
+#[derive(Clone, serde::Serialize)]
+#[serde(transparent)]
+pub(super) struct TaskReviewTiming(pub(super) serde_json::Value);
 impl NativeOutcomeRecord<'_> {
     /// Borrow Root-derived auxiliary observations for the owner. This is neither
     /// a grant, new-write assertion nor a claim of durable/client receipt.
@@ -365,7 +377,7 @@ mod tests {
         assert!(
             matches!(&failed.cause,NativeObservationCause::Panic(p) if p.lock().unwrap().downcast_ref::<&str>()==Some(&"owned observer panic"))
         );
-        failed.defer(NativeJobOutcome { auxiliary_effects:Vec::new(),
+        failed.defer(NativeJobOutcome { task_review_timing:None, auxiliary_effects:Vec::new(),
             provider_probe:None,
             trust_publication:None,
             status: StatusCode::OK,

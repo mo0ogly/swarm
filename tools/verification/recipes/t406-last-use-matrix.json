@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "t406-last-use-matrix",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/*/src/**/*",
+    "rust/crates/swarm-engine/config/*.json",
+    ".cargo/config.toml",
+    ".cargo/storage-policy.json",
+    "tools/verification/cargo_space_guard.py",
+    "tools/verification/build_storage.py",
+    "tests/fixture_area.py",
+    "locales/*.json",
+    "config/*.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "finite-blp-matrix",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-confidentiality",
+        "--lib",
+        "tests::complete_level_compartment_operation_matrix",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test tests::complete_level_compartment_operation_matrix ... ok",
+        "1 passed; 0 failed",
+        "T406_BLP_MATRIX verdicts=768 allowed=270 refused=498 operations=3"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "trust-last-use",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "trust::operations::tests::t406_last_use_refuses_expired_and_stale_mandates",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test trust::operations::tests::t406_last_use_refuses_expired_and_stale_mandates ... ok",
+        "1 passed; 0 failed",
+        "T406_LAST_USE valid=1 expired=2 stale_revision=1 refused_effects=0"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "git-trust-revision",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::paea_git_agreement::tests::agreement_is_void_after_trust_revision_change",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test root_store::paea_git_agreement::tests::agreement_is_void_after_trust_revision_change ... ok",
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

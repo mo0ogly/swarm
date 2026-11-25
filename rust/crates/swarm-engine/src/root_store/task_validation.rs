@@ -19,7 +19,7 @@ mod reconstruction;
 mod review_candidate;
 pub(super) use review_candidate::{acquire as acquire_review_candidate, acquire_using as acquire_claimed_review_candidate, ReviewCandidate};
 mod review_evidence;
-pub(super) use review_evidence::{recorded_managed_candidate, recorded_evidence, recorded_evidence_for_review_result, recorded_evidence_for_prior_review};
+pub(super) use review_evidence::{published_managed_candidate, recorded_managed_candidate, recorded_evidence, recorded_evidence_for_review_result, recorded_evidence_for_prior_review, ReceiptTiming};
 pub use review_evidence::NativeValidationEvidence;
 mod runtime;
 mod mission_authority;
@@ -177,6 +177,81 @@ fn digest(v: &impl Serialize) -> Result<String, E> {
 pub(super) fn submission(db:&rusqlite::Connection,work:&crate::Work,task:&str)->Result<crate::TaskReportRequest,E>{
     latest_submission(db,work,task)?.ok_or(E::Refused("task-validation-submission-required"))
 }
+/// Add first declared controls to an idle managed human-mode submission.
+/// Caller holds the Work writer and checks job/worker ownership. Verify the
+/// current producer and saved report before replacing only validation_policy.
+/// Receipt/Git provenance is checked again at candidate preparation. Refusals
+/// leave the task intact; this creates neither a review nor an acceptance.
+pub(crate) fn attach_managed_submission_controls(
+    db: &rusqlite::Connection,
+    root: &Path,
+    work: &mut crate::Work,
+    request: &crate::Request,
+    settings: &crate::EngineSettingsDocument,
+    authorized_at: String,
+    actor: String,
+) -> Result<(), E> {
+    let planning = work.planning.as_ref()
+        .filter(|planning| planning.repository.is_some())
+        .ok_or(E::Refused("managed-submission-controls-repository-required"))?;
+    super::require_planning_mission_active(db, &work.id)
+        .map_err(|error| E::caused("task-validation-mission-inactive", error))?;
+    if planning.paused || !planning.failure.is_empty() {
+        return Err(E::Refused("managed-submission-controls-planning-inactive"));
+    }
+    if crate::text::trim_space(&actor).is_empty() || crate::text::trim_space(&authorized_at).is_empty() {
+        return Err(E::Refused("task-validation-policy-unauthorized"));
+    }
+    let mut matches = work.tasks.iter().flatten().enumerate().filter(|(_, task)| task.id == request.id);
+    let (index, task) = matches.next().ok_or(E::Refused("managed-submission-controls-task-missing"))?;
+    if matches.next().is_some() || task.status != "submitted" || task.plan_role != "worker"
+        || task.planning_retry || task.independent_review.is_some()
+        || task.automatic_validation.is_some() || task.gate.is_some()
+        || task.manual_override.is_some() || task.revalidation.is_some()
+        || task.corrective_recovery.is_some() || task.recovered_result.is_some()
+        || task.review_coordination.is_some() || task.batch_review_resume.is_some()
+    {
+        return Err(E::Refused("managed-submission-controls-state-invalid"));
+    }
+    if !planning.scopes.iter().flatten().any(|scope|
+        scope.id == task.scope_id && scope.state != "closed" && scope.holder.is_empty())
+    {
+        return Err(E::Refused("managed-submission-controls-scope-unavailable"));
+    }
+    task.validation_policy.as_ref()
+        .filter(|policy| policy.mode == "human" && policy.controls.as_ref().is_none_or(Vec::is_empty)
+            && !policy.actor.is_empty() && !policy.authorized_at.is_empty())
+        .ok_or(E::Refused("managed-submission-controls-first-human-policy-required"))?;
+    if request.expected_contract != crate::task_review_contract(task)
+        .map_err(|error| E::caused("managed-submission-controls-contract", error))?
+    {
+        return Err(E::Refused("contract-digest-stale"));
+    }
+    if crate::text::trim_space(&request.contract_revision_reason).len() < 16
+        || request.contract_revision_reason.len() > 2000 {
+        return Err(E::Refused("contract-reason-invalid"));
+    }
+    let supplied = request.validation_policy.as_ref()
+        .filter(|policy| policy.mode == "human" && policy.controls.as_ref().is_some_and(|v| !v.is_empty()))
+        .ok_or(E::Refused("managed-submission-controls-first-human-policy-required"))?;
+    let limits = settings.values.mutation_limits().map_err(|e| E::caused(e.reason(), e))?;
+    let mut policy = crate::normalize_validation_policy(supplied.clone(), &limits.policy)
+        .map_err(|e| E::caused(e.reason(), e))?;
+    crate::validation_policy_covers_task(&policy, task).map_err(|e| E::caused(e.reason(), e))?;
+    let submitted = submission(db, work, &task.id)?;
+    crate::task_report::completed_producer(db, &work.id, task, &submitted.agent_id)?;
+    let context = settings.values.context_policy_limits().map_err(|e| E::caused(e.reason(), e))?;
+    let report = crate::read_review_delivery(root, &submitted.report_path, &context)
+        .map_err(|e| E::caused("task-validation-report", e))?;
+    if report.trim().is_empty() || crate::provider_configuration::configuration_digest(report.as_bytes()) != submitted.report_sha256 {
+        return Err(E::Refused("task-validation-report-changed"));
+    }
+    policy.authorized_at = authorized_at;
+    policy.actor = actor;
+    work.tasks.as_mut().ok_or(E::Refused("managed-submission-controls-task-missing"))?[index].validation_policy = Some(Box::new(policy));
+    Ok(())
+}
+
 /// Read the latest canonical submission without inventing a missing event.
 /// Event/request/revision coherence and explicit statement finalization are
 /// shared by validation and report relay. None means genuine absence only;

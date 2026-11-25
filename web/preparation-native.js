@@ -164,6 +164,28 @@ const note=document.createElement('section');note.className='notice info';note.i
 $('editor-state').textContent=tr('Éditeur texte · Ctrl/Cmd + S pour enregistrer.');editor.hidden=false;$('monaco').hidden=true;
 const shared=[...document.querySelectorAll('section.prep-note')].find(node=>node.querySelector('h2')?.textContent==='Documents partagés');if(shared)shared.querySelector('p').textContent=tr('Les versions enregistrées sont accessibles depuis le web et le CLI.');
 const help=$('help-dialog').querySelector('section');help.replaceChildren();const paragraph=document.createElement('p');paragraph.textContent=tr('Rédigez le besoin, enregistrez le brief puis adoptez-le. Enregistrez un plan JSON v1, répondez à ses questions puis vérifiez-le. Les limites viennent des réglages Admin. Une erreur conserve votre texte ; un enregistrement incertain doit être vérifié avant toute modification.');help.append(paragraph);
+const architectureHelp=document.createElement('p');
+architectureHelp.textContent=tr('Pour choisir ou revoir une architecture, ouvrez « Choisir l’architecture du workflow » dans la conversation. Le bouton prépare un brouillon. Ajoutez vos preuves et envoyez-le. Relisez les motifs avant de modifier le plan.');
+const workflowHelpTitle=document.createElement('h3');
+workflowHelpTitle.textContent=tr("Choisir une forme de workflow");
+const workflowPatterns=document.createElement('ul');
+workflowPatterns.id='workflow-architecture-help-patterns';
+for(const description of [
+ tr("Séquentiel — Les résultats s’enchaînent dans un ordre imposé. Par exemple, produire, tester, valider."),
+ tr("Parallèle — Les branches indépendantes avancent selon les créneaux et les droits disponibles. Par exemple, préparer les tests et la documentation."),
+ tr("Hiérarchique — Un orchestrateur délègue des périmètres et arbitre leurs dépendances. Par exemple, coordonner plusieurs spécialistes et leurs remises."),
+ tr("Itératif — Une revue peut demander une correction avec une limite de tentatives. Par exemple, produire, examiner, corriger, puis vérifier de nouveau.")
+]){
+ const item=document.createElement('li');
+ item.textContent=description;
+ workflowPatterns.append(item);
+}
+const workflowHelpRoles=document.createElement('p');
+workflowHelpRoles.textContent=tr("Quel que soit le workflow, définissez les livrables et leurs prérequis. Attribuez la production et la revue indépendante à des rôles distincts. Le plan utilise le format ActionPlan JSON v1.");
+const workflowHelpCatalogue=document.createElement('p');
+workflowHelpCatalogue.textContent=tr("Une mission peut combiner ces formes. Consultez le catalogue pour distinguer les modèles qui construisent un plan des modèles qui aident à cadrer le besoin.");
+help.append(workflowHelpTitle,workflowPatterns,workflowHelpRoles,workflowHelpCatalogue);
+help.append(architectureHelp);
 const admin=document.createElement('a'),adminQuery=new URLSearchParams(location.search);adminQuery.set('view','admin');admin.href='/native-runtime.html?'+adminQuery;admin.textContent=tr('Ouvrir les réglages Admin');note.append(document.createTextNode(' '),admin,document.createTextNode(' '),$('budget-open'),document.createTextNode(' '),$('sources-open'),document.createTextNode(' '),$('template-open'),$('template-draft-status'));
 dialogueUI=mountPreparationDialogue(api,{
  current:async()=>{if(!ready||busy||pending||conflict||dirty||decisions.hasDraft())throw Error(tr('Enregistrez les documents avant l’envoi.'));return current;},

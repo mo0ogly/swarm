@@ -18,3 +18,23 @@ html[data-theme="etat"] body{background:var(--wattson-carte-appuyee)}
 
 #version-dialog a{color:var(--wattson-lien)}
 #version-dialog-content>section:not(:first-child){background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:.5rem;padding:1rem;margin-top:1rem}
+
+.rail-bottom>#help {width:100%;margin-block:8px;text-align:start;min-height:44px}
+#native-cockpit-help {
+  width:min(40rem,calc(100vw - 24px));max-height:calc(100dvh - 24px);
+  padding:0;overflow:hidden;background:var(--wattson-carte);color:var(--wattson-texte);
+  border:1px solid var(--wattson-ligne);border-radius:12px
+}
+#native-cockpit-help[open] {display:flex;flex-direction:column}
+#native-cockpit-help>header {
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;
+  padding:12px 16px;border-bottom:1px solid var(--wattson-ligne)
+}
+#native-cockpit-help h2,#native-cockpit-help h3 {margin:0}
+#native-cockpit-help h2 {font-size:1.25rem}
+#native-cockpit-help button {min-height:44px}
+#native-cockpit-help>section {min-height:0;overflow:auto;padding:0 16px}
+#native-cockpit-help>section>section {padding-block:14px}
+#native-cockpit-help>section>section+section {border-top:1px solid var(--wattson-ligne)}
+#native-cockpit-help p {margin:6px 0}
+#native-cockpit-help p+div {display:flex;flex-wrap:wrap;gap:8px}

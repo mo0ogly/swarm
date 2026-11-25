@@ -205,7 +205,7 @@ d’intégration `preparation_transport.rs` et le parcours public
 Le travailleur API (`_prepare_turn`, branche Api de `swarm-cli/src/
 preparation_worker.rs`) appelle désormais la décision au dernier usage avant
 toute émission classifiée, via
-`RootStore::preparation_worker_transport_gate(id, token, base_url, model)`.
+`RootStore::preparation_worker_transport_gate(id, token, base_url, model, prompt)`.
 La gate tourne dans la réservation egress partagée déjà tenue par le
 travailleur et refuse avant la construction de la requête HTTP : aucun socket
 ne s’ouvre sans décision.

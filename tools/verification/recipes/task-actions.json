@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "task-actions",
+  "inputs": [
+    "rust/crates/swarm-authority/src/policy.rs",
+    "rust/crates/swarm-engine/src/agent_tool_guard.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/task_action_observation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_actions.rs",
+    "rust/crates/swarm-web/src/service/task_actions.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_task_actions.py",
+    "tests/rust_task_actions_ui.cjs",
+    "web/cockpit-native-graph.js",
+    "web/graph.css",
+    "web/i18n-en.js"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "protected-action-file",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile; from pathlib import Path; output=Path(tempfile.mkdtemp(prefix='task-actions-')).resolve()/'journey'; subprocess.run(['python3','tests/rust_task_actions.py','--binary',os.environ['SWARM_ACTIONS_BINARY'],'--output',str(output),'--browser'],check=True); print('TASK_ACTIONS_EVIDENCE '+str(output))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS protected file exists before the first attempt",
+        "PASS heartbeat exposes pending action in the protected file",
+        "PASS actual provider stream stores ordered redacted actions and deduplicates replay",
+        "PASS human gate waits after actual native handoff and HTTP is read only",
+        "PASS protected card, JSON export, action detail and keyboard focus",
+        "PASS acceptance without required evidence is refused and preserves action history",
+        "TASK_ACTIONS_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -8,14 +8,14 @@
 //! Validation: lifetimes strictly positive with idle <= absolute; Argon2
 //! costs accepted by the Argon2 parameter contract; relay body limit
 //! strictly positive; audit retention (when set) at least one day; log
-//! level one of `debug`, `info`, `warn`, `error`. Unknown fields refuse;
+//! level is from LOG_LEVELS. Unknown fields refuse;
 //! `audit_retention_days` and `log_level` are optional on read so documents
 //! written before them still decode (they are always written back).
 use serde::{Deserialize, Serialize};
 use swarm_enrollment_authority::credentials::Parameters;
 
 /// Levels of the daemon diagnostics log, least to most verbose.
-pub const LOG_LEVELS: [&str; 4] = ["error", "warn", "info", "debug"];
+pub const LOG_LEVELS: [&str; 5] = ["critical", "error", "warn", "info", "debug"];
 
 /// Validated configuration snapshot.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -37,10 +37,29 @@ pub struct AuthorityConfig {
     /// Verbosity of the daemon diagnostics file (`debug`…`error`).
     #[serde(default = "default_log_level")]
     pub log_level: String,
+    /// Saved diagnostics policy. Older files inherit the shipped diagnostics policy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostics: Option<DiagnosticsConfig>,
 }
 
+/// Operator settings for the authority log. Paths remain under its declared directory.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DiagnosticsConfig {
+    pub max_bytes: u64,
+    pub archives: usize,
+    pub page_rows: usize,
+}
+
+/// Compatibility default for older configuration files comes from the same
+/// shipped catalogue as fresh installations. Invalid packaged data then fails
+/// the shared validation.
 fn default_log_level() -> String {
-    "info".to_owned()
+    #[derive(Deserialize)]
+    struct Defaults {
+        log_level: String,
+    }
+    serde_json::from_str::<Defaults>(DEFAULTS).map(|value| value.log_level).unwrap_or_default()
 }
 
 /// Installation default, read from the shipped configuration file.
@@ -72,8 +91,27 @@ impl AuthorityConfig {
         {
             return Err("authority-config-invalid");
         }
+        self.diagnostics()?;
         Ok(())
     }
+    /// Return saved policy or the packaged policy for older configuration files.
+    /// A malformed shipped policy is a configuration error, never an empty default.
+    pub fn diagnostics(&self) -> Result<DiagnosticsConfig, &'static str> {
+        #[derive(Deserialize)]
+        struct Defaults {
+            diagnostics: DiagnosticsConfig,
+        }
+        let config = match self.diagnostics {
+            Some(config) => config,
+            None => serde_json::from_str::<Defaults>(DEFAULTS)
+                .map_err(|_| "authority-config-format")?.diagnostics,
+        };
+        if config.max_bytes == 0 || config.archives == 0 || config.page_rows == 0 {
+            return Err("authority-config-invalid");
+        }
+        Ok(config)
+    }
+
     /// Load `dir/authority.json` if present, else the installation default.
     /// A present but invalid file refuses (no silent fallback to defaults);
     /// read errors other than not-found propagate as `authority-config-io`.

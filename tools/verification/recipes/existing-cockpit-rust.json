@@ -76,6 +76,7 @@
     "web/runtime-health.js",
     "web/swarm-design.css",
     "web/swarm-shell.js",
+    "web/task-detail-files.js",
     "tests/rust_status_completion.py",
     "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
     "rust/crates/swarm-engine/src/mission_status_tasks.rs",

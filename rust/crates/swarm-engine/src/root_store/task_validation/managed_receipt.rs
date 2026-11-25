@@ -121,7 +121,7 @@ fn verify<'a>(
     r: &Receipt,
 ) -> Result<Binding<'a>, A> {
     // Full candidate self-binding: schema, nonempty plan, recorded digest.
-    candidate.verify_binding()?;
+    let candidate_sha256 = candidate.verified_binding_digest()?;
     if candidate.work != r.job.work_id
         || candidate.task != r.job.task_id
         || candidate.agent != r.producer_agent_id
@@ -139,9 +139,6 @@ fn verify<'a>(
     if plan.contract != candidate.contract {
         return Err(A::Refused("task-validation-managed-receipt-contract-mismatch"));
     }
-    let candidate_sha256 = candidate
-        .binding_digest()
-        .map_err(|e| caused("task-validation-managed-candidate-digest", e))?;
     origin.verify_candidate_binding(Some(candidate_sha256.as_str()))?;
     origin.verify_controls(&r.job.id, plan)?;
     cohort(plan, &r.policy, &r.job.task_id)?;
@@ -177,13 +174,13 @@ fn cohort(
         {
             return Err(A::Refused("task-validation-managed-receipt-cohort-invalid"));
         }
-        if crate::text::trim_space(&policy.original.mode) != "automatic"
+        if !matches!(crate::text::trim_space(&policy.original.mode), "automatic" | "human")
             || crate::text::trim_space(&policy.original.actor).is_empty()
             || crate::text::trim_space(&policy.original.authorized_at).is_empty()
         {
             return Err(A::Refused("task-validation-managed-receipt-policy-unauthorized"));
         }
-        if policy.normalized.mode != "automatic"
+        if !matches!(policy.normalized.mode.as_str(), "automatic" | "human")
             || !policy.normalized.actor.is_empty()
             || !policy.normalized.authorized_at.is_empty()
         {

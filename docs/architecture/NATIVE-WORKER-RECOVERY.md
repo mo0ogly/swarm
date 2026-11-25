@@ -1,5 +1,84 @@
 # Fin native du worker et reprise
 
+### Ajouter un contrôle après la soumission
+
+Sur un worker géré déjà soumis, `task update WORK --input FILE --json`
+peut compléter une politique `human` autorisée sans contrôles. La requête
+contient l’identifiant de tâche, la révision attendue, `validation_policy`
+avec le premier ensemble de contrôles, `confirm_contract_revision: true`,
+`expected_contract` (empreinte courante du contrat) et
+`contract_revision_reason` (motif de la modification). Une requête mêlant
+statut, critères ou propriétaires garde les règles de modification ordinaires.
+
+Le moteur exige une mission active, un périmètre ouvert sans détenteur, aucun worker actif dans la mission, et une tâche sans contrôleur ni reviewer actif et sans preuve de validation courante. Il relit
+la soumission et la dernière tentative terminée, puis vérifie les octets
+conservés du rapport avant d’autoriser le contrôle selon les réglages Admin.
+Il conserve la soumission, les critères, les tentatives, les plafonds et le
+mode humain. La nouvelle autorisation de contrôle porte la date et
+l’acteur de l’opération. Une deuxième modification avec un identifiant
+différent ne remplace pas les contrôles déjà enregistrés.
+
+```mermaid
+flowchart LR
+    A["Soumission gérée + rapport conservé"] --> B["Révision et contrôle explicitement confirmés"]
+    B --> C["Candidat et exécution des contrôles"]
+    C --> D["Preuve en attente de validation humaine"]
+    D --> E["Revue indépendante et publication protégée"]
+```
+
+`task validation-candidate` relit la provenance Git, puis `task validate`
+exécute les contrôles déclarés sur le candidat. En mode humain, un contrôle
+réussi reste une preuve auxiliaire. La revue indépendante et la décision
+humaine restent exigées avant la publication. Un refus de rattachement laisse
+la soumission intacte. Si l’exécution enregistre des contrôles en échec ou
+incomplets, le moteur conserve le rapport et bloque la tâche avec
+`controls-failed-or-incomplete`. La reprise passe par une décision explicite
+avant un nouveau candidat de validation.
+Le rattachement ne déclenche aucune exécution. Un conducteur de mission déjà
+autorisé peut sélectionner cette soumission pour un contrôle ultérieur.
+
+### Relire le journal d’un worker terminé
+
+Le journal original conserve le dernier instantané des actions en direct.
+À la fin du worker, le moteur efface cette projection de la fiche terminale.
+La relecture du journal applique le même effacement avant de comparer
+l’état attendu à la fiche enregistrée. La recette de rattachement des contrôles
+vérifie cette reprise sur le binaire candidat, après un premier worker. Elle
+compare le journal d’origine avec la fiche terminale. Le mode de comparaison
+historique conserve le refus du binaire précédent dans une exécution distincte.
+
+### Coût des relectures du candidat
+
+Avant et après l’exécution d’un contrôle géré, Swarm vérifie les entrées et
+les empreintes du candidat. Le binaire local est construit avec le profil
+Cargo `dev`. Ce profil optimise les dépendances `sha2` utilisées par les
+relectures, y compris sur les gros candidats. Les chemins, octets, algorithmes,
+autorisations et délais du parcours de validation restent les mêmes.
+
+Pour vérifier un gain sur une machine, comparer les mêmes entrées et les
+mêmes empreintes, puis observer le résultat sur un contrôle natif. Le temps
+de hachage seul n’établit ni un résultat de contrôle ni sa durée maximale.
+
+Lors du démarrage manuel d’un worker géré, `agent run` peut renouveler un
+prévol expiré en observant de nouveau la route, la commande, le workspace et
+l’environnement sous la politique courante. La portée doit rester identique à
+celle de l’admission conservée. Chaque frontière du démarrage vérifie de nouveau
+la tentative, la réservation, la preuve de copie et l’identité des processus.
+Le renouvellement conserve l’original, la tentative et la réservation. Une
+dérive, une annulation ou une prise en charge existante reste refusée par la
+garde concernée. Les autres parcours gardent leur sélection du prévol existante.
+
+`task retain-handoff WORK --root ROOT --input FILE --json` retient le rapport
+d’un worker manuel géré achevé. Le fichier JSON contient `schema_version: 1`,
+`event_id`, `expected_revision` et `task_id`. Le moteur retrouve le producteur et
+la dernière tentative, vérifie le journal terminal et la provenance du workspace,
+puis retient les octets du rapport et la référence Git. Utiliser le producteur,
+le chemin relatif et le SHA-256 renvoyés avec `task submit`. Cette opération ne
+soumet ni ne valide la tâche. Le dépôt géré est ouvert depuis le descripteur
+du Root détenu et son association au datastore est revérifiée avant le reçu.
+Une erreur après rétention peut laisser les preuves
+en place. Relire la révision avant une nouvelle soumission.
+
 Implémentation Linux vérifiée sur fixtures natives isolées dans le lot169. Le journal original de fin est une frontière de confiance locale privée, pas une identité cryptographique ni une protection contre un auteur hostile du même UID. PID absent/mort, bail expiré ou message « terminé » ne suffisent jamais à autoriser une reprise.
 
 L’observateur en lecture seule partage la projection terminale Agent/réservation de recovery ; il n’appelle aucune récupération, n’écrit aucun état et ne rembourse aucune tentative. Il vérifie identité du Root original, ligne terminale complète, ownership normalisé, snapshot/contexte natifs, collecte kernel enregistrée, libération de workspace et disposition gate/sortie explicite. Attente/libération inconnue ou exécution en quarantaine/drainage refuse. Une sortie logique invalide connue peut être décrite pour correction, jamais comme acceptation de qualité. Un refus connu du helper est distingué d’un possible démarrage provider ; aucune exécution n’est devinée.

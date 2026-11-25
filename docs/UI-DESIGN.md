@@ -26,6 +26,11 @@ avec quatre cartes colorées, grands dégradés et panneaux imbriqués.
   Les conserver pour les préférences, liens et tests existants.
 - Les préférences de présentation sont locales ; elles n’altèrent jamais une mission.
 
+Dans **Conduite → Orchestration**, un losange bleu repère l’orchestrateur
+principal, une flèche de branche ocre les sous-orchestrateurs et une coche verte
+le validateur indépendant. Les icônes décoratives complètent les libellés.
+La coche identifie un rôle. Le résultat d’une recette figure dans son reçu.
+
 ### Logo des fenêtres et hiérarchie des textes
 
 Les consignes longues et les journaux ont un contrat de lecture propre :

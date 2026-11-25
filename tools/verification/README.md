@@ -1,5 +1,43 @@
 # Recettes permanentes / Permanent verification recipes
 
+**Remontées de statut** — `recipes/orchestration-signals.json` utilise le
+binaire Rust de livraison indiqué par `SWARM_SIGNALS_BINARY`. Elle suit
+l’escalade native d’un sous-orchestrateur, la décision du parent et l’affichage
+protégé du même événement. Fournisseur inerte, Root et preuves isolés.
+
+**Status updates** — `recipes/orchestration-signals.json` takes a delivered
+Rust binary in `SWARM_SIGNALS_BINARY`. It follows native child escalation,
+the parent decision, and the protected display of that same event. It uses
+an inert provider and isolated Root and evidence.
+
+
+**Fichier d’actions** — `recipes/task-actions.json` prend un Swarm Rust livré
+dans `SWARM_ACTIONS_BINARY`. Elle vérifie la lecture avant tentative, le relevé
+pendant l’appel, le reçu terminal, les modales et le fichier effectivement
+téléchargé avec Chrome, puis l’attente humaine. Le fournisseur est inerte et
+l’acceptation prématurée est refusée. Préparer un répertoire de preuves neuf
+sur le volume gouverné et utiliser un Root de recette isolé.
+
+**Task action file** — `recipes/task-actions.json` takes a delivered Rust
+Swarm in `SWARM_ACTIONS_BINARY`. It checks the pre-attempt read, in-flight
+observation, terminal receipt, dialogs, Chrome download, and human review
+wait. An inert provider is used and premature acceptance is refused. Use a
+fresh evidence directory on the governed volume and an isolated recipe Root.
+
+
+T4.06 : `recipes/t406-last-use-matrix.json` exerce les 768 verdicts du
+catalogue BLP de fixture (quatre niveaux, deux compartiments et trois parcours),
+le refus d'engagement Trust à l'échéance ou après changement de révision, et
+l'invalidation de l'accord Git après changement de révision. Le témoin Trust
+observe un connecteur simulé. Utiliser une cible Cargo de test admise et un
+répertoire de preuves neuf.
+
+T4.06: `recipes/t406-last-use-matrix.json` checks all 768 verdicts for the BLP
+fixture catalogue (four levels, two compartments and three operations),
+Trust commit refusal at expiry or after revision change, and Git agreement
+invalidation after revision change. The Trust control uses a simulated
+connector. Use an admitted Cargo test target and a fresh evidence directory.
+
 Recette capture PAEA : `recipes/paea-capture-reader.json` vérifie les gardes
 `paea_capture_*` du témoin approval-web (27 noms attendus dans la recette ;
 ce compte est une attente, pas une preuve d'exécution). Le refus d'attente du
@@ -3296,6 +3334,16 @@ compilation, ni la provenance de livraison du fichier, ni l'installation du
 service, la séparation UID ou une mission vivante acceptée.
 
 
+For the controlled delivered-settlement recipe, `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`
+requires the private `TMPDIR` effective in the test process. The supported
+Cargo launcher may replace the recipe runner's initial temporary directory
+with its admitted scratch. Both fixture allocators validate the private
+parent before allocation and emit placement witnesses. Missing or invalid
+scratch fails before allocation in this mode. Direct test invocations with
+the mode unset keep the historical private fallback. The launcher owns
+volume admission and descriptor retention. Select the Cargo target through
+the launcher's existing configuration or an admitted target override.
+
 Delivered-binary fictitious settlement chain: `recipes/paea-delivered-settlement-cli-rust.json`
 runs the second domain (separate fictitious ledger) through the same one
 designated delivered ELF. With fresh isolated owned project/ledger roots and the
@@ -3345,6 +3393,15 @@ fail the test — and the public reconciliation journal stays `consistent` with
 `effectCount=1`, the exact provisioned terms and the debt settled once, also
 read through SQLite connections opened read-only separately from the CLI. No
 UID separation, real payment or independent acceptance is claimed by this case.
+
+La recette contrôlée du règlement livré fixe `SWARM_PAEA_DELIVERED_ADMITTED_FIXTURES=1`.
+Les deux allocateurs vérifient le `TMPDIR` privé effectif du processus de test
+avant allocation et consignent leur parent. Le lanceur Cargo pris en charge
+peut remplacer le répertoire initial de la recette par son aire temporaire
+admise. En mode contrôlé, un parent absent ou invalide bloque l’allocation.
+L’appel direct sans ce mode conserve le repli privé historique. Le lanceur
+assure l’admission du volume et la conservation du descripteur. La cible Cargo
+vient de la configuration du lanceur ou d’une cible explicite admise.
 
 Chaîne de règlement fictif sur binaire livré : la recette
 `recipes/paea-delivered-settlement-cli-rust.json` exécute le second domaine
@@ -5156,3 +5213,251 @@ check locally, or `make verify-p02-pilot` to check existing evidence only.
 make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
 make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
 ```
+
+### Validation humaine depuis le détail / Human approval from task details
+
+La recette `task-detail-human-review` utilise le binaire natif de production
+fourni par `SWARM_STATUS_CONTRACT_BINARY` et un nouveau répertoire de fixture
+sur le volume admis, fourni par `SWARM_TASK_REVIEW_FIXTURE`. Elle crée une
+tâche isolée via la CLI. Le navigateur vérifie le motif visible lorsque la preuve
+de livraison manque, pendant le blocage artificiel de la lecture annexe.
+Il vérifie aussi l’aide du cockpit en FR/EN, le retour du focus par Échap,
+le raccourci Conduite et l’absence d’écriture à l’ouverture de l’aide.
+Le contrôle GitHub `checks` utilise la même recette sur le cockpit embarqué.
+La recette historique du cockpit inclut le lecteur dans son inventaire strict de scripts.
+Les réponses d’inventaire et du rapport sont des doubles explicites dans le
+navigateur pour vérifier le rapport ouvert en premier dans Monaco, la recherche,
+le lecteur mobile et la reprise d’une lecture indisponible. Les sondes HTTP
+de refus et les écritures de validation restent natives.
+Le premier affichage doit réutiliser le rapport fourni par l’inventaire.
+Une réouverture explicite relit le fichier. Un rapport en erreur laisse les
+autres pièces accessibles.
+Le contrôle unitaire `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+vérifie séparément la comparaison de la révision et des octets de la mission.
+Il vérifie aussi que deux lectures identiques réutilisent le même décodage et
+qu’une divergence à révision égale impose un nouveau décodage. Les lectures de
+fichiers et leurs contrôles ne sont pas mis en cache.
+Sur le parcours français, la sélection d’une autre pièce déclenche uniquement
+sa lecture et conserve l’inventaire. Le navigateur utilise une réponse contrôlée.
+Le scénario retient la liste des missions et vérifie le lien direct avant de la
+libérer. Une réponse textuelle de saturation affiche son motif, conserve
+l’arborescence et permet une reprise explicite de la pièce choisie.
+Le test Rust `recheck_preserves_mismatch_and_decode_failure` vérifie la
+comparaison de l’empreinte et la conservation d’une erreur de décodage.
+Avec la preuve rattachée, il valide la tâche et relit le
+nouvel état après un seul enregistrement. La recette vérifie aussi le refus
+d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
+projet, ou son chemin via `NODE_PATH` dans un worktree sans dépendances locales.
+
+The `task-detail-human-review` recipe uses the production native binary supplied
+via `SWARM_STATUS_CONTRACT_BINARY` and a new fixture directory on the admitted
+volume supplied via `SWARM_TASK_REVIEW_FIXTURE`. It creates an isolated task via
+the CLI. The browser checks the reason shown when delivery evidence is missing while an auxiliary read is
+held. Explicit browser doubles for the file list and report exercise the default
+Monaco report, search, the mobile reader and recovery from a failed read.
+It checks that the inventory response supplies the initial report without a
+second request, that explicit reopening revalidates it, and that a report
+error leaves the rest of the inventory available.
+The unit test `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+separately checks the mission revision and body comparison.
+It also checks reuse of an identical decoded record and a fresh decode when bytes
+change at the same revision. File data and evidence checks remain uncached.
+The French browser path selects a different item and checks that only its
+original is requested, using a controlled response.
+The fixture holds the mission list while checking that a direct link is usable.
+A plain-text saturation response keeps the tree available, shows the reason and
+allows explicit retry of the selected item.
+The Rust test `recheck_preserves_mismatch_and_decode_failure` checks digest
+comparison and retention of a decode error.
+The browser also checks cockpit help in FR/EN, Escape and focus return,
+the Dispatch shortcut and opening help without a write.
+The GitHub `checks` job runs this recipe against the embedded cockpit.
+If Node exits unsuccessfully, the recipe log includes the browser assertion and
+the completed checks for that language. The isolated fixture keeps both original
+streams, and the recipe reports the original failure.
+
+En cas d’échec de Node, le journal de la recette contient l’assertion du
+navigateur et les contrôles terminés pour la langue concernée. La fixture isolée
+conserve les deux flux originaux et la recette transmet l’échec initial.
+The existing cockpit recipe includes the reader in its strict script inventory.
+HTTP refusal probes and approval writes use the native service.
+With evidence attached, it approves the task and reads back the resulting state
+after one recorded operation. The recipe checks stale revision and missing CSRF
+refusals. Node uses the project's Puppeteer installation, or its path through
+`NODE_PATH` in a worktree without local dependencies.
+
+
+### C3-P — observation Python du résolveur et du placement / Python resolution and placement observation
+
+Le premier lot C3-P observait les décisions historiques sans les corriger.
+Le correctif C-D01 Python distingue maintenant l'absence observée d'une entrée
+sauvegardée des erreurs et d'un champ absent/null : seul le premier cas peut
+sélectionner le défaut livré. Un document présent incomplet refuse sans adoption
+ou écriture automatique. La grammaire suit le validateur Rust de référence,
+sans normalisation ; cela ne corrige pas le résolveur Rust lui-même.
+
+`fixture_area.configured_area(repo, observer=...)` conserve sa signature et le
+retour Path. Base et parent détenus par descripteurs, ouverture NONBLOCK et fstat
+précèdent la lecture du fichier régulier ; une substitution du nom du parent ne
+redirige pas cette lecture. Les octets peuvent encore changer pendant la lecture :
+aucun snapshot atomique, confinement ou authenticité n'est promis. `_AREA` reste
+un cache d'import ; un appel explicite résout à nouveau. Le buffer consommé alimente
+la décision et l'observation. Les causes secondaires de fermeture sont attachées
+à l'erreur primaire dans `fixture_close_errors`, celles d'observer dans
+`fixture_observation_errors`. Sans primaire, la panne de fermeture/observer refuse.
+Le passage des causes close vers result.json du runner est couvert par la garde
+ciblée décrite plus bas ; revue indépendante et autres consommateurs restent
+distincts.
+
+Le runner conserve `fixture-area-proof.json` et
+`fixture-area-proof.receipt.json` dans sa sortie neuve. Le premier distingue
+l'import (provenance interne non observée), l'appel explicite et le placement ;
+le second lie relecture interne, taille/empreinte et invocation. Les données
+comprennent seulement types/métadonnées pertinentes, chemin validé, modes examinés
+et événements mkdir/repli. Le TMPDIR préparé n'est pas un reçu d'enfant ; un
+contrôle avec enfant inerte vérifie séparément sa réception. Aucun historique de
+réglages ou environnement hérité complet n'est ajouté. Ce reçu n'est ni
+indépendant, ni une authentification, ni une preuve de Rust/R04/acceptation.
+
+Un échec de publication de cette preuve arrête les étapes et reste distinct de
+la cause primaire, dans `evidence_failures`. Les effets mkdir précédents ne sont
+pas annulés. Une panne des écritures finales peut encore laisser un dossier
+incomplet, jamais qualifié par l'absence d'erreur. Corriger la précondition puis
+prendre une sortie neuve ; ne pas réessayer automatiquement ni écraser l'ancien
+lot. `verify` exige les preuves/liens pour les nouveaux PASS et accepte le format
+historique sans attribuer rétroactivement une projection aux anciens dossiers.
+La recette `recipes/runner.json` déclare 14 tests runner, 13 helper et 4 snapshot.
+Seules les 13 méthodes helper de ce correctif ont été exécutées sur copies privées
+figées (13 PASS, aucun ignoré), après un D3 rouge sur préimage. Cela ne constitue
+ni un rejeu de la recette entière ni 31 contrôles qualifiés sur ce nouveau candidat.
+
+The first C3-P lot observed historical choices without correcting them. The
+Python C-D01 fix distinguishes observed missing saved entries from IO/shape/type
+errors and missing/null saved fields. Only observed absence can select the shipped
+default; a present incomplete document refuses without automatic adoption/write.
+The path grammar follows the supplied Rust validator, not a shared implementation
+or a correction of the Rust fixture resolver.
+
+`fixture_area.configured_area(repo, observer=...)` keeps its signature and Path
+return. Held base/parent descriptors, NONBLOCK open and fstat precede a regular-file
+read; replacing the parent pathname does not redirect that held read. Content can
+still change during reading: no atomic snapshot, confinement or authenticity is
+promised. `_AREA` remains import-cached; explicit calls resolve afresh. The consumed
+buffer drives choice and observation. Secondary close failures attach to the
+primary as `fixture_close_errors`, observer failures as `fixture_observation_errors`.
+Without a primary, a close/observer failure refuses return. Targeted retention of close details in runner result.json is covered by the
+guard below; independent review and other consumers remain distinct.
+
+Runner retains `fixture-area-proof.json` and `fixture-area-proof.receipt.json`.
+The first separates import (internal provenance unobserved), explicit resolution
+and placement; the second binds internal readback, size/hash and invocation.
+Only relevant types/metadata, validated path, examined modes and mkdir/fallback
+events are added, not full settings history or inherited environment. Prepared
+TMPDIR is not child reception; an inert-child check proves that separately.
+Receipt is neither independent/authenticated nor Rust/R04/engine acceptance.
+Proof-publication failure stops steps, separately retaining the primary cause
+and `evidence_failures`; previous mkdir effects remain. Final writes can still
+leave incomplete evidence. Recover the prerequisite and use new output; never
+automatically retry/overwrite a failed lot. `verify` requires coherent proof for
+new PASS while preserving historical evidence compatibility without inventing
+old projections. `recipes/runner.json` declares 14 runner, 13 helper and 4 snapshot
+tests. Only the 13 affected helper methods were run on frozen private copies
+(13 PASS, none skipped), after a D3 failure on the preimage. This is neither a
+complete recipe replay nor 31 qualified checks on this new candidate.
+
+
+C-D01 / CD01-R09-01 — correction privée après revue09 (15 novembre 2026).
+Le remplacement du lecteur texte avait ignoré le mode UTF-8 de Python : sous
+LC_ALL=C et -X utf8, le JSON UTF-8 brut « évidence » refusait, contrairement à
+Path.read_text et au JSON échappé équivalent. Contre-exemple désormais exécuté,
+témoins ASCII/ancien lecteur, faute brute, équivalent échappé et reprise conservés.
+Le codec est choisi via io.text_encoding(None), puis locale.getencoding seulement
+si Python renvoie locale : compatibilité texte par défaut, aucune politique
+UTF-8 imposée. Les chemins et la détention/fermeture des FD ne changent pas.
+
+Nouvelle garde pérenne séparée tests/test_fixture_area_encoding.py : une méthode,
+modes UTF-8 1 et 0 sous C, comparaison au vrai Path.read_text. La même garde est
+rouge sur le helper revu précédent, verte sur le correctif ; sorties/hashes stables
+retenus en fixture privée. Les 13 méthodes précédentes restent inchangées et non
+rejouées : leur PASS reste lié à l'ancien hash, aucune annonce de 14 tests relancés.
+La recette déclare cette garde séparément et conserve 13 pour le helper historique.
+Revue delta09 requise avant checkpoint/application ; sources partagées et main
+non modifiés. Diagnostic close vers runner, Rust/R04 et acceptation globale ouverts.
+
+
+C-D01 / CD01-R09-01 — private correction after review09 (15 November 2026).
+The replacement decoder ignored Python UTF-8 mode: under LC_ALL=C and -X utf8,
+raw UTF-8 JSON for “évidence” refused while Path.read_text and the escaped JSON
+equivalent accepted it. The counterexample is now executed, retaining ASCII and
+old-reader controls, raw failure, escaped equivalent and recovery. Encoding now
+uses io.text_encoding(None), resolving locale.getencoding only when Python returns
+locale. This preserves default text decoding without imposing a UTF-8 policy.
+Path validation and held-FD/open/close mechanisms are unchanged.
+
+Separate permanent guard tests/test_fixture_area_encoding.py: one named method,
+UTF-8 modes1 and0 under C, compared with actual Path.read_text. The same guard
+fails on the reviewed helper and passes on the fix; private stdout/stderr and
+stable hashes retained. The previous13 methods remain unchanged and unreplayed;
+their PASS stays bound to the old helper hash, not a claim of14 rerun tests.
+Recipe declares this guard separately and keeps13 for the existing helper suite.
+Delta review09 is required before checkpoint/application. No shared/main mutation.
+Runner close diagnostics, Rust/R04 and global acceptance remain open.
+
+
+### C-D01 — causes secondaires du helper jusqu'au runner (delta privé)
+
+Le runner conserve maintenant les causes retenues par le helper dans
+fixture_close_errors, comme celles de fixture_observation_errors : chaque élément
+est résumé par type, errno et phase (fixture-resolution-close ou
+fixture-resolution-observation), sans message secondaire. La cause primaire reste
+dans failure ; aucune perte n'est transformée en PASS, aucune action réexécutée
+pour compléter une preuve. Le résumé CLI conserve status/evidence/steps et exit1
+pour FAIL ; les causes sont consultables dans result.json de la sortie liée.
+
+Une garde nouvelle pérenne test_recipe_fixture_errors.py exerce l'entrée CLI
+réelle avec une injection de fixture explicitement étiquetée : close seul puis
+close+observer, chaque fois témoin valide, refus lecture/fermeture, reprise en
+sortie neuve. La fermeture libère réellement les FD puis lève un diagnostic
+synthétique, pas un refus noyau. Avant correctif : une méthode, deux sous-cas en
+échec car les trois causes close manquent ; après : une méthode PASS, deux
+sous-cas avec trois causes close et zéro/deux causes observer, primaire distincte,
+zéro étape/compteur d'effet inchangé au refus, reprises PASS. Les entrées de la
+version finale restent stables ; noms, argv, stdout/stderr et résultats internes
+sont conservés. Aucun rejeu helper13/codec1, runner14 ou153consommateurs.
+
+Le manifeste runner déclare une étape ciblée supplémentaire ; la recette entière
+n'est pas exécutée. Le bootstrap de qualification reste privé, avec le helper
+codec approuvé figé inchangé. L'allocateur normal de fixture est aussi exercé
+dans le contrôle final, sur réglages explicitement fictifs. Les messages
+secondaires ne sont pas repris dans result.json. Les dossiers d'échec précoces
+peuvent manquer environment.json : aucune nouvelle intégrité verify de ces
+dossiers incomplets n'est revendiquée. Des preuves écrites ne sont pas une
+réception indépendante ; Rust/R04, intégration et BF-L0 global restent ouverts.
+
+
+### C-D01 — helper secondary causes through the runner (private delta)
+
+Runner now retains fixture_close_errors alongside fixture_observation_errors,
+summarizing each by type, errno and phase (fixture-resolution-close or
+fixture-resolution-observation), without secondary messages. Primary remains in
+failure. Missing evidence never becomes PASS and actions are not retried to
+manufacture proof. Public CLI still reports status/evidence/steps and exit1 for
+FAIL; causes are read from the linked output's result.json.
+
+One new permanent test_recipe_fixture_errors.py guard invokes the real CLI with
+an explicitly fixture-only injection: close-only and close+observer, each with
+valid control, read/close refusal, then fresh-output recovery. The close double
+really releases FDs then raises synthetic diagnostics, not a kernel close refusal.
+Before: one method, two failing subcases because three close causes are absent.
+After: one method PASS, both subcases retain three close causes and zero/two
+observer causes, distinct primary, zero steps and unchanged effect counter on
+refusal, successful recoveries. Final inputs stable; names, argv, raw streams and
+inner results retained. No helper13/codec1, runner14 or153consumer replay.
+
+Permanent manifest declares a separate targeted step; the full recipe was not
+run. Qualification uses frozen private sources and the unchanged approved codec
+helper. Final guard also exercises ordinary fixture allocation with explicitly
+synthetic settings. Secondary messages stay out of result.json. Early failed
+dossiers may lack environment.json: no new verify integrity claim is made for
+those incomplete dossiers. Written evidence is not independent receipt; Rust/
+R04, shared integration and global BF-L0 acceptance remain open.

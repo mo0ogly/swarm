@@ -1,5 +1,12 @@
 # Native Rust reviewer: current contract
 
+The current status shared by the CLI and cockpit covers the first attempt in
+a managed repository. A submitted opinion uses the same evidence as publication
+preview. A favorable opinion still awaits publication. Published acceptance is
+checked against current task and dependency evidence. Evidence failures retain
+their cause. Reading does not rerun the reviewer. Retries and some intermediate
+review states are outside this projection.
+
 The native evidence below targets Linux; cross-platform equivalence is not established.
 
 ## Actual availability

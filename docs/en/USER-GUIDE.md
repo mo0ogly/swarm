@@ -125,6 +125,8 @@ both purposes when its capabilities allow it.
 
 ## 3. Prepare a mission
 
+In the preparation conversation, open **Choose a workflow architecture** to [request or revisit an AI assessment](NATIVE-AGENT-EXCHANGES.md#audit-and-reassess-the-choice-with-ai). Review and send the draft. Plan adoption remains your decision.
+
 Choose **Prepare a project**. Describe the result, target directory, boundaries
 and success criteria. For example:
 
@@ -263,19 +265,136 @@ In the session, read timestamps, event types and messages. Received output shows
 observable activity, not the model's private reasoning. Detailed capture is
 optional; without it, not all raw provider output is retained.
 
+### Follow status updates between orchestrators
+
+In the Dispatch summary, **View** under **Needs review** or **Blocked**
+opens the task details over the current view. **Escape** or **Close** returns
+focus to the button.
+
+In the Dispatch **Task details** panel, a deliverable link in the format
+`codex://threads/<UUID>` opens the chat through the Codex app if the device
+handles this link type. The remaining deliverable text stays visible.
+
+In **Dispatch → Team and validation**, open **Status updates** with Logs access.
+**Sent** records the entry into the recipient’s inbox. **Received in context**
+identifies the recorded activation containing the signal. **Processed** links
+to an applied decision that cites it. Open **Show evidence** for references.
+A decision may acknowledge the signal without an operation. Reading has no
+execution effect.
+
+### Approve a submitted task
+
+In the **Dispatch** summary, use **View** under **Needs review** to open the
+task details. A submitted task in human review shows **Approve**. The engine
+checks the revision and the required evidence. For a planned task, this
+includes the original independent review and current delivery evidence.
+The details show the reason for a block. If the independent review is missing,
+they show recorded mission review call consumption, whether the limit was
+reached, and the latest known failure before provider invocation when available.
+
+Click **Approve** after reviewing the deliverable. The action requires
+permission to modify the mission. The details confirm the state after reading
+it back from the engine. If the revision changes or recording is uncertain,
+refresh the mission before proceeding.
+
+The window opens **Report handed off** in Monaco as soon as it is available.
+A mission link opens that mission first. The selector fills in the other
+missions afterwards.
+The report and the file list arrive in one read. If the report cannot be read,
+the other items remain available under **Deliverables**.
+If the mission changes during the read, refresh it to open the files for its
+new revision.
+When you switch deliverables, the server verifies and reads the selected file.
+It reuses the decoded mission record while its bytes remain identical.
+For a managed original, the same validation receipt is decoded once per read.
+Its digest, supporting evidence and the selected file's bytes are still checked.
+The engine reuses the receipt's verified control mapping within the read and
+checks the recorded evidence again on the next request.
+On phones, **Files** expands the tree. Selecting a file closes the tree and
+returns to the viewer. **Technical details** groups the task JSON files. Monaco
+provides read-only search. Available Word, OpenDocument and PDF originals can
+be downloaded. If a read fails, **Try again** retries that read. Protected
+items use Logs view permissions. **Approve** and its status stay above the
+viewer. On a refusal, **Diagnosis** shows the engine code.
+When the server is already handling other reads, the dialog explains why and
+keeps the tree available. **Try again** resumes the selected file.
+To diagnose a delay, add `fileTiming=1` to the cockpit URL. The viewer records
+the latest successful read in its `data-review-timing` attribute. Milliseconds
+cover engine checks, Git commands and browser rendering. Receipt timings cover
+its read and decode, original observations, publication and final recheck.
+The browser console also records the sample as `swarm-task-review-file-timing`
+without paths or payloads. Engine or gateway unavailability is shown in the viewer.
+The engine log records server-side durations under `task_review_timing` in
+the existing `web-outcome` event.
+
+In the side menu, **AI cockpit help** explains how to open a deliverable, see why
+approval is blocked, and find Logs or Resume. Shortcuts open the views you have
+access to. Press **Escape** to close help.
+
+### Open a task's action file
+
+In **Dispatch**, **Actions** on the card opens the task plan, attempts, and
+recorded adjustments. The starting instruction stays visible when submission
+changes the next step. Select an action to see its category and observed
+outcome. **Download JSON file** exports the same read. The account needs
+access to **Logs**. The file displays
+**Awaiting your human review** when the task is submitted under a human
+validation policy.
+
+Swarm matches tool events declared by the provider. The last supervisor
+observation may precede the current action. The completion receipt records
+observed outcomes. Older receipts may lack details. The file omits tool
+arguments, raw paths, and private output. Partial observations are labeled.
+Reading or exporting the file does not trigger a business action.
+
 ### Read the graph and inspect a task
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
 
-In the native cockpit, **Orchestration** displays the observed driver and
-the configured independent reviewer. **Team and scopes** shows the principal
-orchestrator, sub-orchestrators, and their tasks. Each sub-orchestrator has a
+Use **Task graph** and **Team and validation** at the top of the active panel.
+The buttons remain available in fullscreen, and selecting the team exits fullscreen.
+On narrow screens in fullscreen, open **Graph gestures** for shortcuts.
+**Task graph** shows dependencies, task states and graph controls. Role cards
+show the principal orchestrator in blue ◆, sub-orchestrators in amber ↳ and the
+configured independent reviewer in green ✓. The legend distinguishes prerequisites,
+delegation, assignment and configured review. An organized plan opens on the orchestrators.
+Delegations are aligned by level. Activate a card to isolate the path from the
+principal orchestrator to its scope, or use **Show all agents and tasks** for the
+full view. Gray assignment arrows connect each orchestrator to the visible
+tasks along curves that share an initial route within a scope. Task cards identify the observed agent when supplied by the engine.
+Clicking the same orchestrator again or choosing **Back to orchestrators**
+restores the initial view. The configured independent reviewer appears in green
+beside the principal orchestrator in an open scope or in the full view. Drag a card to move it, or use the arrow keys while the card has focus. Color dots accompany
+In a scope, tasks are arranged by dependency rank. Assignments share a line
+above each row, while prerequisites approach from the right. Repeated title
+prefixes are omitted on cards and retained in search and accessible labels.
+The minimap appears in the full view, leaving cards clear in the other levels.
+status labels, and the moving outline follows confirmed execution. The graph header identifies a recorded
+hierarchy when sub-orchestrators report to the principal orchestrator. It also
+shows the engine recommendation and its approval status.
+**Locate a dependency** centers
+the viewport on each prerequisite arrow in turn. The blue **In action** marker
+indicates confirmed execution. The blue outline moves while that state is
+displayed. **Pause animation** holds it still, and the system preference for
+reduced motion also applies. Red
+**Stopped** indicates an interrupted or failed attempt. Amber **Paused** marks
+an unstarted task in a paused mission. Gray **Activity unconfirmed** marks a
+recorded running task without a current running observation. Assigned tasks use
+the same markers. Orchestrator markers indicate paused starts or unconfirmed
+individual activity. The reviewer marker can indicate an ongoing review. **Team and validation**
+displays the observed driver and the configured
+independent reviewer. **Team and scopes** shows the principal
+orchestrator, sub-orchestrators, and their tasks. A blue diamond marks the
+principal orchestrator, an amber branch arrow marks sub-orchestrators, and a
+green check mark identifies the independent reviewer. These icons accompany
+the role labels. Check results appear in the recorded receipt. Each sub-orchestrator has a
 parent and a scope with assigned requirements and tasks. Incidents outside
 that scope belong to the parent. Sibling scopes appear as separate
 branches. Task arrows indicate prerequisites. The task
 list within a scope and the card's accessible label show the current reason
-supplied by the engine. The list displays configured checks and recorded
-receipt verdicts separately. History mode shows the recorded team and leaves
+supplied by the engine. Each assigned task lists configured checks, recorded
+check results and the recorded independent review. It also shows the current
+validation state when the engine supplies it. History mode shows the recorded team and leaves
 operational status unavailable. The graph reports when a team is unattached.
 
 In the CLI, `swarm-rust planning graph ID --root ROOT --json` shows the scopes

@@ -27,7 +27,9 @@
     "web/graph.js",
     "web/i18n-en.js",
     "web/lib/dagre.min.js",
+    "web/pilotage.css",
     "web/swarm-design.css",
+    "web/swarm-workbench.js",
     "web/wattson_themes.css"
   ],
   "environment": {},
@@ -61,7 +63,7 @@
       "expected_exit": 0,
       "required_stdout": [
         "PASS orchestration graph fr etat 1440",
-        "PASS orchestration graph fr sombre 390",
+        "PASS orchestration graph fr sombre 320",
         "PASS orchestration graph en etat 390",
         "PASS orchestration graph en sombre 1440"
       ],

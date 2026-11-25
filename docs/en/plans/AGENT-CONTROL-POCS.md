@@ -2054,3 +2054,103 @@ before `cfg(test)` remain identical (SHA256
 `8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
 Local proof does not replace required checks on the published head; PR #20
 retains their current outcome and the merge decision.
+
+
+### C-D01 — private composition onto the CI checkpoint (16 November 2026)
+
+Proposal only: exact base8f348911abe1f8664bd7cfeb94d10258023363f5; no application,
+delivery or global acceptance. This checkpoint lacks the Python→runner C3-P
+foundation published in2b33932433bb8b2907e4be90e8927f1b47898530. Missing observer
+interface, projection/receipt,14runner tests and snapshot-double adaptation are
+concrete proposed prerequisites, requiring explicit root adoption and CI review.
+Necessary historical bytes are staged privately, then approved
+codec09 and runner-close corrections are composed with qualified source bytes
+unchanged. Existing CI README/plan bytes are preserved; only owned appendices
+are added below.
+
+Adopted D1–D5 remain the target: default after observed absence, refusals for
+errors/present-incomplete settings, reference grammar without normalization,
+consumed-buffer evidence and no retrospective cache reassignment. Python
+composition does not fix Rust/OnceLock/R04.13helper, codec1 and close1 proofs
+retain their original inventories/scopes, not a15test replay on this checkpoint.
+
+Promotion-manifest C-1 is outside this composition: CI has foreign changes and
+lacks the three C-1 support declarations. Do not overwrite it with the historical
+manifest or claim C-1/BF-L0-C integrated. Promotion owner must reconcile its hunks
+under separate reservation.
+
+
+### C-D01 Python — targeted private qualification, 15 November 2026
+
+Adopted D1–D5; private GLM patch personally corrected and reviewed. No shared file
+changed. Two proposed sources: tests/fixture_area.py and tests/test_fixture_area.py;
+held base/parent/leaf read, missing/null refusal, errors and reference path grammar,
+with import cache not retrospectively reassigned.
+
+D3 red on preimage: valid saved controls, then missing field fails to refuse; one
+named method, one expected failure, no bootstrap error. Candidate: 13 named methods
+PASS, no failures/errors/skips, UID 1001; real EACCES, NONBLOCK FIFO, controlled
+parent replacement, synthetic read/close errors, invalid/missing default and recovery.
+Dedicated controls precede faults. Private -I/-B bootstrap and synthetic settings;
+audit hook denies shared checkout access. Shipped default copied and declared,
+no live fallback.
+
+Before/after input inventories match; original argv/stdout/stderr retained in the
+private evidence index. No global watchdog, build, new GLM call, service or Git.
+The historical 23 checks were not replayed. Proposed recipe changes helper count
+from 5 to 13; this does not qualify 14 runner/4 snapshot checks on the new delta.
+
+Swarm00 reservation and CI review precede shared application. End-to-end close
+cause presentation, compatibility across 153 consumer candidates, Rust/OnceLock,
+R04/C-4 and BF-L0 closure remain open. Local results are not independent receipt,
+product runtime effect or global acceptance.
+
+
+### CD01-R09-01 — decoding correction and targeted private guard
+
+
+C-D01 / CD01-R09-01 — private correction after review09 (15 November 2026).
+The replacement decoder ignored Python UTF-8 mode: under LC_ALL=C and -X utf8,
+raw UTF-8 JSON for “évidence” refused while Path.read_text and the escaped JSON
+equivalent accepted it. The counterexample is now executed, retaining ASCII and
+old-reader controls, raw failure, escaped equivalent and recovery. Encoding now
+uses io.text_encoding(None), resolving locale.getencoding only when Python returns
+locale. This preserves default text decoding without imposing a UTF-8 policy.
+Path validation and held-FD/open/close mechanisms are unchanged.
+
+Separate permanent guard tests/test_fixture_area_encoding.py: one named method,
+UTF-8 modes1 and0 under C, compared with actual Path.read_text. The same guard
+fails on the reviewed helper and passes on the fix; private stdout/stderr and
+stable hashes retained. The previous13 methods remain unchanged and unreplayed;
+their PASS stays bound to the old helper hash, not a claim of14 rerun tests.
+Recipe declares this guard separately and keeps13 for the existing helper suite.
+Delta review09 is required before checkpoint/application. No shared/main mutation.
+Runner close diagnostics, Rust/R04 and global acceptance remain open.
+
+
+### C-D01 — helper secondary causes through the runner (private delta)
+
+Runner now retains fixture_close_errors alongside fixture_observation_errors,
+summarizing each by type, errno and phase (fixture-resolution-close or
+fixture-resolution-observation), without secondary messages. Primary remains in
+failure. Missing evidence never becomes PASS and actions are not retried to
+manufacture proof. Public CLI still reports status/evidence/steps and exit1 for
+FAIL; causes are read from the linked output's result.json.
+
+One new permanent test_recipe_fixture_errors.py guard invokes the real CLI with
+an explicitly fixture-only injection: close-only and close+observer, each with
+valid control, read/close refusal, then fresh-output recovery. The close double
+really releases FDs then raises synthetic diagnostics, not a kernel close refusal.
+Before: one method, two failing subcases because three close causes are absent.
+After: one method PASS, both subcases retain three close causes and zero/two
+observer causes, distinct primary, zero steps and unchanged effect counter on
+refusal, successful recoveries. Final inputs stable; names, argv, raw streams and
+inner results retained. No helper13/codec1, runner14 or153consumer replay.
+
+Permanent manifest declares a separate targeted step; the full recipe was not
+run. Qualification uses frozen private sources and the unchanged approved codec
+helper. Final guard also exercises ordinary fixture allocation with explicitly
+synthetic settings. Secondary messages stay out of result.json. Early failed
+dossiers may lack environment.json: no new verify integrity claim is made for
+those incomplete dossiers. Written evidence is not independent receipt; Rust/
+R04, shared integration and global BF-L0 acceptance remain open.

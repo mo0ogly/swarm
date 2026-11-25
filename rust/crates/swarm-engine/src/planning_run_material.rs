@@ -90,16 +90,7 @@ pub(crate) fn prepare(
     request: &PlanningCallPreviewRequest,
     create_workspace: bool,
 ) -> Result<Material, E> {
-    // Presence is enough to require explicit R6 adoption; do not read/reset or
-    // silently replace a possibly public historical Go configuration/history.
-    if directory
-        .names()
-        .map_err(|e| E::caused("planning-legacy-wait-observation", e))?
-        .iter()
-        .any(|n| n.as_slice() == b"provider-wait.json")
-    {
-        return Err(E::Refused("planning-legacy-wait-adoption-required"));
-    }
+    crate::root_store::verify_native_wait(directory, settings, "planning-legacy-wait-adoption-required")?;
     settings
         .values
         .planning_wait_policy()

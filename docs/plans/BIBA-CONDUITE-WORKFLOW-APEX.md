@@ -1,0 +1,126 @@
+# Biba et Bell–LaPadula — audit appliqué de Conduite
+
+## Analyse · révision 102
+
+La lecture du Work et de la mission par le CLI du binaire local v0.1.1-dev.416
+établit huit périmètres délégués, 60 tâches affectées, un validateur indépendant
+configuré et zéro revue enregistrée. La mission est arrêtée, consentement
+désactivé, 0 tâche acceptée sur 60. À cette révision, la seule dépendance
+enregistrée est D11 Wasmtime → gRPC/Tonic. 59 tâches sont sans prérequis déclaré.
+En navigateur isolé avant changement, les rôles sont dans un arbre à puces
+distinct du graphe. La flèche de dépendance est hors du cadrage initial à 390 px.
+
+## Décision
+
+Conserver la **hiérarchie** pour la responsabilité des huit périmètres et
+conserver la **séquence** D11 Wasmtime → gRPC/Tonic là où le plan l’impose.
+Une chaîne séquentielle globale demanderait un ordre que le dossier ne fournit
+pas. Une exécution parallèle de toutes les autres tâches n’est pas établie.
+Le propriétaire du plan examine les éventuels prérequis métier manquants avant
+validation d’une révision. Cet audit ne change ni l’architecture du plan ni
+son consentement, et ne vaut pas validation d’un avis par l’utilisateur.
+
+```mermaid
+flowchart TD
+    R["Orchestrateur principal"] --> S["Confinement d’exécution"]
+    R --> T["Transport"]
+    V["Validateur indépendant"] -. Revue configurée .-> R
+    S -. Affectation .-> W["D11 · contrôle Wasmtime"]
+    T -. Affectation .-> G["gRPC/Tonic"]
+    W -->|Prérequis enregistré| G
+```
+
+## Exécution et vérification
+
+Projeter rôles et tâches dans le même canevas, conserver **Équipe et validation**
+pour les reçus, distinguer visuellement les quatre relations, offrir une
+navigation vers les dépendances et animer uniquement les processus dont
+l’exécution est confirmée. Le contrôle navigateur couvre quatre combinaisons
+langue/thème avec trois largeurs dont 320 px, une hiérarchie imbriquée, une
+branche orpheline, le mode historique et le mouvement réduit. Une reproduction
+en navigateur avec le plan Biba projeté vérifie séparément les cardinalités et
+la navigation. L’installation requiert le contrôle de l’image servie et la
+relecture de la mission. Le contrôle de dépendances métier demeure à la charge
+du propriétaire du plan.
+
+L’échec initial a exposé une collision entre les sélecteurs des cartes SVG et
+ceux du panneau de validation. Le graphe porte désormais son propre attribut
+de périmètre. Le témoin navigateur conserve le contrôle des données du panneau
+et distingue ses lectures d’avis des mutations.
+
+## Reprise après examen du graphe
+
+Les 60 flèches d’affectation se superposaient aux trajets des tâches. Des traits
+plus fins les auraient maintenues dans le champ. Le choix retenu masque ces
+flèches à l’ouverture et permet de les révéler pour un seul périmètre à la fois.
+La sélection reste locale à la vue et survit à un nouveau rendu du même Work.
+Les délégations sont en trait plein ambre et la liaison de revue en pointillé
+vert. Le test navigateur contrôle l’ouverture, la sélection d’un périmètre, le
+retour à l’affichage initial et la présence des relations permanentes.
+
+## Liens de responsabilité et type de workflow à l’ouverture
+
+Le retour d’usage a montré que le réglage précédent supprimait du premier
+rendu une information essentielle. La vue initiale montre donc toutes les
+affectations en trait fin gris. Le filtre permet de se concentrer sur un
+périmètre. L’organisation enregistrée et l’avis du moteur apparaissent dans
+le graphe. Le même résultat de lecture, lié à la révision du Work, alimente
+l’avis détaillé dans **Équipe et validation**. Cette projection ne modifie pas
+le plan et la validation demeure une action explicite dans cette vue détaillée.
+
+## Exploration progressive et états sur les cartes
+
+Le plan organisé s’ouvre sur les orchestrateurs et les délégations. Cliquer
+sur un orchestrateur ouvre ses tâches et les affectations associées. La vue
+complète ouvre les autres tâches. Le validateur indépendant configuré apparaît
+dans le périmètre ouvert et dans la vue complète. Le second clic sur la même
+carte ou le bouton de retour remonte aux orchestrateurs seuls. Le retour restaure le focus
+sur l’orchestrateur d’origine. La vue repose sur les données du même graphe,
+contrairement à des diagrammes distincts qui auraient dupliqué la navigation et
+le placement. Le contrôle navigateur vérifie l’état initial, le périmètre
+demandé, la remontée, les points d’activité, l’agent observé et la poignée.
+Le crochet « Voir dans le graphe » révèle explicitement la tâche recherchée.
+
+```mermaid
+flowchart LR
+    H["Orchestrateurs et délégations"] -->|Ouvrir un périmètre| S["Orchestrateur, tâches et agents observés"]
+    H -->|Afficher tous les agents et tâches| A["Vue complète et validateur"]
+    S -->|Remonter| H
+    A -->|Remonter| H
+```
+
+Le retour visuel a aussi identifié les coudes droits comme un obstacle de
+lecture. Les affectations partagent un départ par périmètre et le moteur de
+tracé du graphe arrondit leurs embranchements, ainsi que ceux des délégations.
+Le choix conserve les points d’attache et la séparation visuelle des types de
+liens. Les courbes bleues demeurent les prérequis éditables.
+
+Le retour d’usage a justifié un cadrage plus serré. La vue d’ensemble aligne
+les branches par niveau avec un trajet partagé sur le côté. Le détail cache
+les branches sœurs et rapproche uniquement le chemin réellement enregistré,
+le validateur configuré et les tâches du périmètre. Les changements de
+position sont propres à la vue et ne modifient pas la disposition mémorisée.
+Sur écran étroit, les liens passent de part et d’autre du validateur.
+
+### Disposition des tâches et séparation des flèches
+
+Le détail d’un périmètre répartit ses tâches par rang de dépendance, en une
+colonne sur petit écran ou deux quand la largeur le permet. Les affectations
+utilisent un tronc gris unique et une branche propre à chaque rangée. Les
+préconditions présentes dans ce périmètre arrivent par la droite. Les
+trajets et rangées restent des choix de présentation.
+
+```mermaid
+flowchart TD
+    S["Sous-orchestrateur"] --- T["Tronc d’affectation"]
+    T --- L1["Rangée des prérequis"]
+    T --- L2["Rangée suivante"]
+    L1 --> A["Tâche amont"]
+    L2 --> B["Tâche aval"]
+    A -->|Prérequis par la droite| B
+```
+
+Les cartes natives utilisent leur corps comme contrôle de déplacement. La
+poignée distincte a été retirée. Les flèches du clavier déplacent la carte
+ciblée et Entrée continue d’ouvrir la tâche. Le test garde les cas de
+déplacement groupé, d’annulation et d’export du placement.

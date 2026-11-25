@@ -1,6 +1,6 @@
 //! Immutable worker output, before candidate publication or quality acceptance.
 //! The owning Root caller checks current completion, rights and lease separately.
-use super::{proof, repository, with_storage, workspace};
+use super::{proof, repository, with_open_storage, with_storage, workspace};
 use super::super::{commit, git, hash, inside, text, LocalDirectory, E};
 use crate::{Agent, EngineSettingsDocument, Work};
 use serde::{Deserialize, Serialize};
@@ -126,9 +126,27 @@ fn report_bytes(bare: &Path, oid: &str, base: &str, path: &str, settings: &Engin
 /// files; they do not imply rollback. No retry, SQL,
 /// provider, candidate publication, task acceptance or deletion is performed.
 pub(crate) fn retain_result(root: &Path, work: &Work, agent: &Agent, settings: &EngineSettingsDocument) -> Result<Result<RetainedResult, &'static str>, E> {
+    retain_result_using(work, agent, settings, |run| with_storage(root, work, true, run))
+}
+
+/// Retain the same immutable report using an already opened Root directory.
+/// Caller verifies the connected database and current worker before and after
+/// the operation. No command path, producer or storage alias is accepted from
+/// the operator. Retention errors may leave original evidence in owned storage.
+pub(crate) fn retain_bound_result(state: &LocalDirectory, work: &Work, agent: &Agent, settings: &EngineSettingsDocument) -> Result<Result<RetainedResult, &'static str>, E> {
+    retain_result_using(work, agent, settings, |run| with_open_storage(state, work, true, run))
+}
+
+/// Apply a single custody operation in the caller-selected managed lane.
+fn retain_result_using(
+    work: &Work,
+    agent: &Agent,
+    settings: &EngineSettingsDocument,
+    acquire: impl FnOnce(&dyn Fn(&LocalDirectory) -> Result<Result<RetainedResult, &'static str>, E>) -> Result<Result<RetainedResult, &'static str>, E>,
+) -> Result<Result<RetainedResult, &'static str>, E> {
     // One retention attempt: a clean failed lane acquisition is recognized on
     // its result, before the incomplete wrapper is applied.
-    let attempt = with_storage(root, work, true, |dir| {
+    let attempt = acquire(&|dir| {
         repository(dir, work, settings)?;
         let p = proof(dir, &format!("native-worker-{}.json", agent.id))?;
         let repo = work.planning.as_deref().and_then(|v| v.repository.as_deref()).ok_or(E::Refused("managed-repository-required"))?;

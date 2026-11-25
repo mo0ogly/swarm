@@ -5,14 +5,14 @@ Use actual native planning then a real inert local worker. CLI admission, replay
 completion and queued cancellation run on isolated owned Roots, no paid provider,
 SQL seeding, install or whole-test watchdog. Source and copy evidence are retained.
 """
-import argparse,json,traceback
+import argparse,datetime,json,time,traceback
 from pathlib import Path
 import rust_agent_model_route as fixture
 import rust_managed_planning as planning
 from rust_mission_report_relay import rows
 
 
-def run(binary,profile,out,*,faults=False,detached_git=False,subproject=False):
+def run(binary,profile,out,*,faults=False,detached_git=False,subproject=False,expired_preflight=False,retain_handoff=False):
     """Bind source/candidate/copy/original intent and actual process settlement.
 
     The planning fixture supplies two existing todo tasks. The first executes;
@@ -27,6 +27,8 @@ def run(binary,profile,out,*,faults=False,detached_git=False,subproject=False):
     current=f.ok(['budget','apply',f.work],dict(schema_version=1,event_id='managed-worker-budget',expected_revision=current['revision'],budget=dict(limit_usd=10,reserve_per_launch_usd=1,estimate_source='Owned inert worker fixture',reference_date='2026-10-24')))
     git_path='../.git' if subproject else '.git'
     program=fixture.PROGRAM.replace('raw=sys.stdin.buffer.read()',"raw=sys.stdin.buffer.read()\nos.rename("+repr(git_path)+","+repr(git_path+'.worker-retained')+")") if detached_git else fixture.PROGRAM
+    if retain_handoff:
+        program=program.replace('raw=sys.stdin.buffer.read()', 'raw=sys.stdin.buffer.read()\nos.makedirs("docs",exist_ok=True)\nopen("docs/task.md","w").write("Attributed worker report.\\n")', 1)
     fixture.publish(root/'codex',program.encode());(root/'codex').chmod(0o700)
     source=planning.repository.inventory(root/'source');base=current['planning']['repository']['candidate_commit']
     f.request=dict(schema_version=1,event_id='session',expected_revision=current['revision'],task_id='task',provider='fixture',capture_output=True)
@@ -65,11 +67,32 @@ def run(binary,profile,out,*,faults=False,detached_git=False,subproject=False):
             assert f.snapshot()==before and not (parked/'model-received.json').exists()
         finally:parked.rename(workspace)
         print('PASS managed-manual-proof-copy-refusals-preserve-same-queued-agent',flush=True)
+    if expired_preflight:
+        deadline=datetime.datetime.fromisoformat(agent['preflight']['valid_until'])
+        while (remaining:=(deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds())>0:
+            time.sleep(remaining)
+        provider=root/'codex'
+        original_bytes=provider.read_bytes()
+        before=f.snapshot()
+        provider.write_bytes(original_bytes+b'\n# Drift after admission\n')
+        try:
+            code,wire=f.call(['agent','run','session'])
+            assert code!=0 and 'agent-execution-preflight-changed' in json.dumps(wire),wire
+            assert f.snapshot()==before and not (workspace/'model-received.json').exists()
+        finally:provider.write_bytes(original_bytes)
+        print('PASS managed-manual-expired-preflight-refuses-provider-drift',flush=True)
     ran=f.ok(['agent','run','session']);assert ran['agent']['status']=='completed'
     observed=json.loads((workspace/'model-received.json').read_bytes());assert observed['stdin_sha256']==fixture.digest(agent['prompt'].encode())
     assert f.reservation()==('estimated',1.0)
     work=f.ok(['work','show',f.work])['work'];task=next(t for t in work['tasks'] if t['id']=='task')
     assert task['status']=='blocked' and len(task['attempts'])==1
+    if expired_preflight:
+        assert ran['agent']['preflight']==agent['preflight']
+        assert ran['agent']['attempt_id']==agent['attempt_id']==task['attempts'][0]['id']
+        before=f.snapshot()
+        code,wire=f.call(['agent','run','session'])
+        assert code!=0 and f.snapshot()==before,wire
+        print('PASS managed-manual-expired-preflight-reobserved-once-same-attempt',flush=True)
     assert planning.repository.inventory(root/'source')==source and workspace.is_dir()
     (root/'docs').mkdir(exist_ok=True)
     fixture.publish(root/'docs/task.md',b'Unrelated Root report must never be attributed to managed copy.\n')
@@ -102,7 +125,24 @@ def run(binary,profile,out,*,faults=False,detached_git=False,subproject=False):
     assert item['attempt']['agent_id']=='cancel-managed' and item['attempt']['process_state']=='interrupted',item
     print('PASS managed-status-cancelled-identity-and-settlement',flush=True)
     print('PASS managed-manual-queued-cancellation-releases-without-provider',flush=True)
-    proof=dict(status='PASS',root=str(root),work=f.work,completed='session',cancelled='cancel-managed',accepted=False,installed=False,refusal_recovery=faults,worker_git_renamed=detached_git,project_subdir=subdir,global_watchdog=None)
+    if retain_handoff:
+        w=last
+        request=dict(schema_version=1,event_id='retain-handoff',expected_revision=w['revision'],task_id='task')
+        prior=f.snapshot()
+        code,wire=f.call(['task','retain-handoff',f.work],{**request,'expected_revision':w['revision']-1})
+        assert code!=0 and 'managed-manual-handoff-revision-conflict' in json.dumps(wire),wire
+        assert f.snapshot()==prior
+        retained=f.ok(['task','retain-handoff',f.work],request)
+        assert f.ok(['task','retain-handoff',f.work],request)==retained and f.snapshot()==prior
+        report=(root/retained['report_path']).read_bytes()
+        assert report==b'Attributed worker report.\n' and fixture.digest(report)==retained['report_sha256']
+        assert retained['agent_id']=='session' and retained['attempt_id']==agent['attempt_id']
+        submit=dict(schema_version=1,event_id='submit-managed-manual',expected_revision=w['revision'],id='task',agent_id=retained['agent_id'],report_path=retained['report_path'],report_sha256=retained['report_sha256'])
+        submitted=f.ok(['task','submit',f.work],submit)['work']
+        assert next(t for t in submitted['tasks'] if t['id']=='task')['status']=='submitted'
+        assert all(t['status']!='accepted' for t in submitted['tasks'])
+        print('PASS managed-manual-retained-handoff-submitted-awaits-validation',flush=True)
+    proof=dict(status='PASS',root=str(root),work=f.work,completed='session',cancelled='cancel-managed',accepted=False,installed=False,refusal_recovery=faults,worker_git_renamed=detached_git,project_subdir=subdir,expired_preflight=expired_preflight,retained_handoff=retain_handoff,global_watchdog=None)
     fixture.publish(out/'result.json',proof);return proof
 
 
@@ -111,8 +151,10 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['binary','profile','output']:p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--faults',action='store_true');p.add_argument('--detached-git',action='store_true');p.add_argument('--subproject',action='store_true')
+    p.add_argument('--expired-preflight',action='store_true')
+    p.add_argument('--retain-handoff',action='store_true')
     a=p.parse_args()
-    try:run(a.binary.resolve(),a.profile.resolve(),a.output.resolve(),faults=a.faults,detached_git=a.detached_git,subproject=a.subproject)
+    try:run(a.binary.resolve(),a.profile.resolve(),a.output.resolve(),faults=a.faults,detached_git=a.detached_git,subproject=a.subproject,expired_preflight=a.expired_preflight,retain_handoff=a.retain_handoff)
     except BaseException as e:
         if a.output.is_dir():fixture.publish(a.output/'failure.json',dict(cause=''.join(traceback.format_exception(e))))
         raise

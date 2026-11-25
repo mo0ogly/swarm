@@ -15,6 +15,10 @@ mod mission_report_relay;
 #[cfg(target_os = "linux")]
 pub use mission_report_relay::MissionReportRelayOutcome;
 mod agent_log_history;
+mod task_actions;
+#[cfg(target_os = "linux")]
+mod orchestration_signals;
+mod workflow_architecture;
 mod graph_batch;
 #[cfg(target_os = "linux")]
 mod agent_archive_history;
@@ -59,6 +63,7 @@ mod review_recovery;
 pub(crate) use native_worker_retry::WorkerCompletionInput;
 #[cfg(target_os = "linux")]
 pub use review_preview::{TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, TaskReviewOutcome, execute_review_gate};
+pub use review_preview::TaskReviewFileReader;
 #[cfg(target_os = "linux")]
 pub use planning_native::{execute_planning_gate, PlanningRunOutcome};
 #[cfg(target_os = "linux")]
@@ -66,7 +71,7 @@ pub use planning_step::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
 pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence, ReviewRefreshOutcome};
 #[cfg(target_os = "linux")]
-pub(crate) use task_validation::require_validation_idle;
+pub(crate) use task_validation::{require_validation_idle, attach_managed_submission_controls};
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
@@ -4034,6 +4039,7 @@ mod preparation_proposal;
 #[path="provider_wait_store.rs"]
 mod provider_wait_store;
 #[cfg(target_os="linux")]
+pub(crate) use provider_wait_store::verify_native_wait;
 pub use provider_wait_store::{ProviderWaitView,ProviderWaitMutation};
 
 #[cfg(target_os="linux")]

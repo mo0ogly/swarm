@@ -16,7 +16,7 @@ mod source;
 #[path = "managed_repository_controls.rs"]
 mod controls;
 pub(crate) use controls::{ControlPlan as ManagedControlPlan, plan as managed_control_plan};
-pub(crate) use worker::{candidate_worker, clean_lane_contention, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_result, verify_result, verify_worker, WorkerCheck};
+pub(crate) use worker::{candidate_worker, clean_lane_contention, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_bound_result, retain_result, verify_result, verify_worker, WorkerCheck};
 pub(crate) use worker::with_storage as with_bound_storage;
 use sha2::{Digest, Sha256};
 use std::os::unix::fs::PermissionsExt;
@@ -606,6 +606,20 @@ mod tests {
         assert_eq!(observe(&root,&work,&settings).unwrap_err().code(),"managed-storage-binding-mismatch");
         std::fs::remove_file(&alias).unwrap();symlink(&root,&alias).unwrap();
         observe(&root,&work,&settings).unwrap();
+        // A retained Root descriptor must refuse a replacement state directory,
+        // before the callback can publish anything to the managed lane.
+        let held = LocalDirectory::open(&root.join(".swarm")).unwrap();
+        let parked = root.join("original-state");
+        std::fs::rename(root.join(".swarm"), &parked).unwrap();
+        std::fs::rename(other.join(".swarm"), root.join(".swarm")).unwrap();
+        let result = worker::with_open_storage(&held, &work, true, |_| -> Result<(), E> {
+            panic!("replacement state directory reached managed custody")
+        });
+        assert_eq!(result.unwrap_err().code(), "managed-storage-binding-mismatch");
+        std::fs::rename(root.join(".swarm"), other.join(".swarm")).unwrap();
+        std::fs::rename(&parked, root.join(".swarm")).unwrap();
+        worker::with_open_storage(&held, &work, true, |_| Ok(())).unwrap();
+        held.close().unwrap();
         std::fs::remove_file(&alias).unwrap();assert!(observe(&root,&work,&settings).is_err());
         symlink(&root,&alias).unwrap();observe(&root,&work,&settings).unwrap();
         std::fs::write(storage.join("repository.json.pending"),b"{}").unwrap();
@@ -693,4 +707,34 @@ mod tests {
         dir.close().unwrap();
         std::fs::remove_dir_all(root).unwrap();
     }
+}
+
+/// Read an exact declared regular blob from held managed storage. Caller has
+/// already verified the candidate record and exact allowlist/mode. Existing
+/// delivery and Git policy bound the read. Report the duration of the Git
+/// commands inside the bound repository. This never visits the working tree.
+pub(crate) fn read_original_blob(
+    root: &Path, work: &crate::Work, candidate: &ManagedCandidate,
+    path: &str, settings: &EngineSettingsDocument, limit: Option<usize>,
+    git_elapsed: &mut std::time::Duration,
+) -> Result<Vec<u8>, E> {
+    with_bound_storage(root, work, false, |storage| {
+        inside(storage.child("repository.git", false)
+            .map_err(|error| E::caused("managed-repository-open", error))?, |bare| {
+            let repository = bare.process_path();
+            let object = format!("{}:{path}", candidate.commit);
+            let git_started = Instant::now();
+            let size = text(git(&repository, &["cat-file", "-s", &object], settings)?)?
+                .parse::<usize>().map_err(|error| E::caused("task-review-file-size-invalid", error))?;
+            if limit.is_some_and(|max| size > max) {
+                return Err(E::Refused("task-review-file-limit"));
+            }
+            let bytes = git(&repository, &["cat-file", "blob", &object], settings)?;
+            *git_elapsed = git_started.elapsed();
+            if bytes.len() != size {
+                return Err(E::Refused("task-review-file-size-changed"));
+            }
+            Ok(bytes)
+        })
+    })
 }

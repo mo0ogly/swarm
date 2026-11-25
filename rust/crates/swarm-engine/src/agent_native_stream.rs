@@ -109,6 +109,11 @@ impl NativeStream {
     pub(crate) fn observation(&self) -> Result<AgentGuardObservation, AgentGuardError> {
         self.guard.observation(self.at()?)
     }
+    /// Project only guard-attributed action metadata from the observed stream.
+    /// Pending results and loss of event visibility remain visible.
+    pub(crate) fn task_actions(&self) -> crate::task_action_observation::ActionReceipt {
+        self.guard.task_actions()
+    }
     /// SHA256 of every observed byte, including content omitted by retention.
     pub(crate) fn sha256(&self) -> String {
         format!("{:x}", self.hash.clone().finalize())

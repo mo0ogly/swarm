@@ -117,7 +117,36 @@ impl Fixture {
         actions: Vec<swarm_identity_contract::Permission>,
         binding: Option<(Scope, i64)>,
     ) -> Self {
-        let root = tempfile::tempdir_in(area()).unwrap();
+        Self::build_bound_in(enrolled, actions, binding, &area())
+    }
+    /// Construct a signed fixture at an already admitted test-only parent.
+    /// Rejects invalid private paths before allocation and propagates fixture
+    /// errors by panic, like the existing constructors. No fallback is used.
+    pub(crate) fn build_for_trust_in(
+        action: swarm_identity_contract::Permission,
+        scope: Scope,
+        revision: i64,
+        parent: &std::path::Path,
+    ) -> Self {
+        let _parent = swarm_enrollment_config::store::open_private_directory(
+            parent,
+            rustix::process::geteuid().as_raw(),
+        )
+        .expect("admitted identity fixture parent must be private");
+        let fixture = Self::build_bound_in(true, vec![action], Some((scope, revision)), parent);
+        assert_eq!(fixture._root.path().parent(), Some(parent));
+        println!("delivered-identity-fixture-parent {}", parent.display());
+        fixture
+    }
+    /// Allocate beneath the selected parent and bootstrap the signed fixture.
+    /// The explicit-parent caller retains the validated directory during setup.
+    fn build_bound_in(
+        enrolled: bool,
+        actions: Vec<swarm_identity_contract::Permission>,
+        binding: Option<(Scope, i64)>,
+        parent: &std::path::Path,
+    ) -> Self {
+        let root = tempfile::tempdir_in(parent).unwrap();
         mode(root.path(), 0o700);
         for name in [
             "bootstrap",

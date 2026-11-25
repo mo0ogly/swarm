@@ -7,7 +7,7 @@ Le parcours métier natif décrit ci-dessous concerne les **plans manuels**.
 Une mission hiérarchique conserve son parcours de révision de contrat : le lot
 ne contourne ni ses rôles ni le refus existant de création manuelle de tâches.
 Le zoom (boutons ou Ctrl + molette), la vue d’ensemble, le déplacement du fond,
-les poignées souris/clavier des cartes, l’orientation et le plein écran sont des
+le déplacement des cartes à la souris et au clavier, l’orientation et le plein écran sont des
 préférences de présentation. Les positions sont locales à l’origine HTTP, à la
 mission et à l’orientation ; elles ne modifient ni révision ni budget. Échap
 annule un déplacement en cours avant de fermer le plein écran. Ce dernier est
@@ -30,9 +30,9 @@ Cette lecture locale est destinée aux analystes :
   cartes (clic, Entrée ou Espace) en sélection. Le texte liste les identifiants,
   un contour à motif et l’état accessible distinguent les cartes choisies.
   Quitter ce mode conserve le groupe ; **Effacer la sélection** le vide.
-  Déplacer la poignée d’une carte sélectionnée, au pointeur ou avec les flèches,
-  translate le groupe sans déformer son placement. Une poignée non sélectionnée
-  déplace sa carte seule. Le groupe est clampé à l’origine, sans coordonnées
+  Déplacer une carte sélectionnée, au pointeur ou avec les flèches,
+  translate le groupe sans déformer son placement. Une carte hors sélection
+  se déplace seule. Le groupe est clampé à l’origine, sans coordonnées
   négatives. Échap pendant le geste annule tout le groupe ; undo/redo s’appliquent
   au groupe terminé. Hors geste, Échap quitte le mode sélection avant le plein écran.
 
@@ -247,8 +247,8 @@ Preuves et critères ouverts : [reprise APEX](../plans/migration-rust/GRAPH-REGR
 ### Déplacer les cadres et modifier les liens
 
 Glisser directement le corps d’une carte déplace son placement local. Un clic
-sans mouvement ouvre sa tâche ; la poignée et ses flèches clavier restent
-disponibles, y compris pour le groupe sélectionné. Échap annule le déplacement
+sans mouvement ouvre sa tâche. Les flèches du clavier déplacent la carte
+qui a le focus, individuellement ou avec son groupe sélectionné. Échap annule le déplacement
 provisoire et Annuler le placement restaure le précédent. Aucun déplacement
 ne modifie le Work. Les icônes des outils complètent leurs textes ; les couleurs
 viennent des paires sémantiques du thème, avec une légende des états.
@@ -280,8 +280,8 @@ externe ni opération privée de stockage n'est ajoutée.
 
 - **Plein écran** agrandit l'atelier. Échap revient au cockpit ; le bouton retrouve
   le focus. L'inspecteur de tâche reste accessible au-dessus du graphe.
-- La poignée **Déplacer la carte** fonctionne au pointeur et avec les quatre
-  flèches du clavier. Échap annule un geste en cours. **Ranger les cartes** efface
+- Dans le graphe natif, glissez le corps de la carte ou utilisez les flèches
+  du clavier quand elle a le focus. Échap annule un geste en cours. **Ranger les cartes** efface
   les positions personnalisées pour retrouver le placement automatique.
 - Les positions sont mémorisées dans ce navigateur par projet, mission et
   orientation. Elles survivent au rechargement mais ne sont pas partagées entre
@@ -324,7 +324,7 @@ L'utilisateur peut déplacer des cartes pour dégager une route. Ce tracé ne pr
 pas résoudre automatiquement toutes les intersections d'un placement arbitraire.
 Le zoom, la recherche, les branches et le déplacement du canevas sont conservés.
 Les couleurs de rôles et d'états utilisent les paires sémantiques partagées,
-complétées par les libellés ; poignée, ports et sélection ont un focus visible.
+complétées par les libellés. Cartes, ports et sélection ont un focus visible.
 
 ## Recette et limites
 

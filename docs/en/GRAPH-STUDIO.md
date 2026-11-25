@@ -6,7 +6,7 @@ The native cockpit uses `web/cockpit-native-graph.js` on actual Work objects.
 The native business workflow below applies to **manual plans**. Hierarchical
 missions retain their contract revision workflow; batches do not bypass roles
 or the existing refusal of manual task creation.
-Zoom buttons or Ctrl + wheel, fit, canvas panning, keyboard/pointer card handles,
+Zoom buttons or Ctrl + wheel, fit, canvas panning, keyboard and pointer card movement,
 orientation and full screen are presentation preferences. Positions are local to
 the HTTP origin, Work and orientation; they change no revision or budget. Escape
 cancels an active drag before closing full screen. Full screen uses a native modal
@@ -27,9 +27,8 @@ main flow. This local reading workflow is intended for analysts:
 - **Select multiple cards** temporarily changes card activation (click, Enter or
   Space) into selection. Text lists exact IDs; a patterned border and accessible
   pressed state identify selected cards. Leaving this mode retains the group;
-  **Clear selection** empties it. A selected card’s handle moves the group with
-  pointer or arrow keys, preserving relative placement. An unselected handle
-  moves only its own card. Group translation clamps at the SVG origin without
+  **Clear selection** empties it. A selected card moves the group with the pointer or arrow keys, preserving
+  relative placement. A card outside the selection moves on its own. Group translation clamps at the SVG origin without
   negative coordinates. Escape during a gesture rolls back the entire group;
   undo/redo cover a completed group move. Outside a gesture, Escape exits selection
   mode before closing full screen.
@@ -227,8 +226,7 @@ availability. [APEX recovery and open criteria](../plans/migration-rust/GRAPH-RE
 ### Move cards and edit links
 
 Drag a card body to change its local placement. A click without movement opens
-the task; the handle and its keyboard arrows remain available for individual
-cards and selected groups. Escape cancels the provisional move; Undo placement
+the task. Arrow keys move the focused card or its selected group. Escape cancels the provisional move; Undo placement
 restores the previous one. Moving never changes Work. Tool icons complement
 visible text; colors use the theme semantic pairs with a status legend.
 
@@ -256,7 +254,7 @@ public graph draft API. It adds no remote dependency or private storage operatio
 
 - **Full screen** expands the workbench. Escape returns to the cockpit and restores
   button focus. The task inspector remains visible above the workbench.
-- **Move card** handles support dragging and keyboard arrows. Escape cancels an
+- In the native graph, drag the card body or use the arrow keys while it has focus. Escape cancels an
   unfinished gesture. **Arrange cards** restores automatic placement.
 - Positions persist in this browser by project, mission and orientation. They
   survive reload but are not shared between users. Storage failures are visible.
@@ -279,7 +277,7 @@ it does not apply edits.
 
 ```mermaid
 flowchart LR
-    P[Pointer or keyboard handle] --> L[Local graph positions]
+    P[Card moved by pointer or keyboard] --> L[Local graph positions]
     L --> V[SVG cards and curves]
     U[Port or selected link] --> B[Draft operation batch]
     B --> M[Engine preview and constraints]

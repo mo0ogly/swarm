@@ -51,7 +51,7 @@ pub(crate) struct ControlPlan {
 ///
 /// Returns a complete plan or a safe static refusal/typed codec/policy cause.
 /// Missing selection, duplicate/invalid participating IDs, missing authority,
-/// nonautomatic mode, invalid policy/coverage or transport collision refuse the
+/// missing controls, invalid policy/coverage or transport collision refuse the
 /// whole plan. This allocates only: no filesystem, SQL, command, lease, mutation,
 /// execution permission, source observation or acceptance is established. Actual
 /// producer, Root, candidate witnesses and gate permissions remain caller duties.
@@ -87,8 +87,8 @@ pub(crate) fn plan(
         }
         let normalized = crate::normalize_validation_policy(original.clone(), limits)
             .map_err(|e| E::caused("managed-controls-policy-invalid", e))?;
-        if normalized.mode != "automatic" {
-            return Err(E::Refused("managed-controls-automatic-required"));
+        if normalized.controls.as_ref().is_none_or(Vec::is_empty) {
+            return Err(E::Refused("managed-controls-required"));
         }
         crate::validation_policy_covers_task(&normalized, task)
             .map_err(|e| E::caused("managed-controls-coverage", e))?;
@@ -219,7 +219,11 @@ mod tests {
                     .unwrap()
                     .authorized_at
                     .clear(),
-                3 => task.validation_policy.as_mut().unwrap().mode = "human".into(),
+                3 => {
+                    let policy = task.validation_policy.as_mut().unwrap();
+                    policy.mode = "human".into();
+                    policy.controls = None;
+                }
                 4 => {
                     task.validation_policy
                         .as_mut()
@@ -234,6 +238,19 @@ mod tests {
             assert!(plan(&work, "current", &limits).is_err());
             assert_eq!(plan(&valid, "current", &limits).unwrap(), original);
         }
+    }
+    /// A human-mode control is retained in the plan with its real mode and
+    /// can cover fewer than all criteria without pretending to replace review.
+    #[test]
+    fn managed_controls_keep_human_mode_with_declared_controls() {
+        let mut selected = task("current", "submitted");
+        selected.validation_policy.as_mut().unwrap().mode = "human".into();
+        selected.criteria.as_mut().unwrap().push("Requires a human decision".into());
+        let plan = plan(&Work { tasks: Some(vec![selected]), ..Default::default() },
+            "current", &ValidationPolicyLimits::legacy_go()).unwrap();
+        assert_eq!(plan.policies[0].normalized.mode, "human");
+        assert_eq!(plan.slots.len(), 1);
+        assert_eq!(plan.slots[0].control.criteria.as_deref(), Some([1].as_slice()));
     }
     #[test]
     fn managed_controls_valid_witness_then_missing_duplicate_or_invalid_selection() {

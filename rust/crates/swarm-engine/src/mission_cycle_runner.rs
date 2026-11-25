@@ -161,18 +161,23 @@ fn maintain(
             .map_err(|e| caused("mission-cycle-cadence-invalid", e))?;
         // A real positive policy has already been validated by the claim.
         lease.policy().validate().map_err(E::Settings)?;
-        let pulse = || {
-            let now = crate::system_timestamp().map_err(|e| caused("mission-cycle-clock", e))?;
-            peer.update_mission_supervision(lease, &now, false)
-        };
-        pulse()?;
+        let pulse = || peer.renew_mission_supervision(lease, |delay| {
+            !matches!(stop.recv_timeout(delay), Err(mpsc::RecvTimeoutError::Timeout))
+        });
+        if !pulse()? {
+            return Ok(());
+        }
         ready
             .send(())
             .map_err(|e| caused("mission-cycle-ready-disconnected", e))?;
         loop {
             match stop.recv_timeout(Duration::from_millis(cadence)) {
                 Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => return Ok(()),
-                Err(mpsc::RecvTimeoutError::Timeout) => pulse()?,
+                Err(mpsc::RecvTimeoutError::Timeout) => {
+                    if !pulse()? {
+                        return Ok(());
+                    }
+                }
             }
         }
     })();

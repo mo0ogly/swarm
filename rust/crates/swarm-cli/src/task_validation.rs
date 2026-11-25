@@ -16,6 +16,8 @@ use std::io::{self, Write};
 /// saved limits, without authenticating its sender, recording a review or exec;
 /// validation-candidate retains a managed Git candidate outside Root locks and
 /// grants no control job, review or acceptance; validate runs only the task's saved authorized controls;
+/// retain-handoff retains one completed manual managed worker's report and
+/// returns the producer, path and digest for a separate task submit;
 /// validation-reconcile applies fresh original receipts; validation-retire explicitly
 /// abandons original observations after known process completion, without a command.
 /// No caller-supplied command, default timeout, retry or acceptance is introduced.
@@ -35,7 +37,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let action = a.pos[1].as_str();
     if !matches!(
         action,
-        "review-refresh" | "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish"
+        "review-refresh" | "review-preview" | "review-inputs" | "review-check" | "baseline-preview" | "publication-preview" | "publish" | "retain-handoff"
             | "validation-preview"
             | "validation-candidate"
             | "validate"
@@ -74,6 +76,10 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         }
         if action == "publication-preview" {
             return json_bytes(&store.preview_managed_publication(&a.pos[2], &raw).map_err(root_error)?)
+                .map_err(CliError::Output);
+        }
+        if action == "retain-handoff" {
+            return json_bytes(&store.retain_manual_managed_handoff(&a.pos[2], &raw).map_err(root_error)?)
                 .map_err(CliError::Output);
         }
         if action == "review-check" {

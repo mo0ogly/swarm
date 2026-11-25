@@ -119,7 +119,7 @@ impl RootStore {
                         let agent = observations.iter().find(|a| a.agent.task_id == task.id);
                         let inputs = super::mission_status_reports::observed_result_inputs(
                             &self.root, &work, task, agent.map(|a| a.agent),
-                            &settings, &mut causes, facts,
+                            &settings, &mut causes, (facts, None),
                         )?;
                         results.push((task.id.clone(), result_presentation(task, agent, &inputs)?));
                         if let ReportListing::Observed(paths) = inputs.reports {

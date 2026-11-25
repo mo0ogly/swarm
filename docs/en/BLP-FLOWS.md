@@ -22,6 +22,14 @@ prevention of disclosure**. No provider, live data, account or security setting
 changes. In that initial inventory-only increment, no product-executable behavior changed: build, installation and release
 notes are therefore not required for this increment.
 
+The November 22 D12 reconciliation covers local publication references, the
+API send guard, and attribution preview. The checker reads 74 references for
+25 flows. The inventory retains each flow’s authority limits and open criteria.
+
+The `security-proofs-engine` test also compares the digest and fields returned
+by `security-show` against the source inventory bytes. A mismatch fails the
+check at the engine reader.
+
 ## Inventoried boundaries
 
 | Flows | Sources → recipients | Required integration |
@@ -187,6 +195,40 @@ five checker tests with verified integrity. Stale inventory refusal remains in
 `20261101-preparation-flow-inventory-before-01`. Counts do not establish effective
 BLP controls or independent acceptance.
 
+#### D01 — captured slice correspondence in the Trust diagnostic
+
+The `blp-preparation-check` request accepts an optional `engine_source_index`.
+The engine first checks the turn, Root, current confidentiality attributions
+for all slices, and reader clearance. The `engine_source_integrity` result
+reports the evidence kind, slice digest, index, and turn revision.
+
+- Engine instructions must match the compiled bytes.
+- A plan contract (`preparation_plan_contract`) is reproduced from the
+  validated settings history entry identified by the turn’s native digest.
+- Project context (`preparation_project_context`) requires the
+  `ProjectContext` origin in the manifest. The diagnostic calls
+  `read_project_context` for the bound Root and the `preparation` role,
+  using limits from that same historical entry. It compares the full
+  provenance of the reread context with the metadata retained in the turn
+  and native envelope, then compares the exact slice bytes.
+- Engine-generated JSON delimiters and keys (`preparation_data_framing`)
+  require the full prompt grammar check.
+
+Origin selects the check even when two slices share a digest. JSON values
+remain outside this evidence. A missing settings history entry, missing or
+different context provenance, and different bytes produce typed HTTP 409
+refusals. Read and validation failures retain their original causes.
+A malformed index refuses with HTTP 400. Turns without manifests retain
+their existing refusal. Omitting the selector runs the confidentiality
+diagnostic alone.
+
+This read-only comparison establishes correspondence between observations
+within the limits of the source reader and local storage. Historical physical
+file identity, immutability, and resistance to same-UID processes remain
+outside this evidence. The result grants no Biba grade or send permission.
+The Trust consumer and HTTP status cases are listed in the
+`blp-preparation-check` recipe.
+
 ### Revision: explicit preparation quarantine
 
 BF-05/06/07 include current refusal at admission, claim and API/CLI transport. Four additional anchors track the dedicated egress lock and local/enrolled Trust mutations; the business lock is released before IO. The ten references whose sources changed were reread and refreshed. All 25 flows remain OPEN: optional quarantine establishes neither classified recipient authorization, result inheritance nor descendant confinement. New journey evidence is retained in the APEX plan.
@@ -228,21 +270,24 @@ distinguishes 400/404/409/403/500. The surveillance grants neither emission
 rights, OS confinement, nor result inheritance; BF-07 remains OPEN for the real
 transport engagement, BF-05 for physical source identity.
 
-### Revision: worker emission gate (BF-07 hook delivered)
+### Revision: BF-07 worker emission gate
 
-The BF-07 hook is implemented and locally verified: the Rust worker's Api
-branch calls the decision through
-`preparation_worker_transport_gate(id, token, base_url, model)` inside the
+The H1 candidate's Rust worker calls the gate from its Api branch through
+`preparation_worker_transport_gate(id, token, base_url, model, prompt)` inside the
 already-held egress reservation, before the request is built — no socket
 without a decision. Zero admission receipt matching the turn
 (preparation_id, provider, request_hash — a hash that covers the event_id:
-the admission→turn binding is per event) → legacy path unchanged; ≥1
-receipt → full re-verification (receipt's principal, settings freshness,
+the admission→turn binding is per event) keeps the legacy path with no Trust
+read. The requested prompt must match the owned turn's bytes. When an admission
+exists, its captured revision and bytes must also match. A mismatch refuses
+with `preparation-transport-prompt-mismatch` or `blp-transport-source-changed`
+before emission. If the source context changed, capture and attribute it again,
+then admit a new event before sending. The gate rechecks the receipt principal, settings freshness,
 attribution for the digest resolved from the turn's `provider`, mandatory
 echo of the actual `base_url`/`model` closing the claim→send TOCTOU,
-no-write-down at last use, read-only budget). The scan is fail-closed and
+no-write-down at last use and the read-only budget. The scan is fail-closed and
 turn custody is required (`running` state, SHA256(nonce) token, PID/stamp/
-host). Verified by `preparation_worker_transport.rs` and the recipe
+host). Candidate qualification uses `preparation_worker_transport.rs` and the recipe
 `tools/verification/recipes/blp-preparation-worker-gate.json`. Still OPEN:
 result inheritance (BF-16), OS/descendant confinement, optional quarantine;
 not activated in production, not accepted.
@@ -255,3 +300,16 @@ metadata and compiled inventory, no project content or imported evidence.
 69 references, 25 OPEN flows. Changed anchors were reread and refreshed; this
 does not qualify concurrent BF-16a/storage edits. NOT_TESTED/unknown/not_qualified
 remain explicit; no certification is established.
+
+### H1 preparation candidate
+
+The first scope binds preparation source bytes to the Trust check (BF-25) and
+the owned turn bytes to the transport decision (BF-07). Diagnostics remain
+read-only. Cross-flow activation, output domain inheritance (BF-16), and the
+other flows remain open. This connection introduces no operator setting.
+
+The recorded-source diagnostic test and both producer tests passed on the D01
+checkpoint in the qualification branch. The static inventory for the
+composition on `main` covers 75 references and 25 open flows. The composition
+requires its own execution before review and integration. The host free-space
+guard refused compiler admission in this checkout.

@@ -41,6 +41,34 @@
 .graph-teinte[data-etat=neutre]::before{background:var(--wattson-carte-creuse)}
 .graph-titre{font-size:13px;font-weight:700;fill:var(--wattson-titre)}
 .graph-sous-titre{font-size:12px;fill:var(--wattson-texte)}
+[data-activity="paused"] { --graph-activity-color:var(--wattson-attention-encre); }
+[data-activity="stopped"], [data-activity="error"] { --graph-activity-color:var(--wattson-alerte-encre); }
+[data-activity="running"] { --graph-activity-color:var(--wattson-info-encre); }
+[data-activity="idle"], [data-activity="unconfirmed"] { --graph-activity-color:var(--wattson-libelle); }
+.graph-activity-mark { fill:var(--graph-activity-color); pointer-events:none; }
+.graph-activity-frame {
+  fill:none;
+  stroke:var(--graph-activity-color);
+  stroke-width:2;
+  stroke-dasharray:6 4;
+  pointer-events:none;
+}
+@keyframes graph-task-execution {
+  to { stroke-dashoffset:-10; }
+}
+@media (prefers-reduced-motion:no-preference) {
+  .graph-activity-frame { animation:graph-task-execution 2.4s linear infinite; }
+}
+.graph-activity-key { display:inline-flex; align-items:center; gap:.45em; }
+.native-graph-orchestration .graph-activity-key { margin-inline-start:.6em; }
+.native-graph-orchestration [data-orchestration-role="driver"] .graph-activity-key { margin-inline-start:0; }
+.graph-activity-key::before {
+  content:"";
+  inline-size:.6em;
+  block-size:.6em;
+  border-radius:50%;
+  background:var(--graph-activity-color);
+}
 .graph-agent{font-size:11px;fill:var(--wattson-libelle)}
 .graph-alerte{font-size:11px;font-weight:700;fill:var(--wattson-alerte)}
 .graph-legende{margin-top:10px;font-size:13px;color:var(--wattson-libelle)}
@@ -55,7 +83,7 @@
 .graph-responsibility[data-tone="attention"] rect{fill:var(--wattson-attention-fond);stroke:var(--wattson-attention-encre)}
 .graph-responsibility[data-tone="attention"] text{fill:var(--wattson-attention-encre)}
 .graph-responsibility:focus{outline:none}
-.graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
+.graph-responsibility[aria-pressed=true] rect,.graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
 
 .graph-fleche-role{fill:var(--wattson-info-encre)}
 
@@ -90,6 +118,13 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-noeud { cursor:default; }
 .native-graph-studio output { align-self:center; min-width:4em; text-align:center; }
 .native-graph-studio .pilot-actions { flex-wrap:wrap; }
+.conduite-view-switch { flex:none; flex-wrap:wrap; margin-block-end:10px; border-top:1px solid var(--wattson-ligne); border-radius:8px; }
+.conduite-view-switch button[aria-pressed="true"] {
+  background:var(--wattson-info-fond);
+  color:var(--wattson-info-encre);
+  border-color:currentColor;
+}
+.native-graph-studio[hidden], .native-graph-orchestration[hidden] { display:none; }
 .native-graph-orchestration {
   border:1px solid var(--wattson-ligne);
   border-radius:10px;
@@ -106,7 +141,44 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-orchestration ul { margin:4px 0; padding-inline-start:16px; list-style:none; }
 .native-graph-orchestration li { padding-inline-start:10px; margin-block:4px; }
 .native-graph-orchestration li[data-scope] { border-inline-start:2px solid var(--wattson-ligne); }
-.native-graph-orchestration li[data-scope] > strong { color:var(--wattson-titre); }
+.orchestration-role-label {
+  display:inline-flex;
+  align-items:baseline;
+  gap:.5em;
+  max-inline-size:100%;
+  box-sizing:border-box;
+  padding:.2em .55em .2em .25em;
+  border:1px solid currentColor;
+  border-radius:.45em;
+  color:var(--orchestration-ink);
+  background:var(--orchestration-surface);
+}
+.orchestration-role-icon {
+  display:inline-grid;
+  flex:none;
+  place-items:center;
+  inline-size:1.65em;
+  block-size:1.65em;
+  border-radius:.35em;
+  line-height:1;
+  color:var(--orchestration-surface);
+  background:var(--orchestration-ink);
+}
+[data-orchestration-role="root"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-info-encre);
+  --orchestration-surface:var(--wattson-info-fond);
+}
+[data-orchestration-role="root"] > .orchestration-role-label > .orchestration-role-icon::before { content:"◆"; }
+[data-orchestration-role="subplanner"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-attention-encre);
+  --orchestration-surface:var(--wattson-attention-fond);
+}
+[data-orchestration-role="subplanner"] > .orchestration-role-label > .orchestration-role-icon::before { content:"↳"; }
+[data-orchestration-role="reviewer"] > .orchestration-role-label {
+  --orchestration-ink:var(--wattson-succes-encre);
+  --orchestration-surface:var(--wattson-succes-fond);
+}
+[data-orchestration-role="reviewer"] > .orchestration-role-label > .orchestration-role-icon::before { content:"✓"; }
 .native-graph-orchestration [data-orchestration-tree] > ul { padding-inline-start:0; }
 .native-graph-search { display:flex; flex-wrap:wrap; align-items:center; gap:8px; flex-basis:100%; min-width:0; }
 .native-graph-search label,.native-graph-search output { flex-basis:100%; min-width:0; overflow-wrap:anywhere; }
@@ -132,6 +204,15 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .graph-copy rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
 .graph-copy text { fill:var(--wattson-texte); font-size:12px; pointer-events:none; }
 .graph-copy:focus rect,.graph-copy:hover rect { stroke:var(--wattson-lien); stroke-width:4; }
+.graph-task-actions { cursor:pointer; }
+.graph-task-actions rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
+.graph-task-actions text { fill:var(--wattson-texte); font-size:11px; pointer-events:none; }
+.graph-task-actions:is(:focus,:hover) rect { stroke:var(--wattson-lien); stroke-width:2; }
+.native-task-actions { width:min(680px,calc(100vw - 24px)); }
+.native-task-actions[open] { display:flex; flex-direction:column; }
+.native-task-actions header h2 { min-width:0; overflow-wrap:anywhere; }
+.native-task-actions .modal-body { min-height:0; overflow-wrap:anywhere; }
+.native-task-actions button { min-height:44px; }
 .native-graph-copy-fallback { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 .native-graph-copy-fallback[hidden] { display:none; }
 .native-graph-copy-fallback input { min-width:0; max-width:100%; }
@@ -195,8 +276,6 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-task-open { cursor:grab; touch-action:none; user-select:none; }
 .native-graph-studio .graph-task-open:active { cursor:grabbing; }
 .native-graph-studio .graph-noeud[data-etat=attente] .graph-cadre { fill:color-mix(in srgb,var(--wattson-info-fond) 45%,var(--wattson-carte)); stroke:var(--wattson-info-encre); stroke-width:2; }
-.native-graph-studio .graph-drag rect { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
-.native-graph-studio .graph-drag text { fill:var(--wattson-info-encre); }
 .native-graph-studio .graph-port[data-side=in] { fill:var(--wattson-attention-fond); stroke:var(--wattson-attention-encre); }
 .native-graph-studio .graph-port[data-side=out] { fill:var(--wattson-info-fond); stroke:var(--wattson-info-encre); }
 .native-graph-studio .graph-arete { stroke:var(--wattson-info-encre); stroke-width:2.5; cursor:pointer; pointer-events:stroke; }
@@ -218,6 +297,9 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
   .native-graph-studio :is(#pilot-zoom-in,#pilot-zoom-out,#pilot-fullscreen,#pilot-search-previous,#pilot-search-next,#pilot-search-clear) .native-graph-tool-icon { margin:0; }
   .native-graph-search input { flex-basis:100px; }
   .native-graph-gesture-hint { font-size:13px; line-height:1.4; }
+  /* The help button remains in the toolbar. Reclaim the duplicate hint's
+     vertical space so cards are visible before scrolling on narrow screens. */
+  .native-graph-studio.is-fullscreen .native-graph-gesture-hint { display:none; }
 }
 
 /* Scoped ID beats the shared neutral fit override without changing its token. */
@@ -244,3 +326,16 @@ dialog.native-graph-dialog { inset:0; margin:0; padding:0; width:100vw; max-widt
 .native-graph-studio .graph-search-dim { opacity:.32; transition:opacity .15s; }
 @media(prefers-reduced-motion:reduce) { .native-graph-studio .graph-search-dim { transition:none; } }
 @media(max-width:760px) { .native-graph-studio #pilot-zoom-in,.native-graph-studio #pilot-zoom-out,.native-graph-studio #pilot-fullscreen,.native-graph-studio #pilot-search-previous,.native-graph-studio #pilot-search-next,.native-graph-studio #pilot-search-clear { width:44px; min-width:44px; min-height:44px; } }
+
+/* Recorded workflow responsibilities share the task canvas and its zoom. */
+.graph-workflow-role[role="img"] { cursor:default; }
+.graph-workflow-edge { fill:none; stroke-width:1.6; pointer-events:none; }
+.graph-workflow-edge[data-relation="delegation"] { stroke:var(--wattson-attention-encre); }
+.graph-workflow-edge[data-relation="assignment"], .graph-workflow-edge[data-relation="assignment-trunk"] { stroke:color-mix(in srgb,var(--wattson-libelle) 70%,var(--wattson-fond)); stroke-width:1.25; vector-effect:non-scaling-stroke; }
+.graph-workflow-edge[data-relation="assignment"]:not([data-visible-assignment]) { display:none; }
+.graph-workflow-edge[data-relation="review"] { stroke:var(--wattson-succes-encre); stroke-dasharray:6 4; }
+.graph-workflow-delegation-marker { fill:var(--wattson-attention-encre); }
+.graph-workflow-assignment-marker { fill:var(--wattson-libelle); }
+.graph-workflow-review-marker { fill:var(--wattson-succes-encre); }
+.graph-workflow-key { margin-block:.3rem; }
+.native-graph-studio[data-motion-paused="true"] .graph-activity-frame { animation-play-state:paused; }

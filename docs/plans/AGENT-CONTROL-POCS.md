@@ -2425,3 +2425,106 @@ produit avant `cfg(test)` restent identiques (SHA256
 `8ad0a25c28581acc25b7c566ff59e32d708fb923cdf06a2428368ecb31291871`).
 Ces preuves locales ne remplacent pas les contrôles requis sur la tête publiée ;
 leur résultat courant et la décision de fusion sont consultables dans PR #20.
+
+
+### C-D01 — composition privée sur checkpoint CI (16 novembre 2026)
+
+Proposition seulement : base exacte 8f348911abe1f8664bd7cfeb94d10258023363f5,
+aucune application, livraison ou acceptation globale. Le checkpoint ne contient
+pas le socle C3-P Python→runner publié dans 2b33932433bb8b2907e4be90e8927f1b47898530.
+Son absence est un prérequis proposé, non adopté par déduction. Swarm00 doit
+arbitrer ce périmètre avant revue/intégration CI : interface observer, projection/réception,
+14 contrôles runner et adaptation du double snapshot sont repris dans leurs octets
+historiques nécessaires, puis les correctifs privés codec09 et runner-close
+approuvés sont composés sans changer leurs sources qualifiées. Aucun hunk étranger
+du README ou du plan CI n'est remplacé : les ajouts sont bornés ci-dessous.
+
+D1–D5 restent les arbitrages adoptés : défaut après absence observée, refus sur
+erreur/présent incomplet, grammaire de référence sans normalisation, preuve du
+buffer consommé et cache non réattribué. Cette composition Python ne corrige pas
+Rust/OnceLock/R04. Les preuves13 puis codec1 et close1 gardent leurs inventaires
+et portées d'origine ; aucun cumul en campagne15 sur ce nouveau checkpoint.
+
+C-1 du manifeste promotion est hors de cette composition : son entrée CI a des
+changements étrangers et ne déclare pas les trois supports C-1. Ne pas recopier
+le manifeste historique ni annoncer C-1 ou BF-L0-C intégré. Le propriétaire du
+lot promotion devra rapprocher ces hunks sous réservation séparée.
+
+
+### C-D01 Python — qualification privée ciblée du 15 novembre 2026
+
+Décisions D1–D5 adoptées ; patch privé GLM puis corrigé et revu par le principal.
+Aucun fichier partagé modifié. Deux sources proposées : tests/fixture_area.py et
+tests/test_fixture_area.py ; lecture du fichier via descripteurs base/parent/feuille,
+refus absent/null, erreurs et grammaire de référence, cache import non réattribué.
+
+D3 reproduit rouge sur préimage : témoin sauvegardé valide puis champ absent qui
+ne refuse pas, 1 méthode / 1 échec attendu, aucune erreur de bootstrap. Candidat :
+13 méthodes nommées PASS, zéro échec/erreur/ignoré, UID 1001 ; EACCES réel, FIFO
+NONBLOCK, remplacement contrôlé du parent, erreurs read/close synthétiques, défaut
+absent/invalide et reprise. Les défauts sont précédés de témoins dans les contrôles
+dédiés. Bootstrap -I/-B et réglages fictifs privés ; accès au checkout partagé
+interdit par audit hook. Défaut livré copié et déclaré, aucun fallback live.
+
+Inventaires d'entrée avant/après identiques ; argv/stdout/stderr originaux conservés
+dans l'index de preuve privé. Aucun watchdog global, compilation, nouvel appel GLM,
+service ou Git. Les 23 contrôles historiques ne sont pas rejoués. Compte recette
+proposé 13 helper au lieu de 5, sans qualifier les 14 runner/4 snapshot sur ce delta.
+
+Réservation puis revue CI par Swarm00 avant toute application partagée. Détail des
+causes de fermeture jusqu'au runner, compatibilité globale des 153 consommateurs,
+Rust/OnceLock, R04/C-4 et clôture BF-L0 restent ouverts. Ces résultats locaux ne
+prouvent ni réception indépendante, ni effet produit, ni acceptation globale.
+
+
+### CD01-R09-01 — décodage, correction privée et garde ciblée
+
+
+C-D01 / CD01-R09-01 — correction privée après revue09 (15 novembre 2026).
+Le remplacement du lecteur texte avait ignoré le mode UTF-8 de Python : sous
+LC_ALL=C et -X utf8, le JSON UTF-8 brut « évidence » refusait, contrairement à
+Path.read_text et au JSON échappé équivalent. Contre-exemple désormais exécuté,
+témoins ASCII/ancien lecteur, faute brute, équivalent échappé et reprise conservés.
+Le codec est choisi via io.text_encoding(None), puis locale.getencoding seulement
+si Python renvoie locale : compatibilité texte par défaut, aucune politique
+UTF-8 imposée. Les chemins et la détention/fermeture des FD ne changent pas.
+
+Nouvelle garde pérenne séparée tests/test_fixture_area_encoding.py : une méthode,
+modes UTF-8 1 et 0 sous C, comparaison au vrai Path.read_text. La même garde est
+rouge sur le helper revu précédent, verte sur le correctif ; sorties/hashes stables
+retenus en fixture privée. Les 13 méthodes précédentes restent inchangées et non
+rejouées : leur PASS reste lié à l'ancien hash, aucune annonce de 14 tests relancés.
+La recette déclare cette garde séparément et conserve 13 pour le helper historique.
+Revue delta09 requise avant checkpoint/application ; sources partagées et main
+non modifiés. Diagnostic close vers runner, Rust/R04 et acceptation globale ouverts.
+
+
+### C-D01 — causes secondaires du helper jusqu'au runner (delta privé)
+
+Le runner conserve maintenant les causes retenues par le helper dans
+fixture_close_errors, comme celles de fixture_observation_errors : chaque élément
+est résumé par type, errno et phase (fixture-resolution-close ou
+fixture-resolution-observation), sans message secondaire. La cause primaire reste
+dans failure ; aucune perte n'est transformée en PASS, aucune action réexécutée
+pour compléter une preuve. Le résumé CLI conserve status/evidence/steps et exit1
+pour FAIL ; les causes sont consultables dans result.json de la sortie liée.
+
+Une garde nouvelle pérenne test_recipe_fixture_errors.py exerce l'entrée CLI
+réelle avec une injection de fixture explicitement étiquetée : close seul puis
+close+observer, chaque fois témoin valide, refus lecture/fermeture, reprise en
+sortie neuve. La fermeture libère réellement les FD puis lève un diagnostic
+synthétique, pas un refus noyau. Avant correctif : une méthode, deux sous-cas en
+échec car les trois causes close manquent ; après : une méthode PASS, deux
+sous-cas avec trois causes close et zéro/deux causes observer, primaire distincte,
+zéro étape/compteur d'effet inchangé au refus, reprises PASS. Les entrées de la
+version finale restent stables ; noms, argv, stdout/stderr et résultats internes
+sont conservés. Aucun rejeu helper13/codec1, runner14 ou153consommateurs.
+
+Le manifeste runner déclare une étape ciblée supplémentaire ; la recette entière
+n'est pas exécutée. Le bootstrap de qualification reste privé, avec le helper
+codec approuvé figé inchangé. L'allocateur normal de fixture est aussi exercé
+dans le contrôle final, sur réglages explicitement fictifs. Les messages
+secondaires ne sont pas repris dans result.json. Les dossiers d'échec précoces
+peuvent manquer environment.json : aucune nouvelle intégrité verify de ces
+dossiers incomplets n'est revendiquée. Des preuves écrites ne sont pas une
+réception indépendante ; Rust/R04, intégration et BF-L0 global restent ouverts.

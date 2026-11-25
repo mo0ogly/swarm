@@ -278,7 +278,7 @@
 
     // The graph projects both recorded Work structure and the separate mission
     // observation. A history read carries no current conductor or task reason.
-    try { SwarmRustDependencyGraph.render(work, mission, data.readMode); }
+    try { SwarmRustDependencyGraph.render(work, mission, data.readMode, data.control?.paused === true); }
     catch (cause) { SwarmRustDependencyGraph.clear(t('Graphe indisponible : ') + String(cause.message)); }
 
   }

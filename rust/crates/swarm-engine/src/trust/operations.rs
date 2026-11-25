@@ -1263,6 +1263,75 @@ mod tests {
     use super::*;
     use serde_json::json;
 
+    /// Drive real Trust transitions with a fixed clock and isolated state.
+    /// A valid control writes one simulated receipt. At mandate expiry or
+    /// after a configuration-only revision change, the same approved action
+    /// must be denied without a ledger entry, receipt or action mutation.
+    #[test]
+    fn t406_last_use_refuses_expired_and_stale_mandates() {
+        let now = timestamp("2026-01-01T00:00:00Z").unwrap();
+        let expiry = timestamp("2026-01-01T00:01:00Z").unwrap();
+        let before_expiry = expiry - time::Duration::nanoseconds(1);
+        let config = |event_id, expected_revision| serde_json::to_vec(&json!({
+            "schema_version":1, "event_id":event_id, "expected_revision":expected_revision,
+            "reason":"Fixed clock and current revision fixture",
+            "policy":{"mandate_ttl_seconds":3600,"unknown_reconcile_seconds":0,
+                      "evidence_retention_days":365,"require_separation":true},
+            "identities":[
+                {"subject":"requester","token":"fixture-requester-token","integrity":1,"roles":["requester"]},
+                {"subject":"approver","token":"fixture-approver-token","integrity":2,"roles":["approver"]},
+                {"subject":"admin","token":"fixture-admin-token","integrity":3,"roles":["admin","effect"]}
+            ]
+        })).unwrap();
+        let call = |state: &mut State, op: &str, event: &str, token: &str, at, mut terms: Value| {
+            terms["schema_version"] = 1.into();
+            terms["event_id"] = event.into();
+            let transition = execute(state, op, &serde_json::to_vec(&terms).unwrap(), token, at)
+                .unwrap_or_else(|error| panic!("{op} {event}: {error:?}"));
+            serde_json::from_slice::<Value>(&transition.bytes).unwrap()
+        };
+        let mut state = State::initial();
+        super::super::config::change(&mut state, &config("initial-config", 0), false, now, "fixture").unwrap();
+        call(&mut state, "mandate-create", "mandate", "fixture-admin-token", now, json!({
+            "mandate_id":"mandate","subject":"requester","actions":["settle"],"resource":"invoice/t406",
+            "max_amount_minor":10,"currency":"EUR","beneficiary":"fixture-supplier",
+            "expires_at":"2026-01-01T00:01:00Z"
+        }));
+        let action = call(&mut state, "request", "request", "fixture-requester-token", now, json!({
+            "mandate_id":"mandate","resource":"invoice/t406","amount_minor":10,"currency":"EUR",
+            "beneficiary":"fixture-supplier","idempotency_key":"t406-once"
+        }));
+        let approved = call(&mut state, "approve", "approve", "fixture-approver-token", now, json!({
+            "action_id":action["id"],"mandate_id":"mandate","content_digest":action["content_digest"],
+            "resource":"invoice/t406","amount_minor":10,"currency":"EUR","beneficiary":"fixture-supplier"
+        }));
+        assert_eq!(approved["state"], "approved");
+        let commit = |state: &mut State, at| call(state, "commit", "commit", "fixture-admin-token", at,
+                                                  json!({"action_id":action["id"]}));
+        let mut control = state.clone();
+        assert_eq!(commit(&mut control, before_expiry)["state"], "committed");
+        assert_eq!(control.ledger.len(), 1);
+        assert_eq!(control.connector_receipts.len(), 1);
+        for at in [expiry, expiry + time::Duration::nanoseconds(1)] {
+            let mut expired = state.clone();
+            let denial = commit(&mut expired, at);
+            assert_eq!(denial["state"], "denied");
+            assert_eq!(denial["reason"], "mandat expiré");
+            assert!(expired.ledger.is_empty() && expired.connector_receipts.is_empty());
+            assert_eq!(expired.actions, state.actions);
+        }
+        let mut stale = state.clone();
+        super::super::config::change(&mut stale, &config("revised-config", 1), false, now, "fixture").unwrap();
+        assert_eq!(stale.revision, 2);
+        assert_eq!(stale.mandates, state.mandates);
+        let denial = commit(&mut stale, before_expiry);
+        assert_eq!(denial["state"], "denied");
+        assert_eq!(denial["reason"], "révision de configuration du mandat périmée");
+        assert!(stale.ledger.is_empty() && stale.connector_receipts.is_empty());
+        assert_eq!(stale.actions, state.actions);
+        println!("T406_LAST_USE valid=1 expired=2 stale_revision=1 refused_effects=0");
+    }
+
     #[test]
     fn root_mandate_digest_matches_legacy_preimage() {
         let m = json!({

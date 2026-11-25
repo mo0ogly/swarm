@@ -202,16 +202,60 @@ pub(super) fn read<T: serde::de::DeserializeOwned>(
         .directory
         .read_native_receipt(name)
         .map_err(E::Storage)?;
-    let value = serde_json::from_slice(&raw).map_err(|e| {
-        E::Launch(Box::new(crate::AgentLaunchError::caused(
-            "task-validation-journal-decode",
-            e,
-        )))
-    })?;
+    let value = decode(&raw)?;
     Ok((
         value,
         crate::provider_configuration::configuration_digest(&raw),
     ))
+}
+
+/// Decode a receipt body already obtained from storage, retaining codec causes.
+fn decode<T: serde::de::DeserializeOwned>(raw: &[u8]) -> Result<T, E> {
+    serde_json::from_slice(raw).map_err(|e| {
+        E::Launch(Box::new(crate::AgentLaunchError::caused(
+            "task-validation-journal-decode",
+            e,
+        )))
+    })
+}
+
+/// Recheck a previously decoded or canonically serialized receipt's body.
+/// Preserve the anchored frame read and close checks on every call, and the
+/// original domain decode error when changed bytes are malformed. A match
+/// reuses the already validated representation and confers no authority.
+pub(super) fn recheck<T: serde::de::DeserializeOwned>(
+    store: &RootStore,
+    name: &str,
+    expected: &str,
+) -> Result<bool, E> {
+    let raw = store.directory.read_native_receipt(name).map_err(E::Storage)?;
+    matches_body::<T>(&raw, expected)
+}
+
+/// Compare the observed bytes and check the domain shape on a mismatch so a
+/// malformed replacement keeps its codec error. No file or Root IO occurs here.
+fn matches_body<T: serde::de::DeserializeOwned>(raw: &[u8], expected: &str) -> Result<bool, E> {
+    if crate::provider_configuration::configuration_digest(raw) == expected {
+        return Ok(true);
+    }
+    decode::<T>(raw)?;
+    Ok(false)
+}
+
+#[cfg(test)]
+mod recheck_tests {
+    use super::*;
+
+    #[test]
+    fn recheck_preserves_mismatch_and_decode_failure() {
+        let original = b"[1,2]";
+        let hash = crate::provider_configuration::configuration_digest(original);
+        assert_eq!(decode::<Vec<u8>>(original).unwrap(), [1, 2]);
+        assert!(matches_body::<Vec<u8>>(original, &hash).unwrap());
+        assert!(!matches_body::<Vec<u8>>(b"[1,3]", &hash).unwrap());
+        assert!(matches_body::<Vec<u8>>(b"[false]", &hash).is_err());
+        assert!(matches_body::<Vec<u8>>(original, &hash).unwrap());
+    }
 }
 /// Atomically publish the exact public JSON, or synchronize an already equal
 /// file after uncertain publication. The expected extent is a format equality

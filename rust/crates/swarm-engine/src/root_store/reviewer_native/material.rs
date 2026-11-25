@@ -36,8 +36,8 @@ fn launch(error: A) -> E {
 }
 /// Prepare actual task originals plus a tool-free provider route/host candidate
 /// under caller-owned SQL/settings snapshots. Required reply/event caps disabling
-/// observation refuse before any reservation or launch. Legacy provider-wait
-/// state requires adoption rather than bypass. All provider metadata is rechecked;
+/// observation refuse before any reservation or launch. A legacy provider-wait
+/// file must agree with the native settings. All provider metadata is rechecked;
 /// missing/stale/unsupported/IO/codec/release causes survive without empty success.
 /// The initial claim creates an engine-labelled I0 output leaf; rechecks only
 /// open the leaf named by the recorded event and bind its host scope. Output
@@ -77,7 +77,7 @@ pub(super) fn prepare_for_job_using(
     work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
     candidate:Option<&task_validation::ReviewCandidate>,
 )->Result<Material,E>{
-    require_native_wait(store)?;
+    require_native_wait(store, &settings)?;
     let prepared = store.prepare_review_snapshot_using(tx,settings,work,request,review,candidate)?;
     let config = prepared
         .work
@@ -222,18 +222,90 @@ impl Material {
     }
 }
 
-/// Require explicit adoption of historical provider-wait state, even during
-/// ongoing source observations. Presence refuses; no historical file is parsed,
-/// overwritten or silently mapped to planner policy. This creates no process.
-pub(super) fn require_native_wait(store: &RootStore) -> Result<(), E> {
-    if store
-        .directory
-        .names()
-        .map_err(E::Storage)?
-        .iter()
-        .any(|name| name.as_slice() == b"provider-wait.json")
-    {
-        return Err(E::Refused("review-legacy-wait-adoption-required"));
+/// Check the same legacy coexistence contract as planner admission.
+/// Review-specific limits still come from the saved reviewer configuration.
+pub(super) fn require_native_wait(store: &RootStore, settings: &EngineSettingsDocument) -> Result<(), E> {
+    crate::root_store::verify_native_wait(&store.directory, settings, "review-legacy-wait-adoption-required")
+        .map_err(launch)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{io::Write, os::unix::fs::OpenOptionsExt};
+    use crate::{
+        planning_call_preview::PlanningCallPreviewRequest,
+        provider_wait::{ProviderWaitConfig, ProviderWaitValues},
+    };
+
+    /// Exercise the wait-file gate through both production preparation entry
+    /// points on an isolated Root. Observe a downstream refusal after passing
+    /// the gate, without launching a provider or changing either input file.
+    #[test]
+    fn native_roles_read_matching_legacy_wait_without_changing_settings() {
+        let area = tempfile::tempdir_in(crate::fixture_area()).unwrap();
+        let store = RootStore::initialize(area.path(), &mut crate::SystemEnvironment).unwrap();
+        let settings = store.settings().unwrap();
+        let wait = settings.values.planning_wait_policy().unwrap();
+        let mut legacy = ProviderWaitConfig {
+            schema_version: 1,
+            revision: 0,
+            history: Some(vec![]),
+            values: ProviderWaitValues {
+                silence_seconds: wait.silence_seconds.0,
+                max_duration_seconds: wait.max_duration_seconds.0,
+                planning_lease_seconds: wait.default_lease_seconds.0,
+            },
+        };
+        let planner = PlanningCallPreviewRequest {
+            schema_version: 1,
+            expected_revision: 1,
+            claim_id: "missing-claim".into(),
+            scope: "root".into(),
+            scope_revision: 1,
+            holder: "fixture".into(),
+            generation: 1,
+        };
+        let reviewer = task_validation::Request {
+            schema_version: 1,
+            expected_revision: 1,
+            event_id: "legacy-wait-fixture".into(),
+            task_id: "missing-task".into(),
+        };
+        let observe = || {
+            let tx = store.db.unchecked_transaction().unwrap();
+            let plan = crate::planning_run_material::prepare(
+                &tx, &store.root, &store.directory, &settings, "missing-work", &planner, false,
+            ).err().unwrap();
+            let review = prepare_for_job_using(
+                &store, &tx, settings.clone(), "missing-work", &reviewer, None, None,
+            ).err().unwrap();
+            tx.rollback().unwrap();
+            let review_code = match &review {
+                E::Launch(error) => error.code(),
+                _ => review.code(),
+            };
+            (plan.code(), review_code)
+        };
+        let settings_path = area.path().join(".swarm/engine-settings.json");
+        let settings_bytes = std::fs::read(&settings_path).unwrap();
+        let path = area.path().join(".swarm/provider-wait.json");
+        let absent = observe();
+        let check = |bytes: &[u8]| {
+            std::fs::OpenOptions::new()
+                .create(true).truncate(true).write(true).mode(0o600)
+                .open(&path).unwrap().write_all(bytes).unwrap();
+            let observed = observe();
+            assert_eq!(std::fs::read(&path).unwrap(), bytes);
+            assert_eq!(std::fs::read(&settings_path).unwrap(), settings_bytes);
+            observed
+        };
+        assert_eq!(check(&serde_json::to_vec(&legacy).unwrap()), absent);
+        legacy.values.planning_lease_seconds += 1;
+        assert_eq!(check(&serde_json::to_vec(&legacy).unwrap()), (
+            "planning-legacy-wait-adoption-required", "review-legacy-wait-adoption-required",
+        ));
+        assert_eq!(check(b"{"), ("provider-wait-source-invalid", "provider-wait-source-invalid"));
+        store.close().unwrap();
     }
-    Ok(())
 }

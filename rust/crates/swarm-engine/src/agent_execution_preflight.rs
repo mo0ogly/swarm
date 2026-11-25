@@ -209,7 +209,11 @@ fn process_boundary(agent: &Agent, stage: ExecutionStage) -> Result<(), AgentLau
 /// consent/lease/profile/capacity before grant; a supplied label cannot select it.
 /// Checks run under the caller's current SQL/settings
 /// snapshot. Checks current work/attempt, headers, policy, guards, reserved budget,
-/// context/workflow, provider/environment/workspace/model-source bytes and original TTL.
+/// context/workflow, provider/environment/workspace/model-source bytes and the
+/// applicable preflight TTL. For a manual managed startup, a compatible fresh
+/// host observation can replace an expired TTL for this boundary only. The
+/// original admission and its scope remain intact. No attempt, reservation or
+/// authority is created by choosing the new observation.
 /// Task choices are rebound from current Work at every process boundary; their
 /// selected route, stored requested route and unique source receipt must match fresh resolution;
 /// this proves neither the applied model nor account availability or pricing.
@@ -337,13 +341,16 @@ pub(crate) fn inspect(
     }
     launch::field_guide(root)?;
     let (model, host, provider_raw) = observe_retained_host(root, dir, settings, &work, &agent, &request, &policy)?;
+    let original = agent.preflight.as_deref()
+        .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
     let effective_preflight = match mission.as_ref() {
         Some(binding) => crate::root_store::adoption_preflight(tx, &agent, binding, settings)
-            .map_err(|e| AgentLaunchError::caused("agent-execution-adoption-preflight", e))?,
-        None => None,
-    }
-    .or_else(|| agent.preflight.as_deref().cloned())
-    .ok_or(AgentLaunchError::Refused("agent-execution-preflight-missing"))?;
+            .map_err(|e| AgentLaunchError::caused("agent-execution-adoption-preflight", e))?
+            .unwrap_or_else(|| original.clone()),
+        None if work.planning.as_deref().is_some_and(|p| p.repository.is_some())
+            && preflight_expired(original)? => host.preflight.clone(),
+        None => original.clone(),
+    };
     check_expiry(&effective_preflight)?;
     let workflow = crate::read_agent_workflow(
         root,
@@ -397,18 +404,25 @@ pub(crate) fn inspect(
 }
 
 /// Check the selected execution receipt at the current process boundary.
-/// The caller selects it from the original admission or verified adoption lineage.
+/// The caller selects it from admission, verified adoption or a freshly
+/// observed manual managed startup with the unchanged original scope.
 pub(crate) fn check_expiry(receipt: &crate::PreflightResult) -> Result<(), AgentLaunchError> {
+    if preflight_expired(receipt)? {
+        return Err(AgentLaunchError::Refused("agent-execution-preflight-expired"));
+    }
+    Ok(())
+}
+
+/// Compare the receipt deadline with the local clock. Clock and timestamp
+/// errors remain refusals, including for callers that can reobserve expiry.
+fn preflight_expired(receipt: &crate::PreflightResult) -> Result<bool, AgentLaunchError> {
     let now = crate::system_timestamp()
         .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))?;
     let parse = |raw: &str| {
         swarm_wire_json::go_rfc3339::parse(raw)
             .map_err(|e| AgentLaunchError::caused("agent-execution-clock", e))
     };
-    if parse(&now)? >= parse(&receipt.valid_until)? {
-        return Err(AgentLaunchError::Refused("agent-execution-preflight-expired"));
-    }
-    Ok(())
+    Ok(parse(&now)? >= parse(&receipt.valid_until)?)
 }
 
 /// Observe host and route under saved policy, matching the immutable original.

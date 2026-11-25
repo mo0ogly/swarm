@@ -1,5 +1,80 @@
 # Native worker completion and retry
 
+### Attach a control after submission
+
+For an already submitted managed worker, `task update WORK --input FILE --json`
+can complete an authorized `human` policy with no controls. The request carries
+the task ID, expected revision, `validation_policy` with the first controls,
+`confirm_contract_revision: true`, `expected_contract` (current task-contract
+digest), and `contract_revision_reason`. A request that also changes status,
+criteria, or ownership still follows the ordinary contract-edit rules.
+
+The engine requires an active mission, an open scope with no holder and no active worker in the mission, and a task with no active controller or reviewer and no current validation evidence. It rereads
+the submission and latest completed attempt, then checks the retained report
+bytes before authorizing the controls under the Admin policy. It preserves
+the submission, criteria, attempts, caps, and human mode. The new control
+authorization records the time and actor of the operation. A new event cannot
+overwrite the already attached controls.
+
+```mermaid
+flowchart LR
+    A["Managed submission and retained report"] --> B["Explicit revision and control confirmation"]
+    B --> C["Candidate and control execution"]
+    C --> D["Evidence pending human validation"]
+    D --> E["Independent review and guarded publication"]
+```
+
+`task validation-candidate` verifies Git provenance again, then
+`task validate` runs the declared controls on the candidate. A passing
+human-mode control provides auxiliary evidence. Independent review and the
+human decision remain required before publication. A refused attachment leaves
+the submission intact. If execution records failed or incomplete controls, the
+engine retains the report and blocks the task with
+`controls-failed-or-incomplete`. Recovery requires an explicit decision before
+preparing another validation candidate.
+Attachment starts no execution. An already authorized mission driver may
+select the submission for a later control.
+
+### Read a completed worker's journal
+
+The original journal retains the last live action snapshot. Worker settlement
+clears that projection from the terminal record. Journal replay applies the
+same clearing before comparing the expected and recorded terminal states.
+The managed controls recipe checks this path by reopening an isolated mission
+after its first worker completes on the candidate binary. It compares the
+original journal with the terminal record. The historical comparison mode
+checks refusal on the previous binary in a separate run.
+
+### Cost of candidate rechecks
+
+Before and after a managed control runs, Swarm verifies candidate inputs
+and digests. The local binary uses Cargo's `dev` profile. That profile
+optimizes the `sha2` dependencies used for these reads, including large
+candidates. Validation still uses the same paths, bytes, algorithms,
+permission checks, and configured deadlines.
+
+To measure an improvement on a host, compare the same inputs and digests,
+then observe the result of a native control. Hashing time alone establishes
+neither a control result nor an upper bound on its runtime.
+
+During manual startup of a managed worker, `agent run` can refresh an expired
+preflight by observing the route, command, workspace and environment under the
+current policy. The scope must match the retained admission. Every startup
+boundary rechecks the attempt, reservation, workspace copy evidence and process
+identities. Refresh preserves the original, the attempt and the reservation.
+The applicable guard still refuses drift, cancellation or an already-owned
+intent. Other paths retain their existing preflight selection.
+
+`task retain-handoff WORK --root ROOT --input FILE --json` retains a completed
+manual managed worker's report. The JSON document contains `schema_version: 1`,
+`event_id`, `expected_revision` and `task_id`. The engine resolves the producer
+and latest attempt, checks terminal and workspace provenance, and retains the
+report bytes and Git reference. Pass the returned producer, relative path and
+SHA-256 to `task submit`. Retention keeps the task status unchanged. Managed
+storage is opened from the owned Root descriptor and its association to the
+datastore is rechecked before returning the receipt. An error
+after retention may leave evidence present. Read back the revision before submitting.
+
 Linux implementation verified on isolated native fixtures in migration lot169. The existing terminal completion journal is a private local trust boundary, not cryptographic actor identity or hostile same-UID writer protection. A dead/missing PID, expired lease or end-event message is never enough to authorize retry.
 
 The readonly observer shares the existing recovery terminal Agent/reservation projection; it does not call recovery, write state or refund an attempt. It checks the original Root identity, full terminal row, normalized ownership, native snapshot/context, recorded kernel reap, workspace release and explicit gate/output disposition. Unknown wait/release or unresolved/draining execution refuses. Known logical output failure can be described for correction, never quality acceptance. A known helper refusal is distinguished from possible provider start; no provider execution is guessed.

@@ -1,5 +1,13 @@
 # Reviewer natif Rust : contrat actuel
 
+Le statut courant partagé par la CLI et le cockpit couvre la première
+tentative en dépôt géré. Il lit l’avis d’une tâche soumise via les mêmes
+preuves que l’aperçu de publication. Un avis favorable attend encore la
+publication. Une acceptation publiée est vérifiée via les preuves courantes
+de la tâche et de ses dépendances. Les refus de preuve gardent leur cause.
+La lecture ne relance pas le vérificateur. Les reprises et certains états
+intermédiaires de revue restent hors de cette projection.
+
 Les preuves natives décrites ici ciblent Linux ; aucune équivalence entre
 plateformes n’est établie.
 

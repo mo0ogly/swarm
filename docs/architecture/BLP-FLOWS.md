@@ -23,6 +23,15 @@ d'une divulgation**. Aucun appel fournisseur, donnée vivante, compte ou réglag
 de sécurité n'est modifié. Pour ce premier lot d’inventaire, aucun comportement de l'exécutable produit ne change ;
 build, installation et notes d'évolution ne sont donc pas requis pour ce lot.
 
+Le rapprochement D12 du 22 novembre couvre les références de publication locale,
+le garde d’envoi API et la prévisualisation d’attribution. Le vérificateur relit
+74 références pour 25 flux. Les limites d’autorité et les critères ouverts des
+flux restent inscrits dans l’inventaire.
+
+Le test `security-proofs-engine` compare aussi l’empreinte et les champs
+exposés par `security-show` aux octets de l’inventaire source. Une divergence
+au point de lecture ne constitue pas une qualification.
+
 ## Frontières recensées
 
 | Flux | Sources → destinataires | Raccord restant |
@@ -203,6 +212,41 @@ vérificateur, avec intégrité vérifiée. Le refus de l’ancien inventaire re
 conservé dans `20261101-preparation-flow-inventory-before-01`. Ces comptes ne sont
 pas des comptes de contrôles BLP effectifs ni une acceptation indépendante.
 
+#### D01 — correspondance des tranches capturées dans le diagnostic Trust
+
+La demande `blp-preparation-check` accepte `engine_source_index` en option.
+Le moteur vérifie d’abord le tour, la racine, les attributions de confidentialité
+courantes de toutes les tranches et l’habilitation du lecteur. Le résultat
+`engine_source_integrity` donne le type de preuve, l’empreinte de la tranche,
+son index et la révision du tour.
+
+- Les instructions moteur exigent l’égalité avec les octets compilés.
+- Le contrat de plan (`preparation_plan_contract`) est reproduit depuis
+  l’entrée de l’historique validé désignée par le digest natif du tour.
+- Le contexte de projet (`preparation_project_context`) exige l’origine
+  `ProjectContext` dans le manifeste. Le diagnostic relit
+  `read_project_context` pour la racine liée et le rôle `preparation`, avec
+  les limites de cette même entrée historique. Il compare la provenance
+  complète du contexte relu aux métadonnées retenues du tour et de
+  l’enveloppe native, puis compare les octets exacts de la tranche.
+- Les délimiteurs et clés JSON émis par le moteur (`preparation_data_framing`)
+  exigent la vérification de la grammaire du prompt entier.
+
+L’origine sélectionne le contrôle, même si deux tranches ont la même empreinte.
+Les valeurs JSON restent exclues. Des réglages absents de l’historique, une
+provenance de contexte absente ou divergente et des octets différents donnent
+des refus typés HTTP 409. Les échecs de lecture ou de validation conservent
+leur cause d’origine. Un index mal formé refuse en HTTP 400. Un tour sans
+manifeste garde son refus existant. Sans sélecteur, le diagnostic de
+confidentialité s’applique seul.
+
+Ce rapprochement en lecture seule établit une correspondance entre les
+observations, dans les limites du lecteur de sources et du stockage local.
+L’identité physique historique des fichiers, leur immutabilité et la résistance
+à un processus de même UID restent hors de cette preuve. Le résultat ne confère
+aucun grade Biba ni droit d’envoi. Les cas du consommateur Trust et du mappage
+HTTP sont inscrits dans la recette `blp-preparation-check`.
+
 ### Révision : quarantaine explicite des préparations
 
 BF-05/06/07 incluent le refus courant à l’admission, au claim et au transport API/CLI. Quatre ancrages supplémentaires suivent le verrou egress dédié et les mutations Trust locales/enrôlées ; le verrou métier est relâché avant l’IO. Les dix références dont les sources ont changé ont été relues et actualisées. Les 25 flux restent OPEN : une quarantaine optionnelle ne fournit ni autorisation classifiée de destinataire ni héritage de résultat ni confinement des descendants. Les preuves du nouveau parcours sont conservées dans le plan APEX.
@@ -244,21 +288,25 @@ distingue 400/404/409/403/500. La surveillance ne crée ni droit d’émission n
 confinement OS ni héritage de résultat ; BF-07 reste OPEN pour l’engagement
 réel du transport, BF-05 pour l’identité physique des sources.
 
-### Révision : gate travailleur d’émission (hook BF-07 livré)
+### Révision : garde du travailleur d’émission BF-07
 
-Le hook BF-07 est implémenté et vérifié localement : la branche Api du
-travailleur Rust appelle la décision via
-`preparation_worker_transport_gate(id, token, base_url, model)` dans la
+Dans le candidat H1, la branche Api du travailleur Rust appelle le garde via
+`preparation_worker_transport_gate(id, token, base_url, model, prompt)` dans la
 réservation egress déjà tenue, avant la construction de la requête — aucun
 socket sans décision. Zéro receipt d’admission correspondant au tour
 (preparation_id, provider, request_hash — hash qui couvre l’event_id : la
-liaison admission→tour est par événement) → chemin legacy inchangé ; ≥1
-receipt → re-vérification complète (principal du receipt, fraîcheur
+liaison admission→tour est par événement) conserve le chemin historique sans
+lecture Trust. Le prompt demandé doit correspondre aux octets du tour détenu.
+En présence d'une admission, la révision et les octets capturés doivent aussi
+correspondre au tour avant toute émission. Une divergence refuse avec
+`preparation-transport-prompt-mismatch` ou `blp-transport-source-changed`.
+Si le contexte a changé, recapturer et attribuer ses sources puis admettre un nouvel événement avant l’envoi.
+Le garde revérifie le principal du reçu, la fraîcheur des
 settings, attribution pour le digest résolu du `provider` du tour, écho
 obligatoire du `base_url`/`model` effectifs fermant le TOCTOU claim→envoi,
-no-write-down au dernier usage, budget lecture seule). Le balayage est
+no-write-down au dernier usage et le budget en lecture seule. Le balayage est
 fail-closed et la possession du tour exigée (état `running`, token
-SHA256(nonce), PID/stamp/host). Vérifié par
+SHA256(nonce), PID/stamp/host). La qualification du candidat couvre
 `preparation_worker_transport.rs` et la recette
 `tools/verification/recipes/blp-preparation-worker-gate.json`. Restent
 OPEN : héritage des résultats (BF-16), confinement OS/descendants,
@@ -272,3 +320,17 @@ de configuration et inventaire compilé, sans contenu projet ni preuve importée
 69 références, 25 flux OPEN. Les ancrages modifiés ont été relus et actualisés ;
 ce rafraîchissement ne qualifie pas les modifications concurrentes BF-16a/stockage.
 Les états NOT_TESTED/unknown/not_qualified restent explicites ; aucune certification.
+
+### Candidat H1 sur la préparation
+
+Le premier périmètre relie les octets des sources de préparation au contrôle
+Trust (BF-25) puis les octets du tour détenu à la décision de transport
+(BF-07). Le diagnostic conserve sa portée de lecture seule. L’activation
+transversale, l’héritage du domaine sur les résultats (BF-16) et les autres
+flux restent ouverts. Aucun réglage opérateur n’est introduit par ce raccord.
+
+Le test de diagnostic des sources et les deux tests du producteur ont réussi
+sur le checkpoint D01 de la branche de qualification. L’inventaire statique
+de la composition sur `main` couvre 75 références et 25 flux ouverts.
+La composition doit être exercée séparément avant revue et intégration.
+La réserve hôte a refusé l’admission du compilateur dans ce checkout.
