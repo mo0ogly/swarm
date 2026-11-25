@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La reprise d’un worker terminé relit son journal en tenant compte de l’effacement des actions en direct sur sa fiche terminale.",
+        "en": "Recovery reads the completed worker journal with the live actions cleared from the terminal record."
+      },
+      {
         "fr": "Une première liste de contrôles peut être rattachée à une soumission gérée en validation humaine sans relancer son worker. La revue indépendante reste requise.",
         "en": "A first set of controls can be attached to an existing managed submission in human validation mode without rerunning its worker. Independent review remains required."
       },

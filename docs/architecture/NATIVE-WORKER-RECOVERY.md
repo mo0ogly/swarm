@@ -37,6 +37,16 @@ avant un nouveau candidat de validation.
 Le rattachement ne déclenche aucune exécution. Un conducteur de mission déjà
 autorisé peut sélectionner cette soumission pour un contrôle ultérieur.
 
+### Relire le journal d’un worker terminé
+
+Le journal original conserve le dernier instantané des actions en direct.
+À la fin du worker, le moteur efface cette projection de la fiche terminale.
+La relecture du journal applique le même effacement avant de comparer
+l’état attendu à la fiche enregistrée. La recette de rattachement des contrôles
+vérifie cette reprise sur le binaire candidat, après un premier worker. Elle
+compare le journal d’origine avec la fiche terminale. Le mode de comparaison
+historique conserve le refus du binaire précédent dans une exécution distincte.
+
 ### Coût des relectures du candidat
 
 Avant et après l’exécution d’un contrôle géré, Swarm vérifie les entrées et

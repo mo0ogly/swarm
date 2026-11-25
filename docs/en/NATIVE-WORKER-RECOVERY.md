@@ -35,6 +35,16 @@ preparing another validation candidate.
 Attachment starts no execution. An already authorized mission driver may
 select the submission for a later control.
 
+### Read a completed worker's journal
+
+The original journal retains the last live action snapshot. Worker settlement
+clears that projection from the terminal record. Journal replay applies the
+same clearing before comparing the expected and recorded terminal states.
+The managed controls recipe checks this path by reopening an isolated mission
+after its first worker completes on the candidate binary. It compares the
+original journal with the terminal record. The historical comparison mode
+checks refusal on the previous binary in a separate run.
+
 ### Cost of candidate rechecks
 
 Before and after a managed control runs, Swarm verifies candidate inputs
