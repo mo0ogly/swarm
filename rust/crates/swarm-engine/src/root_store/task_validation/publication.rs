@@ -74,6 +74,13 @@ pub(super) fn replay(store: &RootStore, job: &Job) -> Result<TaskValidationOutco
         work,
     })
 }
+/// Private proof of the complete slot mapping for one immutable receipt borrow.
+/// This is scoped to the caller's read and carries no SQL or execution authority.
+pub(super) struct BoundSlots<'a> {
+    receipt: &'a Receipt,
+    managed: Option<super::managed_receipt::Binding<'a>>,
+}
+
 /// Check the complete stored-policy → original-slot → observed-result mapping.
 ///
 /// Receives private receipt data, never an execution grant. Requires supported
@@ -81,15 +88,15 @@ pub(super) fn replay(store: &RootStore, job: &Job) -> Result<TaskValidationOutco
 /// and result identity/argv matching the effective controls. Executable argv
 /// must also satisfy the existing normalizer's nonempty/non-NUL form; two equal
 /// malformed commands cannot become success. Managed slots use unique transport
-/// names while retaining per-task original control names. Returns optional v3
-/// candidate/cohort binding, None for ordinary originals. Failed or unattempted
+/// names while retaining per-task original control names. The bound view carries
+/// the v3 candidate/cohort binding for managed originals. Failed or unattempted
 /// slots may lack a result, but may not borrow another command's result. Missing
 /// or unsuccessful results must carry the failed flag; otherwise refuse rather
 /// than emitting a blocked artifact with no per-slot failure entry. Returns
 /// a safe static refusal on any mismatch, without IO, mutation or partial public
 /// conversion. Actual SQL rows, native owner, hashes, permission and quiescence
 /// remain obligations of original_for and its callers; data equality grants none.
-fn bound_slots(r: &Receipt) -> Result<Option<super::managed_receipt::Binding<'_>>, A> {
+fn bound_slots(r: &Receipt) -> Result<BoundSlots<'_>, A> {
     let invalid = || A::Refused("task-validation-receipt-slot-source-changed");
     let managed = if r.schema_version == 3 || r.managed_candidate.is_some() {
         super::managed_receipt::bound(r)?
@@ -127,18 +134,39 @@ fn bound_slots(r: &Receipt) -> Result<Option<super::managed_receipt::Binding<'_>
             return Err(invalid());
         }
     }
-    Ok(managed)
+    Ok(BoundSlots { receipt: r, managed })
 }
 /// Check full SQL origin backing for the receipt's explicit private variant.
 /// Legacy/ordinary records cannot claim a candidate digest without a preimage;
 /// schema3 binds the complete control plan and candidate digest to the Job.
 /// Reads SQL only; no command, current source freshness or grant is established.
 pub(super) fn verify_origin(db: &rusqlite::Connection, job: &Job, receipt: &Receipt) -> Result<(), A> {
-    match bound_slots(receipt)? {
-        Some(binding) => super::source_origin::verify_bound_job_receipt(
-            db, job, receipt.source_origin.as_ref(), Some(binding.plan), Some(binding.candidate_sha256.as_str())),
-        None => super::source_origin::verify_job_receipt(
-            db, job, receipt.source_origin.as_ref(), receipt.effective_policy.as_ref()),
+    bound_slots(receipt)?.verify_origin(db, job)
+}
+
+impl BoundSlots<'_> {
+    /// Verify the actual SQL origin using the mapping of this same receipt.
+    /// The owner, frame, slot journals and current Work remain caller checks.
+    fn verify_origin(&self, db: &rusqlite::Connection, job: &Job) -> Result<(), A> {
+        let receipt = self.receipt;
+        match &self.managed {
+            Some(binding) => super::source_origin::verify_bound_job_receipt(
+                db, job, receipt.source_origin.as_ref(), Some(binding.plan), Some(binding.candidate_sha256.as_str())),
+            None => super::source_origin::verify_job_receipt(
+                db, job, receipt.source_origin.as_ref(), receipt.effective_policy.as_ref()),
+        }
+    }
+
+    /// Check pass observations after this receipt's slot mapping was verified.
+    /// The caller still owns all current SQL, journal and authority checks.
+    pub(super) fn all_passed(&self) -> bool {
+        observed_passed(self.receipt)
+    }
+
+    /// Build the public projection for this exact verified mapping.
+    /// Pure conversion, preserving typed encoding errors and blocked results.
+    pub(super) fn public(&self) -> Result<(crate::AutomaticValidation, String, Vec<u8>), A> {
+        public_bound(self)
     }
 }
 /// Require policy-bound original slots, known waits and successful observations.
@@ -146,7 +174,7 @@ pub(super) fn verify_origin(db: &rusqlite::Connection, job: &Job, receipt: &Rece
 /// pass. This pure predicate neither checks SQL authority nor grants execution;
 /// callers performing public conversion use bound_slots to preserve diagnostics.
 pub(super) fn all_passed(r: &Receipt) -> bool {
-    bound_slots(r).is_ok() && observed_passed(r)
+    bound_slots(r).is_ok_and(|slots| slots.all_passed())
 }
 /// Require known successful process observations for every already bound slot.
 /// This helper alone checks no mapping/authority; public conversion first binds
@@ -179,7 +207,14 @@ fn observed_passed(r: &Receipt) -> bool {
 /// any artifact bytes. Known failed/unattempted results remain blocked data;
 /// this conversion performs no publication, SQL mutation or authority check.
 pub(super) fn public(r: &Receipt) -> Result<(crate::AutomaticValidation, String, Vec<u8>), A> {
-    let managed = bound_slots(r)?;
+    bound_slots(r)?.public()
+}
+
+/// Encode public bytes for the receipt borrowed by the verified slot mapping.
+/// This function neither rechecks storage nor publishes anything.
+fn public_bound(slots: &BoundSlots<'_>) -> Result<(crate::AutomaticValidation, String, Vec<u8>), A> {
+    let r = slots.receipt;
+    let managed = &slots.managed;
     let name = format!(
         "native-validation-public-{}.json",
         crate::provider_configuration::configuration_digest(r.job.id.as_bytes())
@@ -225,7 +260,7 @@ pub(super) fn public(r: &Receipt) -> Result<(crate::AutomaticValidation, String,
     };
     let failures=r.steps.iter().enumerate().filter(|(_, (s,_))|s.failed||s.gate.is_some()).map(|(index,(s,_))| {
         let mut value=serde_json::json!({"control_id":s.step.control_id,"causes":s.causes,"gate":s.gate});
-        if let Some(binding)=&managed {
+        if let Some(binding)=managed {
             let slot=&binding.plan.slots[index];
             value["task_id"]=serde_json::json!(slot.task_id);
             value["control_id"]=serde_json::json!(slot.control.id);
@@ -462,7 +497,7 @@ pub(super) fn original(
         } else {
             OriginalUse::CurrentOwner
         },
-    )
+    ).map(|(job, _)| job)
 }
 /// Closed internal use modes. Reading published evidence never transfers a live
 /// owner or recovers a job; RecordedRead is permitted only for terminal rows.
@@ -475,14 +510,24 @@ enum OriginalUse {
 /// Verifies the same original/root/slot/wait material as owner/recovery paths;
 /// terminal publication is mandatory. No command, ownership transfer or mutation.
 pub(super) fn recorded_original(store: &RootStore, r: &Receipt, hash: &str) -> Result<Job, E> {
+    recorded_original_with_slots(store, r, hash).map(|(job, _)| job)
+}
+
+/// Return the job and its verified slot mapping for subsequent comparisons
+/// against the same receipt borrow. All current original checks run per read.
+pub(super) fn recorded_original_with_slots<'a>(
+    store: &RootStore, r: &'a Receipt, hash: &str,
+) -> Result<(Job, BoundSlots<'a>), E> {
     original_for(store, r, hash, OriginalUse::RecordedRead)
 }
 /// Read the exact private original and scalar job, validate caller-purpose owner
 /// or terminal state, Root identity, policy/slot/result mapping, every immutable
-/// slot hash and known quiescence. Returns the current original Job or preserves
+/// slot hash and known quiescence. Returns the current Job and bound slots or preserves
 /// safe typed IO/SQL/codec/source/ownership failures. Reads only; receipt tuples
 /// and equality do not grant execution, prove OS confinement or accept a task.
-fn original_for(store: &RootStore, r: &Receipt, hash: &str, mode: OriginalUse) -> Result<Job, E> {
+fn original_for<'a>(
+    store: &RootStore, r: &'a Receipt, hash: &str, mode: OriginalUse,
+) -> Result<(Job, BoundSlots<'a>), E> {
     let launch = |e| E::Launch(Box::new(e));
     let name = journal::name("job", &r.job.id);
     let unchanged = if matches!(mode, OriginalUse::RecordedRead) {
@@ -500,14 +545,14 @@ fn original_for(store: &RootStore, r: &Receipt, hash: &str, mode: OriginalUse) -
     {
         return Err(E::Refused("task-validation-original-receipt-changed"));
     }
-    bound_slots(r).map_err(launch)?;
+    let slots = bound_slots(r).map_err(launch)?;
     let current = store::job(&store.db, &r.job.id)
         .map_err(launch)?
         .ok_or(E::Refused("task-validation-job-missing"))?;
     if !same_origin(&current, &r.job) {
         return Err(E::Refused("task-validation-job-source-changed"));
     }
-    verify_origin(&store.db, &current, r).map_err(launch)?;
+    slots.verify_origin(&store.db, &current).map_err(launch)?;
     match mode {
         OriginalUse::Recovery => departed(&current).map_err(launch)?,
         OriginalUse::CurrentOwner => {
@@ -554,7 +599,7 @@ fn original_for(store: &RootStore, r: &Receipt, hash: &str, mode: OriginalUse) -
         }
         journal::quiescent(s).map_err(launch)?;
     }
-    Ok(current)
+    Ok((current, slots))
 }
 
 #[cfg(test)]
@@ -760,6 +805,9 @@ mod binding_tests {
         assert!(all_passed(&r));
         assert_ne!(r.steps[0].0.step.control_id, r.steps[1].0.step.control_id);
         let (validation, _, bytes) = public(&r).unwrap();
+        let slots = bound_slots(&r).unwrap();
+        assert!(slots.all_passed());
+        assert_eq!(slots.public().unwrap().2, bytes);
         assert_eq!(validation.candidate_sha, "3".repeat(40));
         assert_eq!(validation.controls.as_ref().unwrap().len(), 1);
         assert_eq!(validation.controls.as_ref().unwrap()[0].id, "shared");
@@ -771,6 +819,9 @@ mod binding_tests {
         prior.result.as_mut().unwrap().exit_code = 1;
         assert!(!all_passed(&r));
         let (blocked, _, bytes) = public(&r).unwrap();
+        let slots = bound_slots(&r).unwrap();
+        assert!(!slots.all_passed());
+        assert_eq!(slots.public().unwrap().2, bytes);
         assert_eq!(blocked.state, "blocked");
         assert!(blocked.controls.as_ref().unwrap()[0].passed);
         let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();

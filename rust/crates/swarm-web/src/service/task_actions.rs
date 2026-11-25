@@ -112,6 +112,7 @@ pub(super) fn public_reason(error: &E) -> Option<&'static str> {
 impl NativeHttpService {
     /// Read task review originals under the existing Logs view and Root binding.
     /// GET/HEAD accept one Work, task, revision and optional declared file key.
+    /// GET may opt into elapsed phase times on a named original.
     /// The engine owns admission and byte integrity; this adapter records nothing.
     pub(super) fn task_review_files(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, E> {
         if !matches!(*request.method(), Method::GET | Method::HEAD) {
@@ -120,7 +121,7 @@ impl NativeHttpService {
         let invalid = || E::Refused("task-review-files-query-invalid");
         let mut fields = std::collections::BTreeMap::new();
         for (key, value) in form_urlencoded::parse(request.uri().query().unwrap_or("").as_bytes()) {
-            if !matches!(key.as_ref(), "work" | "task" | "revision" | "file" | "include_report")
+            if !matches!(key.as_ref(), "work" | "task" | "revision" | "file" | "include_report" | "timing")
                 || value.is_empty() || fields.insert(key.into_owned(), value.into_owned()).is_some()
             {
                 return Err(invalid());
@@ -135,6 +136,11 @@ impl NativeHttpService {
             Some("1") if !fields.contains_key("file") => true,
             _ => return Err(invalid()),
         };
+        let profile = match fields.get("timing").map(String::as_str) {
+            None => false,
+            Some("1") if request.method() == Method::GET && fields.contains_key("file") => true,
+            _ => return Err(invalid()),
+        };
         if !request.body().is_empty() || ![work, task].iter().all(|id| swarm_identity_contract::name(id.as_bytes())) {
             return Err(invalid());
         }
@@ -143,7 +149,7 @@ impl NativeHttpService {
         let store = RootStore::open(&self.root, false).map_err(|cause| root("open", cause))?;
         let result = (|| {
             self.check_binding(&store)?;
-            let value = store.task_review_files_cached(work, &raw, fields.get("file").map(String::as_str), include_report, &self.task_review_reader)
+            let value = store.task_review_files_profiled(work, &raw, fields.get("file").map(String::as_str), include_report, &self.task_review_reader, profile)
                 .map_err(|cause| root("task-review-files-read", cause))?;
             serde_json::to_vec(&value).map(RouteBody::plain).map_err(E::ResponseJson)
         })();

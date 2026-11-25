@@ -7,6 +7,7 @@ use std::{
     collections::BTreeMap,
     path::Path,
     sync::{Arc, Mutex},
+    time::{Duration, Instant},
 };
 
 /// Select the supported text and document formats. This reader has no
@@ -87,6 +88,24 @@ impl RootStore {
         include_report: bool,
         reader: &TaskReviewFileReader,
     ) -> Result<Value, E> {
+        self.task_review_files_profiled(work, raw, file, include_report, reader, false)
+    }
+
+    /// Perform the same protected read and optionally report elapsed phase times
+    /// on a successful named file. Values use a monotonic clock and contain no
+    /// payload, path, authority or policy details. Failures keep their usual causes.
+    pub fn task_review_files_profiled(
+        &self,
+        work: &str,
+        raw: &[u8],
+        file: Option<&str>,
+        include_report: bool,
+        reader: &TaskReviewFileReader,
+        profile: bool,
+    ) -> Result<Value, E> {
+        let started = Instant::now();
+        let (mut work_elapsed, mut receipt_elapsed, mut submission_elapsed, mut git_elapsed) =
+            (Duration::ZERO, Duration::ZERO, Duration::ZERO, Duration::ZERO);
         if include_report && file.is_some() {
             return Err(E::Refused("task-review-files-query-invalid"));
         }
@@ -98,8 +117,10 @@ impl RootStore {
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
             let observed = (|| {
+                let snapshot_started = Instant::now();
                 let observed = crate::recorded_work::observe_work(&tx, work, previous.as_ref())
                     .map_err(E::Work)?;
+                work_elapsed = snapshot_started.elapsed();
                 let current = &observed.work;
                 if current.revision != request.expected_revision {
                     return Err(E::Refused("review-revision-conflict"));
@@ -114,6 +135,7 @@ impl RootStore {
                     .planning
                     .as_deref()
                     .is_some_and(|planning| planning.repository.is_some());
+                let receipt_started = Instant::now();
                 let candidate = if managed {
                     Some(task_validation::published_managed_candidate(
                         self, current, &task.id,
@@ -121,8 +143,11 @@ impl RootStore {
                 } else {
                     None
                 };
+                receipt_elapsed = receipt_started.elapsed();
+                let submission_started = Instant::now();
                 let report = task_validation::submission(&tx, current, &request.task_id)
                     .map_err(|e| E::Launch(Box::new(e)))?;
+                submission_elapsed = submission_started.elapsed();
                 Ok((observed, candidate, report))
             })();
             let (observed, candidate, report) = finished(observed, tx.rollback().map_err(E::Sql))?;
@@ -188,6 +213,7 @@ impl RootStore {
                     path,
                     &settings,
                     limits.review_delivery_bytes,
+                    &mut git_elapsed,
                 )
                 .map_err(|error| E::Launch(Box::new(error)))?;
                 if crate::provider_configuration::configuration_digest(&bytes) != *hash {
@@ -230,6 +256,19 @@ impl RootStore {
         })?;
         if let Ok(mut last) = reader.last_work.lock() {
             *last = Some(observed);
+        }
+        let mut value = value;
+        if profile && file.is_some() {
+            let elapsed = started.elapsed();
+            let millis = |duration: Duration| duration.as_secs_f64() * 1000.0;
+            value["timing_ms"] = json!({
+                "engine": millis(elapsed),
+                "checks_and_preparation": millis(elapsed.saturating_sub(git_elapsed)),
+                "work_snapshot": millis(work_elapsed),
+                "receipt": millis(receipt_elapsed),
+                "submission": millis(submission_elapsed),
+                "git": millis(git_elapsed),
+            });
         }
         Ok(value)
     }

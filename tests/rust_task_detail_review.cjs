@@ -47,6 +47,8 @@ async function verify(){
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
+     const timed=Boolean(file&&cfg.eligible);
+     assert.equal(uri.searchParams.get('timing'),timed?'1':null);
      if(file==='report')reportReads++;
      else if(file==='support.md')supportReads++;
      else if(file)assert.fail('unexpected original file '+file);
@@ -63,6 +65,7 @@ async function verify(){
        report:unavailable?{id:'report',error:'task-review-file-digest-changed'}:report};
      await request.respond({contentType:'application/json',body:JSON.stringify({
       schema_version:1,work:cfg.work,task:cfg.task,revision:Number(uri.searchParams.get('revision')),data,
+      ...(timed?{timing_ms:{engine:120,checks_and_preparation:116,work_snapshot:6,receipt:90,submission:2,git:4}}:{}),
      })});return;
     }
     await request.continue();
@@ -73,7 +76,9 @@ async function verify(){
    }
   });
   await page.setViewport({width:cfg.eligible?1100:390,height:900});
-  await page.goto(base+'/?'+new URLSearchParams({work:cfg.work,lang:cfg.lang,theme:cfg.eligible?'etat':'sombre'}));
+  const query=new URLSearchParams({work:cfg.work,lang:cfg.lang,theme:cfg.eligible?'etat':'sombre'});
+  if(cfg.eligible)query.set('fileTiming','1');
+  await page.goto(base+'/?'+query);
   await observe(page.waitForSelector('[data-summary=warn] button',{visible:true}));
   assert.equal(await page.$eval('#work',node=>node.value),cfg.work);
   if(cfg.eligible)await observe(initialCatalog);
@@ -163,6 +168,13 @@ async function verify(){
    assert.equal(supportReads,1,'saturation never starts an automatic retry');
    await page.locator(dialog+' .task-detail-file-retry').click();
    await observe(page.waitForFunction(()=>/Supporting\s+evidence/.test(document.querySelector('.monaco-editor .view-lines')?.textContent||'')));
+   const readTiming=await observe(page.waitForSelector(dialog+' [data-review-timing]'));
+   const timing=await readTiming.evaluate(node=>JSON.parse(node.dataset.reviewTiming));
+   assert.equal(timing.receipt,90);
+   assert.equal(timing.git,4);
+   assert.equal(timing.mode,'monaco');
+   assert(timing.total>=timing.request&&timing.render>=0);
+   console.log('PASS named read distinguishes verification, Git and Monaco timing');
    assert.equal(supportReads,2,'the retry reads the same original once');
    assert.equal(listReads,1,'switching files does not reload the inventory');
    assert.equal(reportReads,0,'switching files does not read the submitted report again');

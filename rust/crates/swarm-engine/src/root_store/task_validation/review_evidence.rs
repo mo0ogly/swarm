@@ -104,7 +104,7 @@ fn recorded_receipt(
             .map_err(launch)?.ok_or(E::Refused("review-native-controls-required"))?
     };
     let (receipt, hash): (Receipt, String) = journal::read(root, &journal::name("job", &id))?;
-    let job = publication::recorded_original(root, &receipt, &hash)?;
+    let (job, slots) = publication::recorded_original_with_slots(root, &receipt, &hash)?;
     let revision = job
         .published_revision
         .ok_or(E::Refused("review-native-publication-required"))?;
@@ -119,7 +119,7 @@ fn recorded_receipt(
         }
         || job.receipt_sha256.as_deref() != Some(hash.as_str())
         || revision > work.revision
-        || !publication::all_passed(&receipt)
+        || !slots.all_passed()
     {
         return Err(E::Refused("review-native-controls-stale"));
     }
@@ -132,7 +132,7 @@ fn recorded_receipt(
             return Err(E::Refused("review-native-slot-changed"));
         }
     }
-    let (mut expected, _, bytes) = publication::public(&receipt).map_err(launch)?;
+    let (mut expected, _, bytes) = slots.public().map_err(launch)?;
     let path = expected.receipt.clone();
     let digest = crate::provider_configuration::configuration_digest(&bytes);
     expected

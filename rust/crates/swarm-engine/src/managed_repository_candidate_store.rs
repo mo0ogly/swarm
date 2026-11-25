@@ -68,11 +68,22 @@ impl ManagedCandidate {
     /// Refuses absent/changed bindings; codec causes remain typed. This proves no
     /// current Git/source identity, saved-limit normalization or native authority.
     pub(crate) fn verify_binding(&self) -> Result<(), E> {
-        if self.schema_version != 2 || self.control_plan.is_none()
-            || self.binding_sha256.as_deref() != Some(self.binding_digest()?.as_str()) {
-            return Err(E::Refused("managed-candidate-preimage-binding-mismatch"));
+        self.verified_binding_digest().map(|_| ())
+    }
+
+    /// Return the digest already checked against the candidate's retained
+    /// preimage. This has the same scope and refusals as verify_binding; callers
+    /// can compare the result with a separate origin without hashing again.
+    pub(crate) fn verified_binding_digest(&self) -> Result<String, E> {
+        let mismatch = || E::Refused("managed-candidate-preimage-binding-mismatch");
+        if self.schema_version != 2 || self.control_plan.is_none() {
+            return Err(mismatch());
         }
-        Ok(())
+        let digest = self.binding_digest()?;
+        if self.binding_sha256.as_deref() != Some(digest.as_str()) {
+            return Err(mismatch());
+        }
+        Ok(digest)
     }
     /// Hash the full canonical private preimage under a versioned domain,
     /// excluding only its own digest field to avoid a circular encoding. Includes
