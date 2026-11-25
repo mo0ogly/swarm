@@ -26,6 +26,11 @@
 //!   integrity, attributes}`, `POST …/policy {policy, revision}`.
 //! - `GET  …/config`, `POST …/config/preview {config}`,
 //!   `POST …/config {config, revision}`.
+//! - `GET  …/log` — protected application diagnostics. With only `q` and
+//!   `level`, returns the legacy latest batch. History options select
+//!   source, position, ordering, page size/offset, byte window and severity threshold.
+//!   History reports the retained footprint and archive timestamps for displayed rows.
+//!   A stale snapshot refuses with 409.
 //! - `GET  …/audit` — every audit line ([`crate::audit`]) and `chain_valid`;
 //!   `GET …/audit/sessions?from&to&subject&client&view&no_admin&status&q&sort&dir&page&per_page&format`
 //!   (connections per session; filters, search, sort, server-side pagination,
@@ -787,14 +792,21 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         },
         (Method::GET, ["config"]) => match front.config.read() {
             Ok(c) => ok(json!({"config": *c, "revision": revision(&*c), "source": source(&front.dir, "authority.json"),
-                "log_levels": crate::config::LOG_LEVELS, "log_file": "authority.log"})),
+                "log_levels": crate::config::LOG_LEVELS, "log_file": crate::diag::LOG_FILE})),
             Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
         },
         (Method::GET, ["log"]) => {
-            // Last 200 lines of the daemon's bounded diagnostics file.
-            match front.diag.read_tail(200) {
-                Ok(lines) => ok(json!({"level": front.diag.level(), "lines": lines, "max_bytes": crate::diag::MAX_BYTES})),
-                Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            let query = match crate::diag::LogQuery::parse(&query) {
+                Ok(query) => query,
+                Err(code) => return refuse(StatusCode::BAD_REQUEST, code),
+            };
+            // Keep synchronous retained-file reads out of the HTTP runtime.
+            match tokio::task::spawn_blocking(move || front.diag.query(&query)).await {
+                Ok(Ok(page)) => ok(page),
+                Ok(Err(code @ crate::diag::SNAPSHOT_STALE)) => refuse(StatusCode::CONFLICT, code),
+                Ok(Err(code @ "authority-log-filter-invalid")) => refuse(StatusCode::BAD_REQUEST, code),
+                Ok(Err(code)) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+                Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-diag-io"),
             }
         }
         (Method::POST, ["config", "preview"]) | (Method::POST, ["config"]) => {
@@ -818,10 +830,16 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             if front.sessions.set_config(candidate.clone()).is_err() {
                 return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state");
             }
-            // The diagnostics level follows the applied config (ADM-09);
-            // validation already refused unknown levels.
-            if let Some(level) = crate::diag::level_static(&candidate.log_level) {
-                front.diag.set_level(level);
+            // Both the level and rotation policy follow the validated saved config.
+            let diagnostics = match candidate.diagnostics() {
+                Ok(config) => config,
+                Err(code) => return refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            };
+            let Some(level) = crate::diag::level_static(&candidate.log_level) else {
+                return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-config-invalid");
+            };
+            if let Err(code) = front.diag.configure(level, diagnostics) {
+                return refuse(StatusCode::INTERNAL_SERVER_ERROR, code);
             }
             *live = candidate;
             ok(json!({"applied": true, "revision": revision(&*live)}))

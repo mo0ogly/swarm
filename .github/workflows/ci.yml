@@ -73,7 +73,20 @@ jobs:
                   raise SystemExit('recipe-tmpdir-ancestors-not-private: ' + str(d))
           print('SWARM_RUNNER_TMPDIR=' + str(d))
           PYEOF
-      - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
+      - name: Check authority log rotation and history through Admin
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: |
+          export TMPDIR="$SWARM_RUNNER_TMPDIR"
+          export SWARM_PROTECTED_FIXTURE_AREA="$SWARM_RUNNER_TMPDIR"
+          export SWARM_LOGS_FIXTURE_TMP="$(mktemp -d "$SWARM_RUNNER_TMPDIR/authority-logs.XXXXXXXX")"
+          cargo test --manifest-path rust/Cargo.toml --locked -p swarm-authority --lib diag::rotation_tests
+          cargo build --release --manifest-path rust/Cargo.toml --locked -p swarm-authority --bin swarm-authority --target-dir rust/target
+          mkdir -p .cache/ci-authority-logs
+          sha256sum bin/swarm rust/target/release/swarm-authority > .cache/ci-authority-logs/binaries.sha256
+          node tests/authority_app_logs_http_ui.cjs bin/swarm rust/target/release/swarm-authority .cache/ci-authority-logs/browser
+          sha256sum -c .cache/ci-authority-logs/binaries.sha256
+      - run: TMPDIR="$SWARM_RUNNER_TMPDIR" SWARM_PROTECTED_FIXTURE_AREA="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked --workspace --lib
       - name: Check configured worker admission and extractive summary scope
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-engine --test agent_launch
       - name: Check admitted settlement fixture placement
@@ -167,6 +180,8 @@ jobs:
             .cache/ci-exchange-navigation/browser.stderr
             .cache/ci-exchange-navigation/browser/failure.json
             .cache/ci-cockpit/result.json
+            .cache/ci-authority-logs/binaries.sha256
+            .cache/ci-authority-logs/browser/checks.json
             .cache/ci-task-detail-human-review/result.json
             .cache/ci-task-detail-human-review/step-*.stdout
             .cache/ci-task-detail-human-review/step-*.stderr

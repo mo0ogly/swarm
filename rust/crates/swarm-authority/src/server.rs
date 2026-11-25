@@ -503,17 +503,56 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     Ok(response)
 }
 
+/// Project only public, fixed operation families. No caller path, query,
+/// credential or user data is retained by the application diagnostics.
+fn diagnostic_operation(path: &str) -> Option<&'static str> {
+    Some(match path {
+        "/api/v1/trust-actions" => "trust",
+        "/api/v1/preparations/release-review" => "preparation-review",
+        "/api/v1/task" => "task",
+        "/api/v1/mission" => "mission",
+        _ => return None,
+    })
+}
+
+/// Emit one observed phase using only static fields and optional HTTP status.
+/// Diagnostics are best effort and do not determine the request outcome.
+fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
+    phase: &'static str, status: Option<StatusCode>, code: Option<&'static str>) {
+    let Some(operation) = operation else { return; };
+    let family = match code {
+        Some(code) if code.starts_with("blp-") => "bell-lapadula",
+        Some(code) if code.starts_with("biba-") => "biba",
+        _ => phase,
+    };
+    front.diag.log(level, "operation-stage", serde_json::json!({
+        "operation":operation, "phase":phase, "family":family,
+        "status":status.map(|v|v.as_u16()), "code":code
+    }));
+}
+
 /// Resolve the session, sign an assertion for this exact request and relay
 /// it to the engine; stream the engine response back unchanged.
 async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path_and_query().map(|p| p.as_str().to_owned()).unwrap_or_else(|| "/".into());
-    let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
+    let diagnostic = diagnostic_operation(req.uri().path());
+    let (credential, view) = match authenticate(&front, &req, &path).await {
+        Ok(value) => value,
+        Err(response) => {
+            let level = if response.status().is_server_error() { "critical" } else { "warn" };
+            relay_diagnostic(&front, diagnostic, level, "identity", Some(response.status()), None);
+            return Ok(response);
+        }
+    };
+    relay_diagnostic(&front, diagnostic, "debug", "identity", None, None);
     let meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
     // B6: decide before reading the body or touching the engine; a refusal
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
         Ok(a) => a,
         Err(r) => {
+            let level = if r.status().is_server_error() { "critical" } else { "warn" };
+            relay_diagnostic(&front, diagnostic, level, "access-policy", Some(r.status()), None);
             note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
             return Ok(r);
         }
@@ -524,10 +563,13 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         && req.headers().get(header::ACCEPT).and_then(|v| v.to_str().ok()).is_some_and(|a| a.contains("text/html"));
     if let Credential::Key { scope, .. } = &credential {
         if action > *scope {
+            relay_diagnostic(&front, diagnostic, "warn", "access-policy",
+                Some(StatusCode::FORBIDDEN), Some("authority-key-scope"));
             let body = serde_json::json!({"error": "authority-policy-denied", "action": action, "reason": "key-scope"});
             return Ok(full(StatusCode::FORBIDDEN, "application/json", body.to_string()));
         }
     }
+    relay_diagnostic(&front, diagnostic, "debug", "access-policy", None, None);
     let mut nonce = [0u8; 16];
     if getrandom::fill(&mut nonce).is_err() {
         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
@@ -595,6 +637,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         Ok(s) => s,
         Err(_) => {
             note_consultation(502);
+            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
             return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"));
         }
     };
@@ -602,13 +646,27 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         Ok(v) => v,
         Err(_) => {
             note_consultation(502);
+            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-handshake"));
             return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake"));
         }
     };
     tokio::spawn(conn);
     let response = match sender.send_request(out).await {
-        Ok(resp) => resp.map(|b| b.boxed()),
-        Err(_) => full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"),
+        Ok(mut response) => {
+            let code = response.headers_mut().remove(crate::diag::ENGINE_CODE_HEADER)
+                .and_then(|value| value.to_str().ok().and_then(crate::diag::engine_code));
+            let status = response.status();
+            let level = if status.is_server_error() { "critical" }
+                else if status.is_client_error() { "warn" } else { "info" };
+            relay_diagnostic(&front, diagnostic, level, "engine-reply", Some(status), code);
+            response.map(|body| body.boxed())
+        }
+        Err(_) => {
+            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
+            full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable")
+        }
     };
     if let Some((subject, method, p, a)) = &audited {
         outcome(&front, &meta, subject, &via, Some(&reference), method, p, a, response.status());

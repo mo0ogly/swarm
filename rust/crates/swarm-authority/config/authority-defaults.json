@@ -9,5 +9,10 @@
  },
  "relay_body_max_bytes": 16777216,
  "audit_retention_days": 365,
- "log_level": "info"
+ "log_level": "info",
+ "diagnostics": {
+  "max_bytes": 8388608,
+  "archives": 3,
+  "page_rows": 200
+ }
 }

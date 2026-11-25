@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "authority-application-logs-ui",
+  "inputs": [
+    "web/native-authority-admin.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "frontend/engine-settings/admin.css",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "locales/trust-actions-en.json",
+    "web/trust-actions-en.js",
+    "scripts/i18n/build.cjs",
+    "tests/fixture_area.py",
+    "tests/authority_app_logs_ui.cjs",
+    "tests/authority_capability_consumer_test.cjs",
+    "tools/verification/recipes/authority-application-logs-ui.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "generated-translations",
+      "command": ["node", "scripts/i18n/build.cjs", "--check"],
+      "expected_exit": 0,
+      "required_stdout": ["\"mode\":\"check\"", "\"status\":\"pass\""],
+      "required_stderr": []
+    },
+    {
+      "id": "browser-log-controls",
+      "command": ["node", "tests/authority_app_logs_ui.cjs"],
+      "expected_exit": 0,
+      "required_stdout": ["PASS Admin application logs:", "SCREENSHOTS "],
+      "required_stderr": []
+    },
+    {
+      "id": "authority-consumer-guards",
+      "command": ["node", "tests/authority_capability_consumer_test.cjs"],
+      "expected_exit": 0,
+      "required_stdout": ["AUTHORITY_CAPABILITY_CONSUMER_GUARD_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

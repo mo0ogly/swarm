@@ -7,6 +7,22 @@
     },
     "items": [
       {
+        "fr": "La console distingue le journal actif des archives et affiche le seuil, la rétention, le volume conservé et la dernière rotation.",
+        "en": "The console distinguishes the active log from archives and shows the threshold, retention, retained volume and last rotation."
+      },
+      {
+        "fr": "Administration ouvre une console de logs dédiée, avec fenêtres de lecture, pagination des archives, navigation des occurrences et exports TXT et HTML.",
+        "en": "Administration opens a dedicated application log console with read windows, archive paging, match navigation and TXT and HTML exports."
+      },
+      {
+        "fr": "Les logs applicatifs tournent par fichiers archivés avec des réglages persistants. Administration permet de chercher et filtrer les lignes conservées.",
+        "en": "Application logs rotate into retained files with saved settings. Administration can search and filter retained entries."
+      },
+      {
+        "fr": "Les logs applicatifs du démon distinguent identité, politique et réponse du moteur, avec codes de refus sélectionnés et niveau Critique.",
+        "en": "The authority application logs distinguish identity, policy and engine replies, with selected refusal codes and a Critical level."
+      },
+      {
         "fr": "Le lecteur de livrables réutilise les contrôles déjà vérifiés au sein d’une lecture. Le diagnostic de lecture distingue les temps des vérifications, de Git et de l’affichage.",
         "en": "The file viewer reuses verified controls within a single read. The file timing diagnostic distinguishes verification, Git, and display times."
       },
