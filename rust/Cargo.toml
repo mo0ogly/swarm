@@ -5,3 +5,8 @@ resolver = "2"
 # Shared data-only confidentiality contract; runtime authorities remain in engine.
 [workspace.dependencies]
 swarm-confidentiality = { path = "crates/swarm-confidentiality" }
+
+# Local native delivery uses dev. Keep complete candidate/receipt SHA-256
+# checks affordable without altering the algorithms, guards or saved deadlines.
+[profile.dev.package.sha2]
+opt-level = 3
