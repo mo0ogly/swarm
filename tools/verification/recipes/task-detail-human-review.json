@@ -46,6 +46,7 @@
         "PASS fr cockpit help, keyboard return and read-only guidance",
         "PASS fr submitted report opens first, Monaco search and responsive file tree",
         "PASS selecting another deliverable reads only that original",
+        "PASS saturation preserves the file tree and retries the selected original",
         "PASS click recorded one task.update and public readback confirmed acceptance"
       ],
       "required_stderr": [],

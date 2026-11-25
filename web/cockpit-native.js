@@ -11,8 +11,13 @@
   * A transport/JSON/HTTP failure never becomes an empty successful document. */
  function failure(code,cause){const error=new Error(code,{cause});error.code=code;return error}
  /** One same-origin, cookie-protected GET. No CSRF mutation, auto retry, provider,
-  * local cap or deadline is added. The caller owns visible failure/recovery. */
+  * local cap or deadline is added. Detailed readers keep the dedicated worker
+  * refusal code after an exact text match. Other plain bodies stay generic. */
  async function read(path,detailed=false){let response;try{response=await fetch(path,{credentials:'same-origin',headers:{Accept:'application/json'}})}catch(cause){throw failure('web-native-response-unavailable',cause)}
+  if(detailed&&response.status===503&&/^text\/plain(?:;|$)/i.test(response.headers.get('content-type')||'')){
+   const reason=await response.text().catch(()=>null);
+   throw failure(reason==='web-workers-saturated'?reason:'web-native-service-unavailable');
+  }
   let value;try{value=await response.json()}catch(cause){throw failure(response.status===403?'web-access-refused':response.status===503?'web-native-service-unavailable':'web-native-response-invalid',cause)}
   if(!response.ok)throw responseFailure(value,'web-native-request-refused',detailed);
   return value;

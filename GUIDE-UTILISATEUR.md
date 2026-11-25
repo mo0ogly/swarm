@@ -419,6 +419,8 @@ tâche. Monaco offre une recherche en lecture seule. Les originaux Word,
 OpenDocument et PDF disponibles se téléchargent. Si une lecture échoue,
 **Réessayer** relance la lecture concernée. Les pièces protégées utilisent les
 droits de la vue Journaux. **Valider** et son motif restent au-dessus du lecteur.
+Si le serveur traite déjà d’autres lectures, la modale indique ce motif et
+conserve l’arborescence. **Réessayer** reprend le fichier sélectionné.
 En cas de refus, **Diagnostic** montre le code du moteur.
 
 Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un

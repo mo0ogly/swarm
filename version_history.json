@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "En cas de saturation des lectures, le lecteur conserve l’arborescence et propose de réessayer le fichier sélectionné.",
+        "en": "When read workers are busy, the viewer keeps the file tree available and lets you retry the selected file."
+      },
+      {
         "fr": "Un lien vers une mission ouvre sa fiche avant de charger la liste complète des missions.",
         "en": "A mission link opens its details before loading the full mission list."
       },

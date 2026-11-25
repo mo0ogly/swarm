@@ -5239,6 +5239,11 @@ qu’une divergence à révision égale impose un nouveau décodage. Les lecture
 fichiers et leurs contrôles ne sont pas mis en cache.
 Sur le parcours français, la sélection d’une autre pièce déclenche uniquement
 sa lecture et conserve l’inventaire. Le navigateur utilise une réponse contrôlée.
+Le scénario retient la liste des missions et vérifie le lien direct avant de la
+libérer. Une réponse textuelle de saturation affiche son motif, conserve
+l’arborescence et permet une reprise explicite de la pièce choisie.
+Le test Rust `recheck_preserves_mismatch_and_decode_failure` vérifie la
+comparaison de l’empreinte et la conservation d’une erreur de décodage.
 Avec la preuve rattachée, il valide la tâche et relit le
 nouvel état après un seul enregistrement. La recette vérifie aussi le refus
 d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
@@ -5259,6 +5264,11 @@ It also checks reuse of an identical decoded record and a fresh decode when byte
 change at the same revision. File data and evidence checks remain uncached.
 The French browser path selects a different item and checks that only its
 original is requested, using a controlled response.
+The fixture holds the mission list while checking that a direct link is usable.
+A plain-text saturation response keeps the tree available, shows the reason and
+allows explicit retry of the selected item.
+The Rust test `recheck_preserves_mismatch_and_decode_failure` checks digest
+comparison and retention of a decode error.
 The browser also checks cockpit help in FR/EN, Escape and focus return,
 the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.

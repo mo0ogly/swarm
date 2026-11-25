@@ -312,6 +312,8 @@ provides read-only search. Available Word, OpenDocument and PDF originals can
 be downloaded. If a read fails, **Try again** retries that read. Protected
 items use Logs view permissions. **Approve** and its status stay above the
 viewer. On a refusal, **Diagnosis** shows the engine code.
+When the server is already handling other reads, the dialog explains why and
+keeps the tree available. **Try again** resumes the selected file.
 
 In the side menu, **AI cockpit help** explains how to open a deliverable, see why
 approval is blocked, and find Logs or Resume. Shortcuts open the views you have

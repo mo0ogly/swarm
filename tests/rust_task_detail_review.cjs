@@ -51,8 +51,8 @@ async function verify(){
      else if(file==='support.md')supportReads++;
      else if(file)assert.fail('unexpected original file '+file);
      else assert.equal(uri.searchParams.get('include_report'),'1');
-     if(!file&&++listReads===1&&!cfg.eligible){
-      await request.respond({status:503,contentType:'application/json',body:'{}'});return;
+     if((!file&&++listReads===1&&!cfg.eligible)||(file==='support.md'&&supportReads===1)){
+      await request.respond({status:503,contentType:'text/plain; charset=utf-8',body:'web-workers-saturated'});return;
      }
      const report={id:'report',text:'# Review proof\n\nReadable result review-task',language:'markdown'};
      const unavailable=!file&&!cfg.eligible&&listReads===3;
@@ -111,6 +111,7 @@ async function verify(){
   const mobileFiles=dialog+' .task-detail-mobile-files',tree=dialog+' .task-detail-file-tree';
   if(!cfg.eligible){
    await observe(page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true}));
+   assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/The server is already handling other reads/);
    assert.equal(await page.$eval(tree,node=>getComputedStyle(node).display),'none');
    await page.click(dialog+' .task-detail-file-retry');
   }
@@ -155,11 +156,18 @@ async function verify(){
   console.log('PASS '+cfg.lang+' submitted report opens first, Monaco search and responsive file tree');
   if(cfg.eligible){
    await page.click(dialog+' [data-file-id="original:support.md"]');
+   await observe(page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true}));
+   assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/Le serveur traite déjà d’autres lectures/);
+   assert.equal(await page.$eval(dialog+' [aria-current="true"]',node=>node.dataset.fileId),'original:support.md');
+   assert.equal(await page.$$eval(dialog+' .task-detail-file-row',rows=>rows.filter(row=>row.dataset.fileId.startsWith('original:')).length),2);
+   assert.equal(supportReads,1,'saturation never starts an automatic retry');
+   await page.locator(dialog+' .task-detail-file-retry').click();
    await observe(page.waitForFunction(()=>/Supporting\s+evidence/.test(document.querySelector('.monaco-editor .view-lines')?.textContent||'')));
-   assert.equal(supportReads,1,'switching files reads only the selected original');
+   assert.equal(supportReads,2,'the retry reads the same original once');
    assert.equal(listReads,1,'switching files does not reload the inventory');
    assert.equal(reportReads,0,'switching files does not read the submitted report again');
    console.log('PASS selecting another deliverable reads only that original');
+   console.log('PASS saturation preserves the file tree and retries the selected original');
    await heldCatalog.continue();
    await page.waitForFunction(selector=>document.querySelector(selector)?.disabled===false,{},button);
    await page.click(button);
@@ -176,19 +184,19 @@ async function verify(){
    await page.waitForSelector(dialog,{hidden:true});
    assert.equal(await page.$eval(see,node=>node===document.activeElement),true);
    assert.deepEqual(writes,[]);
-   await held.continue();
    await page.click(see);
    await page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true});
    assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/task-review-file-digest-changed/);
    assert.equal(await page.$$eval(dialog+' [data-file-id="original:support.md"]',nodes=>nodes.length),1);
    assert.equal(reportReads,1,'the initial failure must not trigger a second automatic read');
-   await page.click(dialog+' .task-detail-file-retry');
+   await page.locator(dialog+' .task-detail-file-retry').click();
    await page.waitForSelector(dialog+' .monaco-editor .view-lines');
    await page.waitForFunction(()=>document.querySelector('.monaco-editor .view-lines')?.textContent.includes('review-task'));
    assert.equal(reportReads,2,'the retry must perform a fresh checked read');
    console.log('PASS failed initial report keeps other files and retries with a fresh read');
    await page.keyboard.press('Escape');
    await page.waitForSelector(dialog,{hidden:true});
+   await held.continue();
   }
   assert.deepEqual(errors,[]);
   console.log('PASS '+cfg.lang+' exact task detail, button, outcome and writes');
