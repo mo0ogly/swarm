@@ -40,6 +40,10 @@
 .authority-log-options .engine-settings-fields{margin-top:.5rem}
 
 .authority-log-tools .toolbar,.authority-log-reading{flex-wrap:wrap}
+.authority-log-filters{min-width:0}
+.authority-log-filters[hidden]{display:none}
+.authority-log-filters button{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:start}
+.authority-log-view [data-authority-log-retry]{justify-self:start}
 .authority-log-reading .engine-settings-field{min-width:min(100%,14rem)}
 .authority-log-results{min-width:0}
 .authority-log-results .engine-settings-table-wrap{max-height:min(60vh,36rem);overflow:auto}

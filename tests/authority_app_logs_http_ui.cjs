@@ -81,14 +81,29 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  const nextRead=await getLog(historyQuery+'&offset=1&snapshot='+firstRead.snapshot);
  check('real snapshot reads a distinct next page',nextRead.status===200&&nextRead.body.offset===1&&
   JSON.parse(nextRead.body.lines[0]).operation!==JSON.parse(firstRead.lines[0]).operation);
- expectedRefusals.set(origin+'/api/v1/authority/log?position=all&window_bytes=1',400);
- const invalid=await getLog('?position=all&window_bytes=1');
+ const invalidQuery='?position=all&window_bytes=1&q=private-filter-sentinel';
+ expectedRefusals.set(origin+'/api/v1/authority/log'+invalidQuery,400);
+ const invalid=await getLog(invalidQuery);
  check('invalid window refuses',invalid.status===400&&invalid.body.error==='authority-log-filter-invalid');
+ const sameSnapshot=await getLog(historyQuery+'&snapshot='+firstRead.snapshot);
+ check('invalid read leaves the journal snapshot intact',sameSnapshot.status===200&&sameSnapshot.body.snapshot===firstRead.snapshot);
+ const startup=await getLog('?position=all&q=authority-service');
+ check('Rust daemon startup is visible in the application journal',startup.status===200&&startup.body.lines.some(raw=>{
+  const row=JSON.parse(raw);
+  return row.component==='swarm-authority'&&row.operation==='serve'&&row.phase==='listening'&&row.level==='info';
+ }));
  await fetch(origin+'/api/v1/mission', {redirect:'manual'});
  const staleQuery=historyQuery+'&offset=1&snapshot='+firstRead.snapshot;
  expectedRefusals.set(origin+'/api/v1/authority/log'+staleQuery,409);
  const expired=await getLog(staleQuery);
  check('append invalidates a real snapshot',expired.status===409&&expired.body.error==='authority-log-snapshot-stale');
+ const logStderr=fs.readFileSync(path.join(output,'daemon.stderr'),'utf8');
+ const refusals=logStderr.split('\n').filter(line=>line.startsWith('{')).map(JSON.parse)
+  .filter(row=>row.component==='swarm-authority'&&row.operation==='read-history');
+ check('Rust reports structured invalid and stale reads out of band',[
+  [400,'authority-log-filter-invalid'],[409,'authority-log-snapshot-stale'],
+ ].every(([status,code])=>refusals.some(row=>row.status===status&&row.code===code&&row.level==='warn'&&row.phase==='refused')));
+ check('diagnostics omit filter text and the snapshot value',!logStderr.includes('private-filter-sentinel')&&!logStderr.includes(firstRead.snapshot));
  await page.goto(origin+'/native-runtime.html?lang=fr');
  await page.waitForSelector('[data-native-view="admin"]');
  await page.click('[data-native-view="admin"]');
@@ -120,7 +135,11 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.select('[data-authority-log-source]','archives');
  await page.$eval(query,field=>field.form.requestSubmit());
  await page.waitForFunction(()=>document.querySelector('[data-authority-log-status]').textContent.includes('0 ligne'));
- check('archives filter omits the active log',await page.$eval('[data-authority-log-results]',e=>!e.querySelector('tbody tr')));
+ check('empty archives are distinguished from a filtered-out result',await page.$eval('[data-authority-log-results]',e=>e.textContent.includes('Aucune archive conservée.')));
+ await page.click('[data-authority-log-filter-source]');
+ await page.waitForFunction(()=>document.querySelector('[data-authority-log-results] tbody tr'));
+ check('removing the source chip retained the other filters',await page.$eval(query,field=>field.value==='identity')&&
+  await page.$eval('[data-authority-log-level]',field=>field.value==='warn'));
  await page.select('[data-authority-log-source]','active');
  await page.$eval(query,field=>field.form.requestSubmit());
  await page.waitForFunction(()=>document.querySelector('[data-authority-log-results] tbody tr'));

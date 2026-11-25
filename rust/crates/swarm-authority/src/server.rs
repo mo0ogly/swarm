@@ -734,8 +734,16 @@ fn unauthenticated(req: &Request<Incoming>, path: &str) -> Response<Body> {
     }
 }
 
-/// Serve `front` on an already bound listener until the task is cancelled.
+/// Serve `front` on an already bound listener, recording entry into the accept
+/// loop in the application journal. Return the original listener error if
+/// accepting a connection fails.
 pub async fn serve(listener: tokio::net::TcpListener, front: Arc<Front>) -> std::io::Result<()> {
+    front.diag.log("info", "operation-stage", serde_json::json!({
+        "component": "swarm-authority",
+        "family": "authority-service",
+        "operation": "serve",
+        "phase": "listening"
+    }));
     loop {
         let (stream, _) = listener.accept().await?;
         let f = Arc::clone(&front);
