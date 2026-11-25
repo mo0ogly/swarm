@@ -71,6 +71,17 @@ fn recorded(
     task_id: &str,
     origin: Origin<'_>,
 ) -> Result<NativeValidationEvidence, E> {
+    recorded_receipt(root, work, task_id, origin).map(|(evidence, _)| evidence)
+}
+
+/// Return the decoded job receipt alongside its verified coordinates so the
+/// file reader can reuse it after checking the same framed body again.
+fn recorded_receipt(
+    root: &RootStore,
+    work: &crate::Work,
+    task_id: &str,
+    origin: Origin<'_>,
+) -> Result<(NativeValidationEvidence, Receipt), E> {
     let launch = |e| E::Launch(Box::new(e));
     let task = work
         .tasks
@@ -172,12 +183,12 @@ fn recorded(
     if !valid {
         return Err(E::Refused("review-native-publication-event-changed"));
     }
-    Ok(NativeValidationEvidence {
+    Ok((NativeValidationEvidence {
         job_id: id,
         receipt_sha256: hash,
         published_revision: revision,
         source_sha256: job.source_sha256.clone(),
-    })
+    }, receipt))
 }
 
 /// Recover the actual managed checkpoint from the verified original controls for
@@ -207,9 +218,8 @@ pub(in crate::root_store) fn recorded_managed_candidate(
 pub(in crate::root_store) fn published_managed_candidate(
     root: &RootStore, work: &crate::Work, task: &str,
 ) -> Result<crate::managed_repository::ManagedCandidate, E> {
-    let evidence = recorded(root, work, task, Origin::PublishedControls)?;
-    let (receipt, hash): (Receipt, String) = journal::read(root, &journal::name("job", &evidence.job_id))?;
-    if hash != evidence.receipt_sha256 {
+    let (evidence, receipt) = recorded_receipt(root, work, task, Origin::PublishedControls)?;
+    if !journal::recheck::<Receipt>(root, &journal::name("job", &evidence.job_id), &evidence.receipt_sha256)? {
         return Err(E::Refused("review-native-controls-stale"));
     }
     let candidate = receipt.managed_candidate.ok_or(E::Refused("review-managed-candidate-required"))?;

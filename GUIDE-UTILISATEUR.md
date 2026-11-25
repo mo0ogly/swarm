@@ -403,18 +403,24 @@ depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
 actualisez la mission avant de reprendre.
 
 La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+Un lien vers une mission ouvre d’abord cette mission. Le sélecteur se complète
+ensuite avec les autres missions.
 Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
 est illisible, les autres pièces restent dans **Livrables**.
 Si la mission change pendant la lecture, actualisez-la pour ouvrir les fichiers
 de sa nouvelle révision.
 En passant d’un livrable à l’autre, le serveur vérifie et lit le fichier choisi
 en réutilisant l’enregistrement décodé de la mission tant que ses octets restent identiques.
+Pour un original géré, le même reçu de validation est décodé une fois par
+lecture. Son empreinte, les preuves associées et les octets du fichier restent vérifiés.
 Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
 referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
 tâche. Monaco offre une recherche en lecture seule. Les originaux Word,
 OpenDocument et PDF disponibles se téléchargent. Si une lecture échoue,
 **Réessayer** relance la lecture concernée. Les pièces protégées utilisent les
 droits de la vue Journaux. **Valider** et son motif restent au-dessus du lecteur.
+Si le serveur traite déjà d’autres lectures, la modale indique ce motif et
+conserve l’arborescence. **Réessayer** reprend le fichier sélectionné.
 En cas de refus, **Diagnostic** montre le code du moteur.
 
 Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un

@@ -296,18 +296,24 @@ it back from the engine. If the revision changes or recording is uncertain,
 refresh the mission before proceeding.
 
 The window opens **Report handed off** in Monaco as soon as it is available.
+A mission link opens that mission first. The selector fills in the other
+missions afterwards.
 The report and the file list arrive in one read. If the report cannot be read,
 the other items remain available under **Deliverables**.
 If the mission changes during the read, refresh it to open the files for its
 new revision.
 When you switch deliverables, the server verifies and reads the selected file.
 It reuses the decoded mission record while its bytes remain identical.
+For a managed original, the same validation receipt is decoded once per read.
+Its digest, supporting evidence and the selected file's bytes are still checked.
 On phones, **Files** expands the tree. Selecting a file closes the tree and
 returns to the viewer. **Technical details** groups the task JSON files. Monaco
 provides read-only search. Available Word, OpenDocument and PDF originals can
 be downloaded. If a read fails, **Try again** retries that read. Protected
 items use Logs view permissions. **Approve** and its status stay above the
 viewer. On a refusal, **Diagnosis** shows the engine code.
+When the server is already handling other reads, the dialog explains why and
+keeps the tree available. **Try again** resumes the selected file.
 
 In the side menu, **AI cockpit help** explains how to open a deliverable, see why
 approval is blocked, and find Logs or Resume. Shortcuts open the views you have

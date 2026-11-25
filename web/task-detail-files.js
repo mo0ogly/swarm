@@ -14,6 +14,10 @@ function diagnostic(error){
  const code=error?.code||error?.message;
  return typeof code==='string'&&/^[a-z][a-z0-9_.-]*$/.test(code)?' ('+code+')':'';
 }
+/** Translate the known transport refusal without displaying its response body. */
+function readFailure(error,fallback){
+ return tr(error?.code==='web-workers-saturated'?'Le serveur traite déjà d’autres lectures.':fallback);
+}
 const el=(tag,text,cls)=>{
  const node=document.createElement(tag);
  if(text!=null)node.textContent=text;
@@ -172,10 +176,10 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
    if(report){select(report);return;}
    retryViewer.hidden=primary?.state!=='error';
    retryViewer.onclick=retryViewer.hidden?null:()=>loadGroup(primary);
-   const message=primary?.state==='loading'?'Chargement du rapport remis…'
-    :primary?.state==='error'?'Impossible de charger les livrables.'
-    :'Aucun rapport à ouvrir. Choisissez un fichier dans l’arborescence.';
-   setStatus(viewerStatus,tr(message),primary?.state==='error');
+   const message=primary?.state==='loading'?tr('Chargement du rapport remis…')
+    :primary?.state==='error'?readFailure(primary.error,'Impossible de charger les livrables.')
+    :tr('Aucun rapport à ouvrir. Choisissez un fichier dans l’arborescence.');
+   setStatus(viewerStatus,message,primary?.state==='error');
   }
  }
  /** Retry only one read-only discovery request; leave the selected file and
@@ -247,7 +251,7 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
     const row=el('li',undefined,'task-detail-group-state');
     const status=el('p');status.setAttribute('role','status');
     const failed=state.state==='error';
-    setStatus(status,tr(failed?'Lecture indisponible':'Chargement…'),failed);
+    setStatus(status,failed?readFailure(state.error,'Lecture indisponible'):tr('Chargement…'),failed);
     row.append(status);
     if(failed){
      status.title=diagnostic(state.error).trim();
@@ -313,6 +317,12 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
  }
 
  // — selection (generation-tracked; stale responses are dropped) —
+ /** Report a failed selected-file request and offer one explicit retry. The
+  * caller has already checked that the selection and viewer are still current. */
+ function retrySelected(error,retry){
+  setStatus(viewerStatus,readFailure(error,'Impossible de lire ce fichier.')+diagnostic(error),true);
+  retryViewer.hidden=false;retryViewer.onclick=()=>{viewer.focus();retry()};
+ }
  /** Read one declared file. Retry stays attached to that selection and late
   * responses cannot overwrite a newer file or a closed dialog. */
  async function select(file){
@@ -336,8 +346,12 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   if(file.kind==='document'){
    setStatus(viewerStatus,tr('Téléchargez le document original pour l’ouvrir.'));
    download.hidden=false;download.disabled=false;
-   download.onclick=async()=>{
+   // One explicit request for the current document, followed by a local save
+   // only if the selection survives. Failure leaves the same file retryable.
+   async function downloadOriginal(){
     download.disabled=true;
+    retryViewer.hidden=true;retryViewer.onclick=null;
+    setStatus(viewerStatus,tr('Chargement de « {path} »…').replace('{path}',file.path));
     try{
      const result=await read(file.id);
      if(!alive||ticketValue!==ticket)return;
@@ -346,10 +360,12 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
      const url=URL.createObjectURL(new Blob([bytes],{type:'application/octet-stream'}));
      const link=el('a');link.href=url;link.download=file.path.split('/').at(-1);
      try{viewer.append(link);link.click()}finally{link.remove();requestAnimationFrame(()=>URL.revokeObjectURL(url))}
+     setStatus(viewerStatus,tr('Téléchargez le document original pour l’ouvrir.'));
     }catch(error){
-     if(alive&&ticketValue===ticket)setStatus(viewerStatus,tr('Impossible de lire ce fichier.')+diagnostic(error),true);
+     if(alive&&ticketValue===ticket)retrySelected(error,downloadOriginal);
     }finally{if(alive&&ticketValue===ticket)download.disabled=false}
-   };
+   }
+   download.onclick=downloadOriginal;
    return;
   }
   setStatus(viewerStatus,tr('Chargement de « {path} »…').replace('{path}',file.path));
@@ -358,8 +374,7 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   try{result=await read(file.id);}
   catch(error){
    if(!alive||ticketValue!==ticket)return;
-   setStatus(viewerStatus,tr('Impossible de lire ce fichier.')+diagnostic(error),true);
-   retryViewer.hidden=false;retryViewer.onclick=()=>{viewer.focus();select(file)};
+   retrySelected(error,()=>select(file));
    return;
   }
   if(!alive||ticketValue!==ticket)return;

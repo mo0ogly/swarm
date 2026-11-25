@@ -484,14 +484,19 @@ pub(super) fn recorded_original(store: &RootStore, r: &Receipt, hash: &str) -> R
 /// and equality do not grant execution, prove OS confinement or accept a task.
 fn original_for(store: &RootStore, r: &Receipt, hash: &str, mode: OriginalUse) -> Result<Job, E> {
     let launch = |e| E::Launch(Box::new(e));
-    let (saved, body_hash): (Receipt, String) =
-        journal::read(store, &journal::name("job", &r.job.id))?;
-    if body_hash != hash
+    let name = journal::name("job", &r.job.id);
+    let unchanged = if matches!(mode, OriginalUse::RecordedRead) {
+        journal::recheck::<Receipt>(store, &name, hash)?
+    } else {
+        let (saved, body_hash): (Receipt, String) = journal::read(store, &name)?;
+        body_hash == hash && matches!(saved.schema_version, 1 | 2 | 3)
+    };
+    if !unchanged
         || crate::provider_configuration::configuration_digest(
             &serde_json::to_vec(r)
                 .map_err(|e| launch(caused("task-validation-journal-encode", e)))?,
         ) != hash
-        || !matches!(saved.schema_version, 1 | 2 | 3)
+        || !matches!(r.schema_version, 1 | 2 | 3)
     {
         return Err(E::Refused("task-validation-original-receipt-changed"));
     }
