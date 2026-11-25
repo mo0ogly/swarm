@@ -389,6 +389,32 @@ Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le rep
 
 </details>
 
+### Valider une tâche soumise
+
+Dans la synthèse **Conduite**, choisissez **Voir** sous **À vérifier** pour
+ouvrir le détail. Une tâche soumise en revue humaine affiche **Valider**.
+Le moteur vérifie la révision et les preuves requises. Pour une tâche
+planifiée, celles-ci comprennent un avis indépendant d’origine et une preuve
+de livraison à jour. Le détail indique le motif d’un blocage.
+
+Cliquez sur **Valider** après avoir relu le livrable. Le bouton utilise les droits
+de modification de la mission. Le détail confirme l’état après l’avoir relu
+depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
+actualisez la mission avant de reprendre.
+
+La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
+referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
+tâche. Monaco offre une recherche en lecture seule. Les originaux Word,
+OpenDocument et PDF disponibles se téléchargent. Si une lecture échoue,
+**Réessayer** relance la lecture concernée. Les pièces protégées utilisent les
+droits de la vue Journaux. **Valider** et son motif restent au-dessus du lecteur.
+En cas de refus, **Diagnostic** montre le code du moteur.
+
+Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un
+livrable, lire le motif d’une validation bloquée et retrouver Journaux ou
+Reprise. Les raccourcis ouvrent les vues accessibles. **Échap** referme l’aide.
+
 ### Suivre une remontée entre orchestrateurs
 
 Dans **Conduite → Équipe et validation**, ouvrez **Remontées de statut** avec

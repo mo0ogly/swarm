@@ -5213,3 +5213,39 @@ check locally, or `make verify-p02-pilot` to check existing evidence only.
 make check-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
 make verify-p02-pilot P02_PILOT_EVIDENCE=/CHEMIN/NEUF
 ```
+
+### Validation humaine depuis le détail / Human approval from task details
+
+La recette `task-detail-human-review` utilise le binaire natif de production
+fourni par `SWARM_STATUS_CONTRACT_BINARY` et un nouveau répertoire de fixture
+sur le volume admis, fourni par `SWARM_TASK_REVIEW_FIXTURE`. Elle crée une
+tâche isolée via la CLI. Le navigateur vérifie le motif visible lorsque la preuve
+de livraison manque, pendant le blocage artificiel de la lecture annexe.
+Il vérifie aussi l’aide du cockpit en FR/EN, le retour du focus par Échap,
+le raccourci Conduite et l’absence d’écriture à l’ouverture de l’aide.
+Le contrôle GitHub `checks` utilise la même recette sur le cockpit embarqué.
+La recette historique du cockpit inclut le lecteur dans son inventaire strict de scripts.
+Les réponses d’inventaire et du rapport sont des doubles explicites dans le
+navigateur pour vérifier le rapport ouvert en premier dans Monaco, la recherche,
+le lecteur mobile et la reprise d’une lecture indisponible. Les sondes HTTP
+de refus et les écritures de validation restent natives.
+Avec la preuve rattachée, il valide la tâche et relit le
+nouvel état après un seul enregistrement. La recette vérifie aussi le refus
+d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
+projet, ou son chemin via `NODE_PATH` dans un worktree sans dépendances locales.
+
+The `task-detail-human-review` recipe uses the production native binary supplied
+via `SWARM_STATUS_CONTRACT_BINARY` and a new fixture directory on the admitted
+volume supplied via `SWARM_TASK_REVIEW_FIXTURE`. It creates an isolated task via
+the CLI. The browser checks the reason shown when delivery evidence is missing while an auxiliary read is
+held. Explicit browser doubles for the file list and report exercise the default
+Monaco report, search, the mobile reader and recovery from a failed read.
+The browser also checks cockpit help in FR/EN, Escape and focus return,
+the Dispatch shortcut and opening help without a write.
+The GitHub `checks` job runs this recipe against the embedded cockpit.
+The existing cockpit recipe includes the reader in its strict script inventory.
+HTTP refusal probes and approval writes use the native service.
+With evidence attached, it approves the task and reads back the resulting state
+after one recorded operation. The recipe checks stale revision and missing CSRF
+refusals. Node uses the project's Puppeteer installation, or its path through
+`NODE_PATH` in a worktree without local dependencies.

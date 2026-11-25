@@ -135,6 +135,14 @@ jobs:
       - run: SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/existing-cockpit-rust.json --output .cache/ci-cockpit
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - name: Check cockpit help and task review in the embedded Cockpit
+        run: |
+          export SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm"
+          export SWARM_TASK_REVIEW_FIXTURE="$SWARM_RUNNER_TMPDIR/ci-task-detail-human-review"
+          python3 tools/verification/recipe.py run --recipe tools/verification/recipes/task-detail-human-review.json --output .cache/ci-task-detail-human-review
+          python3 tools/verification/recipe.py verify --evidence .cache/ci-task-detail-human-review
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Check recorded exchange navigation in the embedded Cockpit
         run: TMPDIR="$SWARM_RUNNER_TMPDIR" python3 tests/rust_agent_exchanges_browser.py --binary "$PWD/bin/swarm" --output .cache/ci-exchange-navigation
         env:
@@ -159,6 +167,9 @@ jobs:
             .cache/ci-exchange-navigation/browser.stderr
             .cache/ci-exchange-navigation/browser/failure.json
             .cache/ci-cockpit/result.json
+            .cache/ci-task-detail-human-review/result.json
+            .cache/ci-task-detail-human-review/step-*.stdout
+            .cache/ci-task-detail-human-review/step-*.stderr
             .cache/ci-cockpit/step-*.json
             .cache/ci-cockpit/step-*.stdout
             .cache/ci-cockpit/step-*.stderr

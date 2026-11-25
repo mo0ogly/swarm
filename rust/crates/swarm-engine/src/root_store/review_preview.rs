@@ -2,6 +2,7 @@
 //! Complete text inputs are observations; no invocation grant or publication.
 pub(super) mod inputs;
 mod managed_context;
+mod file_reader;
 mod check;
 pub use check::TaskReviewCheck;
 pub use inputs::{TaskReviewInputs, ReviewInputSource};
