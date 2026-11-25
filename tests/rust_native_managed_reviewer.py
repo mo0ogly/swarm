@@ -162,13 +162,23 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   assert (code==0)==success,(label,wire)
   return wire
  def shown(label):return call(label,['work','show',work])['work']
- before=shown('before-review');request=dict(schema_version=1,event_id='managed-native-review-'+uuid.uuid4().hex,expected_revision=before['revision'],task_id='task')
+ if extra_tracked:
+  # The public inspector already compared the complete saved Work before and after.
+  before=json.loads((out/'inspection/focused-large-witness-after.stdout').read_bytes())['work']
+ else:
+  before=shown('before-review')
+ request=dict(schema_version=1,event_id='managed-native-review-'+uuid.uuid4().hex,expected_revision=before['revision'],task_id='task')
  if before_binary:
   refused=call('old-native-guard',['task','review',work],request,False,exe=before_binary)
   assert 'review-managed-candidate-unported' in json.dumps(refused),refused
   assert shown('after-old-guard')==before
   checks.append('old-binary-managed-invocation-refusal-before-change')
- inputs=call('valid-inputs',['task','review-inputs',work],request);protocol=inputs['managed_protocol']
+ if extra_tracked:
+  inputs=json.loads((out/'inspection/focused-large-witness.stdout').read_bytes())
+  assert inputs['preview']['work_revision']==request['expected_revision']
+ else:
+  inputs=call('valid-inputs',['task','review-inputs',work],request)
+ protocol=inputs['managed_protocol']
  source=Path(setup['workspace'])/'tracked.txt';source_before=source.read_bytes()
  # The only executable changed belongs to this isolated fixture; provider
  # identity comes from real public setup, never a fabricated SQL row. The
@@ -209,6 +219,14 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   assert snapshot['protocol']['context_sha256']==protocol['context_sha256'] and (original['failed'] or original['original_reply'])
   fixture.publish(out/'retained-original.frame',frame)
   checks.append('framed-original-retains-full-cohort-protocol-frozen-policy-and-actual-wait')
+  if extra_tracked:
+   assert case=='pass' and result['verdict_applicable'] and result['review_recorded']
+   assert review['state']=='passed' and review['id']==result['review_id']
+   checked=dict(status='PASS',checks=checks,paid_provider=False,accepted=False,
+                provider_started=True,review_id=review['id'],preflight_until=original['job']['preflight_until'])
+   fixture.publish(out/'result.json',checked)
+   print('PASS managed-review-large-focused-native-invocation',flush=True)
+   return
   if case=='publish-refusal':
    # The CLI refused while the parent-owned directory occupied the context
    # path: the review stays running with the receipt retained. The obstruction

@@ -397,7 +397,7 @@ pub(super) fn run(
 /// Retain the exact owned process lifecycle while carrying a borrowed owning
 /// mission lease to the permission writer. The caller supplies the material
 /// from the exact committed claim for scheduling only. Registration checks
-/// identity and freshness; the permission writer and child revalidate inputs.
+/// identity and expiry. The child verifies the full dossier after the handshake.
 pub(super) fn run_using(root:&RootStore,job:&Job,material:&Material,command:Command,stdout:&mut dyn Write,stderr:&mut dyn Write,lease:Option<&crate::MissionLease>)->Result<Observation,E>{
     if job.phase != Phase::Claimed || job.permission != 0 {
         return Err(E::Refused("review-process-new-claim-required"));

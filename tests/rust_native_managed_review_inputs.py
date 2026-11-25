@@ -27,6 +27,10 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
     saved production policies and historical originals are never edited.
     extra_tracked adds unrelated committed text and uses a small fixture-only
     delivery limit to exercise the focused dossier before native review.
+    This preflight fixture uses one real control with an explicit command
+    allowance: the default 60s killed the helper while inspecting this tree.
+    The reviewer gets the same 120s preflight as the reported mission,
+    saved in the isolated Root before claiming any work.
     Every injected refusal follows a valid applicable witness and restores exact
     bytes/settings. A successful read grants no provider call or verdict. Reused inspection
     preserves prior review calls and opinions instead of assuming fresh counters.
@@ -40,10 +44,14 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
         entries.update((f'bulk/source-{i:05}.txt',f'Unrelated retained source {i}\n'.encode()) for i in range(extra_tracked))
         if binary_source:entries['binary-input.bin']=b'\xff\xfe\x00Not a text review input'
         controls=json.loads(json.dumps(native.CONTROLS))
+        if extra_tracked:
+            # This isolates the reviewer startup measurement from the three-control
+            # ordering scenario. Keep the real first control and native receipt.
+            controls=[dict(controls[0],timeout_seconds=180)]
         if cumulative_fixture:
             for control in controls:
                 control['command']=['python3','-c',"from pathlib import Path; assert Path('tracked.txt').read_bytes()==b'Committed planning input\\n'; print("+repr('CURRENT-COHORT-'+control['id'])+")"]
-        native.managed.worker.subreaper_scope(lambda:native.managed.run(binary,profile,out/'workers',project_subdir='app',controls=controls,source_entries=entries,pending_dependent=pending_dependent,disjoint_results=cumulative_fixture),lambda error:None,native.managed.parent_death.subreaper)
+        native.managed.worker.subreaper_scope(lambda:native.managed.run(binary,profile,out/'workers',project_subdir='app',controls=controls,source_entries=entries,pending_dependent=pending_dependent,disjoint_results=cumulative_fixture,settings_values=({"agent_preflight_ttl_seconds_default":"120"} if extra_tracked else None)),lambda error:None,native.managed.parent_death.subreaper)
         birth=json.loads((out/'workers/fixture.json').read_bytes());root=Path(birth['root']);work=birth['work']
     environment=dict(os.environ);environment['CODEX_HOME']=str(root/'codex-home');checks=[]
     # A reused actual Root retains old quota event IDs; each new journey needs
@@ -72,7 +80,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
         if mission['paused']:ok('resume-mission',['mission','resume',work],dict(schema_version=1,event_id='inspect-resume-mission',expected_revision=state['revision'],reason='Explicit isolated candidate inspection'))
         state=show('planning-work')
         if state['planning'].get('paused'):ok('resume-planning',['planning','resume',work],dict(schema_version=1,event_id='inspect-resume-planning',expected_revision=state['revision'],reason='Explicit isolated candidate inspection'))
-        value=ok('candidate',['task','validation-candidate',work],request('candidate'));assert value['control_count']==3
+        value=ok('candidate',['task','validation-candidate',work],request('candidate'));assert value['control_count']==(1 if extra_tracked else 3)
         current=show('repository');storage=Path(current['planning']['repository']['storage']);found=[json.loads(f.read_bytes()) for f in (storage/'candidates').glob('*/candidate.json') if json.loads(f.read_bytes())['task']=='task'];assert len(found)==1;checkpoint=found[0];workspace=Path(checkpoint['workspace'])
         controls=ok('controls',['task','validate',work],request('controls'));assert controls['controls_passed'] and not controls['task_accepted']
         setup=dict(root=str(root),work=work,workspace=str(workspace),candidate=checkpoint,binary_source=binary_source)

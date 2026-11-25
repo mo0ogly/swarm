@@ -5467,13 +5467,15 @@ R04, shared integration and global BF-L0 acceptance remain open.
 La recette `native-managed-reviewer-scale` utilise le binaire natif et son
 profil qualifié (`SWARM_STATUS_CONTRACT_BINARY`, `SWARM_STATUS_CONTRACT_PROFILE`).
 Elle crée un dépôt isolé contenant au moins 21 466 fichiers suivis, garde un
-dossier de revue ciblé sous la limite de fixture et exige un marqueur du
+dossier de revue ciblé sous la limite de fixture et utilise le prévol de 120 s
+du cas de référence. La recette exige un marqueur du
 fournisseur local simulé et un reçu natif. Aucun appel payant ni acceptation
 de la tâche ne sont nécessaires à ce test.
 
 The `native-managed-reviewer-scale` recipe uses the qualified native binary and
 profile. It creates an isolated repository with at least 21,466 tracked files,
-checks the focused dossier under the fixture limit, and requires a native
+checks the focused dossier under the fixture limit, uses the reference 120s
+preflight and requires a native
 receipt and an execution marker from the local provider double. It requires
 neither a paid call nor task acceptance.
 

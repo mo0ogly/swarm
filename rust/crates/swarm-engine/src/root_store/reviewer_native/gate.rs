@@ -55,7 +55,7 @@ pub(super) fn register(
 register_using(root,tx,settings,job,pid)
 }
 /// Register ownership under the exact persisted frame and freshness boundary.
-/// Full materials are revalidated before permission and again by the child.
+/// The child revalidates the full dossier after the private handshake.
 fn register_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job, pid: u32)->Result<Job,E>{
     guard::owner(job)?;
     guard::frame(root, tx, &settings, job)?;
