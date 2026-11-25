@@ -7,6 +7,26 @@
     },
     "items": [
       {
+        "fr": "Le menu du cockpit propose une aide FR/EN pour ouvrir un livrable, comprendre la validation et retrouver les journaux ou la reprise.",
+        "en": "The cockpit menu provides FR/EN help for opening a deliverable, understanding approval, and finding Logs or Resume."
+      },
+      {
+        "fr": "Conduite ouvre directement le rapport remis. Sur téléphone, le lecteur est prioritaire et l’arborescence s’ouvre avec Fichiers. Le diagnostic de validation est repliable.",
+        "en": "Dispatch opens the submitted report directly. On phones, the viewer takes priority and Files opens the tree. Approval diagnostics are expandable."
+      },
+      {
+        "fr": "Conduite agrandit le détail de tâche et y regroupe les pièces dans une arborescence. Le lecteur Monaco offre la recherche et la validation reste visible en haut.",
+        "en": "Dispatch expands task details and groups review material in a file tree. Monaco provides search, and approval stays visible at the top."
+      },
+      {
+        "fr": "Dans Conduite, le détail d’une tâche soumise en revue humaine vérifie si elle peut être validée, indique le motif d’un blocage et relit l’état après validation.",
+        "en": "In Dispatch, details for a submitted human-review task check whether approval is available, show the reason for a block, and read back the state after approval."
+      },
+      {
+        "fr": "Le bouton Voir de la synthèse Conduite ouvre la fiche dans une fenêtre au-dessus de la vue actuelle.",
+        "en": "View in the Dispatch summary opens the task details over the current view."
+      },
+      {
         "fr": "Dans un périmètre ouvert, les tâches sont rangées par niveau de dépendance et les affectations utilisent un trajet commun distinct des prérequis. Les cartes se déplacent directement, à la souris ou au clavier.",
         "en": "In an open scope, tasks are arranged by dependency rank and share an assignment route separated from prerequisites. Cards can be moved directly with the pointer or keyboard."
       },

@@ -9,6 +9,15 @@ lecture et de reprise documentaire : elle ne lance aucun modèle.
 
 ## Pilotage web : retrouver le sens du travail
 
+Dans la synthèse Conduite, **Voir** sous **À vérifier** ou **Bloquées** ouvre
+le détail de la tâche dans une fenêtre au-dessus de la vue actuelle.
+**Échap** ou **Fermer** ramène le focus sur le bouton.
+
+Dans le panneau **Détail de la tâche** de Conduite, une adresse au format
+`codex://threads/<UUID>` dans le livrable ouvre le chat via l’application Codex
+si le poste prend en charge ce type de lien. Le texte et les autres adresses
+du livrable restent lisibles dans le panneau.
+
 Dans **Conduite → Pilotage des agents**, choisir **Agents** pour les tentatives
 et tâches à préparer, ou **Dépendances** pour voir les liens entre tâches.
 L’orientation **Horizontale / Verticale** et les informations

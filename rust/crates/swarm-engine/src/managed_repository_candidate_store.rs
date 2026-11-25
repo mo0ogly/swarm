@@ -58,6 +58,11 @@ impl ManagedCandidate {
             (name.as_str(), mode, sha256)
         })
     }
+    /// Look up mode and digest for a repository-relative entry in the recorded
+    /// inventory. No filesystem observation or file access is granted.
+    pub(crate) fn review_entry(&self, path: &str) -> Option<(&str, &str)> {
+        self.tracked.get(path).map(TrackedSource::review_identity)
+    }
     /// Verify the recorded complete checkpoint preimage without filesystem IO.
     /// Requires private schema2, a retained control plan and exact domain digest.
     /// Refuses absent/changed bindings; codec causes remain typed. This proves no

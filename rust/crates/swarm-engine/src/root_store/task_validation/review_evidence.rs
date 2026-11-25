@@ -36,6 +36,7 @@ pub(in crate::root_store) fn recorded_evidence(
 #[derive(Clone, Copy)]
 enum Origin<'a> {
     CurrentSource(&'a str),
+    PublishedControls,
     ReviewedReceipt(&'a str),
     PriorReview { sha256: &'a str, attempt: &'a str, producer: &'a str },
 }
@@ -102,6 +103,7 @@ fn recorded(
         || match origin {
             Origin::CurrentSource(source) => job.source_sha256 != super::managed_execution::bound_source(&root.db,&job,source,receipt.managed_candidate.as_ref()).map_err(launch)?,
             Origin::ReviewedReceipt(expected) => hash != expected,
+            Origin::PublishedControls => false,
             Origin::PriorReview { sha256, attempt, producer } => hash != sha256 || receipt.attempt_id != attempt || receipt.producer_agent_id != producer,
         }
         || job.receipt_sha256.as_deref() != Some(hash.as_str())
@@ -197,4 +199,23 @@ pub(in crate::root_store) fn recorded_managed_candidate(
     candidate.verify_binding().map_err(|e|E::Launch(Box::new(e)))?;
     if candidate.work != work.id || candidate.task != task { return Err(E::Refused("publication-managed-original-binding")); }
     Ok((candidate,metadata))
+}
+
+/// Read the previously published managed checkpoint from its original job and
+/// slot receipts. The current Work must carry that exact public control
+/// observation. This does not requalify a worktree or admit a reviewer.
+pub(in crate::root_store) fn published_managed_candidate(
+    root: &RootStore, work: &crate::Work, task: &str,
+) -> Result<crate::managed_repository::ManagedCandidate, E> {
+    let evidence = recorded(root, work, task, Origin::PublishedControls)?;
+    let (receipt, hash): (Receipt, String) = journal::read(root, &journal::name("job", &evidence.job_id))?;
+    if hash != evidence.receipt_sha256 {
+        return Err(E::Refused("review-native-controls-stale"));
+    }
+    let candidate = receipt.managed_candidate.ok_or(E::Refused("review-managed-candidate-required"))?;
+    candidate.verify_binding().map_err(|error| E::Launch(Box::new(error)))?;
+    if candidate.work != work.id || candidate.task != task {
+        return Err(E::Refused("review-managed-candidate-mismatch"));
+    }
+    Ok(candidate)
 }

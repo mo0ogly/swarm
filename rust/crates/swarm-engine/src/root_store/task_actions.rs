@@ -106,6 +106,69 @@ fn history(db: &rusqlite::Connection, work: &str, task: &str) -> Result<History,
 }
 
 impl RootStore {
+    /// Preview the existing acceptance transition for a submitted human-mode
+    /// task at the given Work revision. Uses saved policy and current evidence
+    /// under a protected read snapshot. Refusals retain typed causes. No event,
+    /// permission, reservation for a later write, or acceptance is recorded.
+    pub fn preview_task_human_review(&self, work_id: &str, task_id: &str, revision: i64) -> Result<(), E> {
+        use crate::{SystemEnvironment, TaskLifecycleContext, WorkEngineError};
+        if revision < 1 || !swarm_identity_contract::name(work_id.as_bytes())
+            || !swarm_identity_contract::name(task_id.as_bytes())
+        {
+            return Err(E::Refused("task-review-query-invalid"));
+        }
+        material_path::with_material_read(self, || {
+            let settings = self.read_settings()?;
+            let limits = settings.values.mutation_limits().map_err(E::Settings)?;
+            let quality = settings.values.has_quality_policy()
+                .then(|| settings.quality_policy_snapshot())
+                .transpose()
+                .map_err(E::Settings)?;
+            let mut tx = self.db.unchecked_transaction().map_err(E::Sql)?;
+            tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
+            let result = (|| {
+                let work = crate::read_recorded_work(&tx, work_id).map_err(E::Work)?;
+                if work.revision != revision {
+                    return Err(E::Refused("task-review-revision-changed"));
+                }
+                let task = work.tasks.iter().flatten().find(|task| task.id == task_id)
+                    .ok_or(E::Refused("task-actions-task-missing"))?;
+                if task.status != "submitted" {
+                    return Err(E::Refused("task-review-submission-required"));
+                }
+                if task.validation_policy.as_ref().is_none_or(|p| p.mode != "human" || p.authorized_at.is_empty()) {
+                    return Err(E::Refused("task-review-human-policy-required"));
+                }
+                #[cfg(target_os = "linux")]
+                {
+                    crate::work_engine::require_native_task_idle(&tx, work_id, task_id, "task-active-agents")
+                        .map_err(E::Mutation)?;
+                }
+                let request = crate::Request {
+                    schema_version: 1,
+                    id: task_id.into(),
+                    status: "accepted".into(),
+                    ..Default::default()
+                };
+                let context = TaskLifecycleContext {
+                    root: &self.root,
+                    quality_policy: quality.as_ref(),
+                    task_limits: &limits.task,
+                    validation_limits: &limits.policy,
+                };
+                let mut environment = SystemEnvironment;
+                if work.planning.is_some() {
+                    crate::task_lifecycle::transition_scoped_reviewed_task(
+                        &work, &request, &context, &settings, &mut environment,
+                    )
+                } else {
+                    crate::transition_manual_task(&work, &request, &context, &mut environment)
+                }.map(|_| ()).map_err(|e| E::Mutation(WorkEngineError::Lifecycle(e)))
+            })();
+            finished(result, tx.rollback().map_err(E::Sql))
+        })
+    }
+
     /// Read an existing task's file in a single protected Root read snapshot.
     /// Work/task keys must be valid identifiers, and agent attempts must match
     /// the same task record. Historical receipts without action detail remain

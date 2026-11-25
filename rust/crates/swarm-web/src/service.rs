@@ -559,7 +559,18 @@ impl HttpServiceError {
                 | "preparation-revision-requirement-limit"
                 | "preparation-organization-already-configured" | "preparation-organization-contract-changed" | "preparation-organization-history-present" | "preparation-organization-target-invalid" | "preparation-already-released" | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
-                "task-actions-task-missing" if *operation == "task-actions-read" &&
+                "task-review-file-not-declared" | "task-review-file-unavailable" if *operation == "task-review-files-read"
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_FOUND,
+                "review-revision-conflict" | "task-review-file-digest-changed" if *operation == "task-review-files-read"
+                    && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                "task-review-revision-changed" | "task-review-submission-required" | "task-review-human-policy-required"
+                    if *operation == "task-review-preview" && matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::CONFLICT,
+                _ if *operation == "task-review-preview" && matches!(cause.as_ref(),
+                    RootStoreError::Mutation(swarm_engine::WorkEngineError::Lifecycle(
+                        swarm_engine::TaskLifecycleError::Refused(_)
+                        | swarm_engine::TaskLifecycleError::Gate(swarm_engine::GateContractError::Refused(_))
+                    ))) => StatusCode::CONFLICT,
+                "task-actions-task-missing" if matches!(*operation, "task-actions-read" | "task-review-preview") &&
                     matches!(cause.as_ref(), RootStoreError::Refused(_)) => StatusCode::NOT_FOUND,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
@@ -1414,6 +1425,8 @@ impl NativeHttpService {
             "/api/v1/agent-logs" => self.agent_logs(request),
             "/api/v1/agent-logs/task-actions" => self.task_actions(request),
             #[cfg(target_os = "linux")]
+            "/api/v1/agent-logs/task-review-files" => self.task_review_files(request),
+            #[cfg(target_os = "linux")]
             "/api/v1/agent-logs/orchestration-signals" => self.orchestration_signals(request),
             "/api/v1/planning/workflow-architecture" => self.workflow_architecture(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
@@ -1421,8 +1434,11 @@ impl NativeHttpService {
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),
             "/api/v1/work-budget/apply" => self.work_budget_route(work_budget::Operation::Apply,request),
             "/api/v1/action" => {
+                if matches!(*request.method(), Method::GET | Method::HEAD) {
+                    return self.task_human_review_preview(request);
+                }
                 if request.method() != Method::POST {
-                    return Err(HttpServiceError::Method("POST"));
+                    return Err(HttpServiceError::Method("GET, HEAD, POST"));
                 }
                 let action = task_action(request.body())?;
                 self.task(action)
@@ -1550,7 +1566,9 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     if let Some(probe)=error.provider_probe(){document["provider_contact_may_have_occurred"]=probe.contact_may_have_occurred.into();}
     #[cfg(target_os="linux")]
     if let Some(reason)=project_profile::public_reason(&error){document["failure"]["reason"]=reason.into();}
-    if let Some(reason)=graph_batch::public_reason(&error){document["failure"]["reason"]=reason.into();}
+    if let Some(reason)=graph_batch::public_reason(&error).or_else(|| task_actions::public_reason(&error)){
+        document["failure"]["reason"]=reason.into();
+    }
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }

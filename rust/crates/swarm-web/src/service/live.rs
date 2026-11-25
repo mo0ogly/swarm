@@ -138,9 +138,28 @@ pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError>
     })
 }
 
-/// Insert a fresh per-response style nonce into the harness page. A template
+/// Apply the restrictive shared browser policy, with a nonce for exact
+/// per-response editor/terminal style elements. The caller may also allow
+/// Monaco layout attributes on the Administration and cockpit documents.
+/// Script sources, other style elements and sibling documents stay restricted.
+/// Invalid header encoding refuses.
+pub(super) fn apply_style_nonce(
+    response: &mut http::Response<Vec<u8>>,
+    nonce: &str,
+    monaco_layout_attributes: bool,
+) -> Result<(), HttpServiceError> {
+    let layout = if monaco_layout_attributes { " style-src-attr 'unsafe-inline';" } else { "" };
+    let policy = format!("default-src 'self'; script-src 'self'; style-src 'self' 'nonce-{nonce}';{layout} connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+    response.headers_mut().insert(
+        CONTENT_SECURITY_POLICY,
+        HeaderValue::from_str(&policy).map_err(HttpServiceError::HeaderEncoding)?,
+    );
+    Ok(())
+}
+
+/// Insert a fresh per-response style nonce into an embedded page. A template
 /// without exactly one placeholder is a server error, never a page without CSP.
-fn harness_page(template: &[u8]) -> Result<(Vec<u8>, Option<String>), HttpServiceError> {
+pub(super) fn harness_page(template: &[u8]) -> Result<(Vec<u8>, Option<String>), HttpServiceError> {
     let text = std::str::from_utf8(template)
         .map_err(|_| HttpServiceError::Refused("web-native-template-invalid"))?;
     if text.matches(NONCE_META).count() != 1 {

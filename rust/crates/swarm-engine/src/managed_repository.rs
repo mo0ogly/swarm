@@ -708,3 +708,29 @@ mod tests {
         std::fs::remove_dir_all(root).unwrap();
     }
 }
+
+/// Read an exact declared regular blob from held managed storage. Caller has
+/// already verified the candidate record and exact allowlist/mode. Existing
+/// delivery and Git policy bound the read. This never visits the working tree.
+pub(crate) fn read_original_blob(
+    root: &Path, work: &crate::Work, candidate: &ManagedCandidate,
+    path: &str, settings: &EngineSettingsDocument, limit: Option<usize>,
+) -> Result<Vec<u8>, E> {
+    with_bound_storage(root, work, false, |storage| {
+        inside(storage.child("repository.git", false)
+            .map_err(|error| E::caused("managed-repository-open", error))?, |bare| {
+            let repository = bare.process_path();
+            let object = format!("{}:{path}", candidate.commit);
+            let size = text(git(&repository, &["cat-file", "-s", &object], settings)?)?
+                .parse::<usize>().map_err(|error| E::caused("task-review-file-size-invalid", error))?;
+            if limit.is_some_and(|max| size > max) {
+                return Err(E::Refused("task-review-file-limit"));
+            }
+            let bytes = git(&repository, &["cat-file", "blob", &object], settings)?;
+            if bytes.len() != size {
+                return Err(E::Refused("task-review-file-size-changed"));
+            }
+            Ok(bytes)
+        })
+    })
+}

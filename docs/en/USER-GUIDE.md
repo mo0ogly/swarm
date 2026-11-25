@@ -267,12 +267,45 @@ optional; without it, not all raw provider output is retained.
 
 ### Follow status updates between orchestrators
 
+In the Dispatch summary, **View** under **Needs review** or **Blocked**
+opens the task details over the current view. **Escape** or **Close** returns
+focus to the button.
+
+In the Dispatch **Task details** panel, a deliverable link in the format
+`codex://threads/<UUID>` opens the chat through the Codex app if the device
+handles this link type. The remaining deliverable text stays visible.
+
 In **Dispatch → Team and validation**, open **Status updates** with Logs access.
 **Sent** records the entry into the recipient’s inbox. **Received in context**
 identifies the recorded activation containing the signal. **Processed** links
 to an applied decision that cites it. Open **Show evidence** for references.
 A decision may acknowledge the signal without an operation. Reading has no
 execution effect.
+
+### Approve a submitted task
+
+In the **Dispatch** summary, use **View** under **Needs review** to open the
+task details. A submitted task in human review shows **Approve**. The engine
+checks the revision and the required evidence. For a planned task, this
+includes the original independent review and current delivery evidence.
+The details show the reason for a block.
+
+Click **Approve** after reviewing the deliverable. The action requires
+permission to modify the mission. The details confirm the state after reading
+it back from the engine. If the revision changes or recording is uncertain,
+refresh the mission before proceeding.
+
+The window opens **Report handed off** in Monaco as soon as it is available.
+On phones, **Files** expands the tree. Selecting a file closes the tree and
+returns to the viewer. **Technical details** groups the task JSON files. Monaco
+provides read-only search. Available Word, OpenDocument and PDF originals can
+be downloaded. If a read fails, **Try again** retries that read. Protected
+items use Logs view permissions. **Approve** and its status stay above the
+viewer. On a refusal, **Diagnosis** shows the engine code.
+
+In the side menu, **AI cockpit help** explains how to open a deliverable, see why
+approval is blocked, and find Logs or Resume. Shortcuts open the views you have
+access to. Press **Escape** to close help.
 
 ### Open a task's action file
 
