@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 from urllib.parse import urlencode
 
 import rust_native_http_cli as native
@@ -63,6 +64,8 @@ def verify(binary, out):
 
             Resolve any worktree alias before Chrome binds its Unix socket.
             The browser uses the same temporary directory as the launcher.
+            If it exits unsuccessfully, retain its files, publish the fixture
+            diagnostics through the recipe logs and propagate the original failure.
             """
             config = dict(address=server.address, cookie=server.cookie, work=wid, task=task,
                           lang=lang, eligible=eligible, screenshot=str(out / (lang + '-detail.png')),
@@ -70,10 +73,23 @@ def verify(binary, out):
             environment = os.environ.copy()
             if environment.get('TMPDIR'):
                 environment['TMPDIR'] = str(Path(environment['TMPDIR']).resolve(strict=True))
-            with (out / (lang + '.stdout')).open('xb') as stdout, (out / (lang + '.stderr')).open('xb') as stderr:
-                subprocess.run(['node', 'tests/rust_task_detail_review.cjs'],
-                    input=json.dumps(config).encode(), stdout=stdout, stderr=stderr, env=environment, check=True)
-            for line in (out / (lang + '.stdout')).read_text().splitlines():
+            stdout_path = out / (lang + '.stdout')
+            stderr_path = out / (lang + '.stderr')
+            try:
+                with stdout_path.open('xb') as stdout, stderr_path.open('xb') as stderr:
+                    subprocess.run(['node', 'tests/rust_task_detail_review.cjs'],
+                        input=json.dumps(config).encode(), stdout=stdout, stderr=stderr, env=environment, check=True)
+            except subprocess.CalledProcessError as error:
+                try:
+                    print(f'{lang} browser failure progress:', file=sys.stderr, flush=True)
+                    for line in stdout_path.read_text(errors='replace').splitlines():
+                        if line.startswith('PASS '):
+                            print(line, file=sys.stderr, flush=True)
+                    print(stderr_path.read_text(errors='replace'), file=sys.stderr, flush=True)
+                except OSError as diagnostic_error:
+                    error.add_note(f'Browser diagnostics unavailable: {type(diagnostic_error).__name__}')
+                raise
+            for line in stdout_path.read_text().splitlines():
                 if line.startswith('PASS '):
                     print(line, flush=True)
 

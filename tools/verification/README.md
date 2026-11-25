@@ -5262,6 +5262,13 @@ original is requested, using a controlled response.
 The browser also checks cockpit help in FR/EN, Escape and focus return,
 the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.
+If Node exits unsuccessfully, the recipe log includes the browser assertion and
+the completed checks for that language. The isolated fixture keeps both original
+streams, and the recipe reports the original failure.
+
+En cas d’échec de Node, le journal de la recette contient l’assertion du
+navigateur et les contrôles terminés pour la langue concernée. La fixture isolée
+conserve les deux flux originaux et la recette transmet l’échec initial.
 The existing cockpit recipe includes the reader in its strict script inventory.
 HTTP refusal probes and approval writes use the native service.
 With evidence attached, it approves the task and reads back the resulting state
