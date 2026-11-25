@@ -67,15 +67,23 @@
   }
   return observed;
  }
- /** Read one revision-bound original or the task's protected originals list.
+ /** Read one revision-bound original or the task's protected originals list,
+  * optionally including the initial report or its explicit per-file error.
   * Server checks ownership and hashes. No user path is resolved in the browser. */
- async function readTaskOriginal(work,task,revision,file){
+ async function readTaskOriginal(work,task,revision,file,includeReport=false){
   const query=new URLSearchParams({work,task,revision});
   if(file!==undefined)query.set('file',file);
+  else if(includeReport)query.set('include_report','1');
   const value=await read('/api/v1/agent-logs/task-review-files?'+query,true);
   if(value?.schema_version!==1||value.work!==work||value.task!==task||value.revision!==revision
    ||!value.data||(file===undefined?!Array.isArray(value.data.files):value.data.id!==file))
    throw failure('task-review-files-response-invalid');
+  if(includeReport){
+   const report=value.data.report;
+   const hasText=typeof report?.text==='string';
+   const hasError=typeof report?.error==='string'&&/^[a-z][a-z0-9_.-]*$/.test(report.error);
+   if(report?.id!=='report'||hasText===hasError)throw failure('task-review-files-response-invalid');
+  }
   return value.data;
  }
  const taskReview=Object.freeze({preview:previewTaskReview,accept:acceptTaskReview,original:readTaskOriginal,read});

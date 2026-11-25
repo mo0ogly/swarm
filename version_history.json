@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le détail de tâche ouvre le rapport et l’arborescence avec une seule lecture protégée. Une erreur sur le rapport laisse les autres pièces accessibles.",
+        "en": "Task details open the report and the file tree with one protected read. A report error leaves the other items available."
+      },
+      {
         "fr": "Le menu du cockpit propose une aide FR/EN pour ouvrir un livrable, comprendre la validation et retrouver les journaux ou la reprise.",
         "en": "The cockpit menu provides FR/EN help for opening a deliverable, understanding approval, and finding Logs or Resume."
       },

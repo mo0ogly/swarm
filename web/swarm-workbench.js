@@ -182,10 +182,21 @@
   const hasOriginals=Boolean(taskReview&&task.status==='submitted'&&task.automatic_validation?.receipt);
   const sources=[];
   if(hasOriginals)sources.push({label:deliverables,primary:true,load:async()=>{
-   const data=await taskReview.original(work.id,task.id,work.revision);
+   const data=await taskReview.original(work.id,task.id,work.revision,undefined,true);
+   // The initial report belongs to this revision-scoped explorer only.
+   // Opening it again, including retries, uses a new checked request.
+   let initialReport=data.report;
    for(const file of data.files){
     add('original:'+file.id,deliverables+'/'+(file.id==='report'?t('Rapport remis')+'.md':file.path),file.kind,
-     ()=>taskReview.original(work.id,task.id,work.revision,file.id),file.readable);
+     ()=>{
+      if(file.id==='report'&&initialReport){
+       const report=initialReport;
+       initialReport=null;
+       if(report.error)throw Object.assign(new Error(report.error),{code:report.error});
+       return report;
+      }
+      return taskReview.original(work.id,task.id,work.revision,file.id);
+     },file.readable);
    }
    return files.slice();
   }});

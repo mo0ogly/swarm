@@ -15,6 +15,8 @@
     "rust/crates/swarm-engine/src/root_store/review_preview/file_reader.rs",
     "tests/rust_task_detail_review.cjs",
     "web/i18n-en.js",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
     "tests/rust_native_http_cli.py",
     "tests/rust_task_detail_review.py"
   ],
@@ -27,11 +29,13 @@
         "PASS originals route rejects anonymous and malformed reads",
         "PASS en cockpit help, keyboard return and read-only guidance",
         "PASS en submitted report opens first, Monaco search and responsive file tree",
+        "PASS failed initial report keeps other files and retries with a fresh read",
         "PASS blocked dialog preserves submitted revision",
         "PASS protected read-only precheck, stale revision and CSRF refusal",
         "PASS fr cockpit help, keyboard return and read-only guidance",
         "PASS fr submitted report opens first, Monaco search and responsive file tree",
-        "PASS click recorded one task.update and public readback confirmed acceptance"
+        "PASS click recorded one task.update and public readback confirmed acceptance",
+        "PASS native combined report matches separate reads and recovers from a digest change"
       ],
       "required_stderr": [],
       "command": [

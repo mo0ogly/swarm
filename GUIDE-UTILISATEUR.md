@@ -403,6 +403,8 @@ depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
 actualisez la mission avant de reprendre.
 
 La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
+est illisible, les autres pièces restent dans **Livrables**.
 Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
 referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
 tâche. Monaco offre une recherche en lecture seule. Les originaux Word,

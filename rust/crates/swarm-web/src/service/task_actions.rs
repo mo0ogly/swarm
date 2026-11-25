@@ -120,7 +120,7 @@ impl NativeHttpService {
         let invalid = || E::Refused("task-review-files-query-invalid");
         let mut fields = std::collections::BTreeMap::new();
         for (key, value) in form_urlencoded::parse(request.uri().query().unwrap_or("").as_bytes()) {
-            if !matches!(key.as_ref(), "work" | "task" | "revision" | "file")
+            if !matches!(key.as_ref(), "work" | "task" | "revision" | "file" | "include_report")
                 || value.is_empty() || fields.insert(key.into_owned(), value.into_owned()).is_some()
             {
                 return Err(invalid());
@@ -130,6 +130,11 @@ impl NativeHttpService {
         let task = fields.get("task").ok_or_else(invalid)?;
         let revision = fields.get("revision").and_then(|s| s.parse::<i64>().ok())
             .filter(|n| *n > 0).ok_or_else(invalid)?;
+        let include_report = match fields.get("include_report").map(String::as_str) {
+            None => false,
+            Some("1") if !fields.contains_key("file") => true,
+            _ => return Err(invalid()),
+        };
         if !request.body().is_empty() || ![work, task].iter().all(|id| swarm_identity_contract::name(id.as_bytes())) {
             return Err(invalid());
         }
@@ -138,7 +143,7 @@ impl NativeHttpService {
         let store = RootStore::open(&self.root, false).map_err(|cause| root("open", cause))?;
         let result = (|| {
             self.check_binding(&store)?;
-            let value = store.task_review_files(work, &raw, fields.get("file").map(String::as_str))
+            let value = store.task_review_files(work, &raw, fields.get("file").map(String::as_str), include_report)
                 .map_err(|cause| root("task-review-files-read", cause))?;
             serde_json::to_vec(&value).map(RouteBody::plain).map_err(E::ResponseJson)
         })();
