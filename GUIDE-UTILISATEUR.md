@@ -396,6 +396,9 @@ ouvrir le détail. Une tâche soumise en revue humaine affiche **Valider**.
 Le moteur vérifie la révision et les preuves requises. Pour une tâche
 planifiée, celles-ci comprennent un avis indépendant d’origine et une preuve
 de livraison à jour. Le détail indique le motif d’un blocage.
+Si l’avis indépendant manque, le détail indique la consommation de revue
+enregistrée pour la mission, le plafond atteint et le dernier échec connu
+avant l’appel fournisseur, lorsque ces données sont disponibles.
 
 Cliquez sur **Valider** après avoir relu le livrable. Le bouton utilise les droits
 de modification de la mission. Le détail confirme l’état après l’avoir relu

@@ -64,6 +64,25 @@
   };
   return Object.hasOwn(labels,code)?labels[code]:t('Actualisez la mission et consultez le diagnostic si le blocage persiste.');
  }
+ /** Explain a missing original review using the same recorded Work revision.
+  * Only finite recorded counts and known review failures receive labels.
+  * This is a readback of the mission limit and does not enable approval. */
+ function independentReviewContext(code,work,task){
+  const reviewer=work.planning?.reviewer;
+  if(code!=='native-scoped-submitted-review-required'||!reviewer||
+     !Number.isSafeInteger(reviewer.calls)||reviewer.calls<0||
+     !Number.isSafeInteger(reviewer.max_calls)||reviewer.max_calls<1)return '';
+  const parts=[t('{used}/{limit} appels de revue utilisés.').replace('{used}',reviewer.calls).replace('{limit}',reviewer.max_calls)];
+  if(reviewer.calls>=reviewer.max_calls)parts.push(t('Budget de revue épuisé.'));
+  const previous=Array.isArray(task.previous_reviews)?task.previous_reviews.at(-1):null;
+  if(previous?.state==='error'){
+   if(previous.reason==='native-review-owner-departed-before-grant')
+    parts.push(t('La dernière revue s’est arrêtée avant l’appel : le processus propriétaire a quitté.'));
+   if(previous.reason==='native-review-helper-waited-before-grant')
+    parts.push(t('La dernière revue s’est arrêtée avant l’appel : le processus auxiliaire s’est terminé.'));
+  }
+  return parts.join(' ');
+ }
  /** Present human validation only in the open task dialog. Preview and commit
   * use the captured Work revision. Closing or repainting invalidates the
   * panel before a write, and the pending lock excludes concurrent sends.
@@ -73,12 +92,13 @@
   if(!dialog?.open||!taskReview||task.status!=='submitted'||task.validation_policy?.mode!=='human')return;
   const panel=el('section',undefined,'workbench-review'),button=el('button',t('Valider'),'task-detail-approve');
   const status=el('p',t('Vérification des conditions…'),'hint');
+  const reviewContext=el('p',undefined,'hint');reviewContext.hidden=true;reviewContext.dataset.reviewContext='';
   status.setAttribute('role','status');status.tabIndex=-1;
   button.type='button';button.disabled=true;
   const diagnostic=el('details',undefined,'task-detail-diagnostic');
   const codeLabel=el('code');
   diagnostic.append(el('summary',t('Diagnostic')),codeLabel);diagnostic.hidden=true;
-  panel.append(button,status,diagnostic);taskDialogHeader.append(panel);
+  panel.append(button,status,reviewContext,diagnostic);taskDialogHeader.append(panel);
   const live=()=>taskDialog===dialog&&dialog.open&&panel.isConnected&&model?.work.id===work.id
    &&model.work.revision===work.revision&&selected===task.id;
   const showError=error=>{
@@ -86,6 +106,8 @@
    status.className='notice warn';
    const code=error.code||'web-native-task-review-refused';
    status.textContent=reviewReason(code);
+   reviewContext.textContent=independentReviewContext(code,work,task);
+   reviewContext.hidden=!reviewContext.textContent;
    codeLabel.textContent=code;diagnostic.hidden=false;
    if(document.activeElement===button)status.focus();
   };
