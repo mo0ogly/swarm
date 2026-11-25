@@ -473,7 +473,7 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let cfg = c.get("/api/v1/authority/config", &fresh).json();
     assert_eq!(cfg["config"]["log_level"], "info");
     assert!(cfg["config"].get("audit_retention_days").is_none_or(|v| v.is_null()), "legacy document: no automatic purge");
-    assert_eq!(cfg["log_levels"].as_array().unwrap().len(), 4);
+    assert_eq!(cfg["log_levels"], json!(["critical", "error", "warn", "info", "debug"]));
     let mut next = cfg["config"].clone();
     next["log_level"] = json!("loud");
     assert_eq!(error(&c.post("/api/v1/authority/config/preview", &fresh, json!({"config": next}))), "authority-config-invalid");
@@ -486,6 +486,21 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let applied = c.post("/api/v1/authority/config", &fresh, json!({"config": next, "revision": cfg["revision"]}));
     assert_eq!(applied.status, 200, "{}", applied.body);
     assert_eq!(c.get("/api/v1/authority/log", &fresh).json()["level"], "debug", "level applied live");
+    // An absent engine must appear as a critical transport stage while the
+    // browser receives the original 502. The credential and query stay private.
+    let relay = c.get("/api/v1/mission?opaque=swarm-secret-marker", &fresh);
+    assert_eq!(relay.status, 502, "{}", relay.body);
+    let entries = c.get("/api/v1/authority/log", &fresh).json();
+    let stages: Vec<Value> = entries["lines"].as_array().unwrap().iter()
+        .filter_map(|line| serde_json::from_str::<Value>(line.as_str()?).ok())
+        .filter(|line| line["operation"] == "mission")
+        .collect();
+    assert!(stages.iter().any(|row| row["phase"] == "identity" && row["level"] == "debug"));
+    assert!(stages.iter().any(|row| row["phase"] == "access-policy" && row["level"] == "debug"));
+    assert!(stages.iter().any(|row| row["phase"] == "engine-transport"
+        && row["level"] == "critical" && row["code"] == "authority-engine-unavailable"));
+    assert!(!entries.to_string().contains("swarm-secret-marker"));
+    assert!(!entries.to_string().contains(&fresh));
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");
     fs::set_permissions(&log, fs::Permissions::from_mode(0o400)).unwrap();

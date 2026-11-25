@@ -121,7 +121,7 @@ impl NativeHttpService {
                 store.read_work(&query.work).map_err(|e| root("read", e))?
             };
             let bytes = swarm_engine::encode_model(&work).map_err(E::Model)?;
-            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
+            Ok(RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                 bytes,
                 recorded_work: recorded.clone(),
                 configuration_recorded: false,

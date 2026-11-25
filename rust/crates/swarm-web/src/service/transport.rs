@@ -723,7 +723,7 @@ fn reject_queued(
         owner.fail(error);
     }
     let head = message.request.method() == Method::HEAD;
-    let outcome = NativeJobOutcome { auxiliary_effects:Vec::new(),
+    let outcome = NativeJobOutcome { task_review_timing:None, auxiliary_effects:Vec::new(),
         provider_probe:None,
         recorded_preparation:None,
         trust_publication:None,

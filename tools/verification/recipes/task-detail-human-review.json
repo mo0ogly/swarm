@@ -8,6 +8,7 @@
     "rust/crates/swarm-engine/src/root_store/task_actions.rs",
     "rust/crates/swarm-engine/src/task_lifecycle.rs",
     "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/observation.rs",
     "rust/crates/swarm-web/src/service/task_actions.rs",
     "web/cockpit-native.js",
     "web/cockpit.css",

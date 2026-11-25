@@ -105,7 +105,7 @@ impl NativeHttpService {
                     .map_err(|c| root("mutate", c))?.result.work;
                 recorded = Some((work.id.clone(), work.revision));
                 let bytes = swarm_engine::encode_model(&work).map_err(E::Model)?;
-                return Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: recorded.clone(), configuration_recorded: false, recorded_configuration: None });
+                return Ok(RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: recorded.clone(), configuration_recorded: false, recorded_configuration: None });
             }
             let bytes = match action {
                 "show" => serde_json::to_vec(&store.mission_control_view(&query.work).map_err(mission_error)?),
@@ -120,7 +120,7 @@ impl NativeHttpService {
                 }
                 _ => return Err(E::Refused("web-operation-unported")),
             }.map_err(E::ResponseJson)?;
-            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: None, configuration_recorded: false, recorded_configuration: None })
+            Ok(RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(), bytes, recorded_work: None, configuration_recorded: false, recorded_configuration: None })
         })();
         match close(result, store.close()) {
             Ok(mut body) => { body.observation_causes = observation_causes; Ok(body) }

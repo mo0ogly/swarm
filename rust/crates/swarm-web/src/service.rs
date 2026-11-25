@@ -692,6 +692,7 @@ impl HttpReply {
 /// Internal encoded route result and known effects. Plain data has no claimed
 /// operation effect; it never establishes rollback after an unknown failure.
 struct RouteBody {
+    task_review_timing: Option<observation::TaskReviewTiming>,
     auxiliary_effects: Vec<swarm_engine::AuxiliaryEffect>,
     provider_probe: Option<std::sync::Arc<ProviderProbeReceipt>>,
     trust_publication:Option<&'static str>,
@@ -706,6 +707,7 @@ impl RouteBody {
     /// Wrap successful observational bytes without inventing a recorded mutation.
     fn plain(bytes: Vec<u8>) -> Self {
         Self {
+            task_review_timing: None,
             auxiliary_effects:Vec::new(),
             bytes,
             provider_probe:None,
@@ -1306,6 +1308,9 @@ impl NativeHttpService {
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);
+                if let Some(timing) = body.task_review_timing {
+                    response.extensions_mut().insert(timing);
+                }
                 // Fixed protocol route only, after protected Root success. Errors remain JSON.
                 if request.uri().path()=="/api/v1/web-requests/script.js"{response.headers_mut().insert(CONTENT_TYPE,HeaderValue::from_static("application/javascript; charset=utf-8"));}
                 if !body.auxiliary_effects.is_empty(){response.extensions_mut().insert(observation::AuxiliaryEffects(body.auxiliary_effects));}
@@ -1542,7 +1547,7 @@ impl NativeHttpService {
             let work = outcome.result.work;
             recorded = Some((work.id.clone(), work.revision));
             swarm_engine::encode_model(&work)
-                .map(|bytes| RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, trust_publication:None, preparation_receipt:None, observation_causes: Vec::new(),
+                .map(|bytes| RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, trust_publication:None, preparation_receipt:None, observation_causes: Vec::new(),
                     bytes,
                     recorded_work: recorded.clone(),
                     configuration_recorded: false,
@@ -1613,6 +1618,9 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
         _ => None,
     };
     let mut response=response(error.status(),body,head,allow);
+    if let Some(code) = swarm_authority::diag::engine_code(error.code()) {
+        response.headers_mut().insert(swarm_authority::diag::ENGINE_CODE_HEADER, HeaderValue::from_static(code));
+    }
     if let Some(receipt)=preparation_receipt {response.extensions_mut().insert(observation::PreparationReceipt(receipt));}
     Ok(HttpReply {
         response,

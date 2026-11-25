@@ -322,6 +322,8 @@ cover engine checks, Git commands and browser rendering. Receipt timings cover
 its read and decode, original observations, publication and final recheck.
 The browser console also records the sample as `swarm-task-review-file-timing`
 without paths or payloads. Engine or gateway unavailability is shown in the viewer.
+The engine log records server-side durations under `task_review_timing` in
+the existing `web-outcome` event.
 
 In the side menu, **AI cockpit help** explains how to open a deliverable, see why
 approval is blocked, and find Logs or Resume. Shortcuts open the views you have

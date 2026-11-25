@@ -38,6 +38,7 @@
   * verbatim (already published, user-intent codes — no failure detail). */
  const SAFE_DAEMON_MESSAGES={'group-exists':1,'group-missing':1,'account-exists':1,
   'account-missing':1,'account-authentication-refused':1,'authority-policy-denied':1,
+  'authority-diag-io':1,'authority-log-filter-invalid':1,'authority-log-snapshot-stale':1,
   'authority-session-missing':1,'authority-attributes-line':1,'authority-password-mismatch':1,
   'authority-password-empty':1,'authority-policy-json':1,'authority-preview-required':1,
   'key-expiry-invalid':1,'key-name-invalid':1,'key-missing':1,'authority-purge-days-invalid':1,
@@ -114,6 +115,7 @@
   const button=(text,cls)=>{const b=node('button',text,cls);b.type='button';return b};
   const when=s=>new Date(s*1000).toLocaleString(lang);
   const messages={
+   'authority-log-snapshot-stale':'Le journal a changé. Actualisez pour reprendre la lecture.',
    'authority-self-lockout':'Refusé : cette modification vous retirerait l’administration.',
    'authority-revision-stale':'Refusé : la source a changé depuis votre lecture. Rechargez puis recommencez.',
    'group-exists':'Ce groupe existe déjà.',
@@ -233,6 +235,12 @@
    const groups=[...card.querySelectorAll(':scope > details.engine-settings-group')];if(groups.length<2)return;
    const bar=node('nav',undefined,'toolbar authority-tabs');bar.setAttribute('aria-label',tr('Sections de l’administration'));
    for(const g of groups){const b=button(g.querySelector('summary').textContent);b.dataset.authorityJump='';b.addEventListener('click',()=>{for(const o of groups)o.open=o===g;g.querySelector('summary').focus();g.scrollIntoView({block:'start'})});bar.append(b)}
+   if(me.administer){
+    const logs=button('Logs applicatifs');
+    logs.dataset.authorityLogJump='';
+    logs.addEventListener('click',()=>void openLog(logs));
+    bar.append(logs)
+   }
    card.insertBefore(bar,groups[0]);
   }
   // Personal API keys (B9): every account manages its own; admins see all.
@@ -464,10 +472,15 @@
    const noAdminLabel=node('label','Sans administration','engine-settings-field');noAdminLabel.append(noAdmin,document.createTextNode(' '+tr('seulement les comptes sans droit d’administration')));filters.append(noAdminLabel);
    const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
    const tabs=node('div',undefined,'toolbar authority-tabs');tabs.setAttribute('role','tablist');const panel=node('div');panel.setAttribute('role','tabpanel');panel.tabIndex=-1;
-   const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],log:['Journal du démon',logView],purge:['Purge',purgeView]};let current='connections';
+   const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],purge:['Purge',purgeView]};let current='connections';
    for(const [k,[label]] of Object.entries(tabsMap)){const b=button(label);b.setAttribute('role','tab');b.dataset.auditTab=k;b.addEventListener('click',()=>show(k));tabs.append(b)}
-   function show(k){current=k;for(const b of tabs.children){const on=b.dataset.auditTab===k;b.setAttribute('aria-selected',String(on));b.className=on?'primary':'';b.tabIndex=on?0:-1}panel.replaceChildren(node('p','Chargement…','notice info'));tabsMap[k][1]()}
+   function show(k){
+    current=k;
+    for(const b of tabs.children){const on=b.dataset.auditTab===k;b.setAttribute('aria-selected',String(on));b.className=on?'primary':'';b.tabIndex=on?0:-1}
+    panel.replaceChildren(node('p','Chargement…','notice info'));tabsMap[k][1]()
+   }
    const apply=button('Filtrer');apply.addEventListener('click',()=>show(current));
+   const auditFilterBar=toolbar(apply);
    const chainNote=valid=>node('p',valid?'Chaîne d’empreintes intacte.':'Chaîne d’empreintes rompue : le journal a été modifié ou tronqué.','notice '+(valid?'info':'alert'));
    /** Collapsible per-section help (ADM-11), FR text translated by SwarmI18n. */
    const help=(text)=>{const d=node('details',undefined,'authority-help');d.append(node('summary','Aide'),node('p',text));return d};
@@ -534,14 +547,6 @@
      for(const e of entries){const row=node('tr');cell(row,when(e.at));cell(row,e.subject||'—');cell(row,e.detail||e.action||'—');cell(row,e.method+' '+e.path);cell(row,e.status==null?'—':String(e.status));tb.append(row)}
      panel.replaceChildren(chainNote(r.chain_valid),help('Chaque mutation d’administration est décrite en clair (création de compte, changement de mot de passe, application de politique…) à partir du chemin demandé — jamais du corps, qui peut contenir un secret.'),entries.length?wrap:node('p','Aucune action d’administration sur la période.'))}catch(e){fail(e)}
    }
-   async function logView(){
-    try{const r=await call('GET','/log');const pre=node('pre',undefined,'authority-log');pre.tabIndex=0;pre.textContent=(r.lines||[]).join('\n')||tr('(journal vide)');
-     const levels=r.log_levels||['error','warn','info','debug'];
-     const cfg=await call('GET','/config');const cur=cfg.config.log_level||'info';
-     const levelSel=document.createElement('select');for(const l of levels){const o=node('option');o.value=l;o.textContent=l;levelSel.append(o)}levelSel.value=levels.includes(cur)?cur:'info';
-     const save=button('Enregistrer le niveau','primary');save.addEventListener('click',async()=>{const c=structuredClone(cfg.config);c.log_level=levelSel.value;await call('POST','/config',{config:c,revision:cfg.revision});notice('Niveau de journal enregistré et appliqué en direct.');await logView()});
-     panel.replaceChildren(help('Diagnostics du démon dans un fichier borné (8 Mio, tronqué par le début). Le niveau choisit la quantité de détails : error, warn, info, debug. Le changement est appliqué en direct.'),also(node('p',undefined,'authority-log-meta'),p=>p.textContent=tr('Niveau courant')+' : '+r.level+' · '+tr('Taille maximale')+' : '+Math.round(r.max_bytes/1048576)+' Mio'),field(node('div',undefined,'engine-settings-fields'),'Niveau minimum',levelSel),toolbar(save),pre)}catch(e){fail(e)}
-   }
    async function purgeView(){
     const days=input('text');days.inputMode='numeric';const run=button('Purger','primary');run.dataset.auditPurge='';
     const retention=input('text');retention.inputMode='numeric';
@@ -562,8 +567,309 @@
     panel.replaceChildren(box);
    }
    function fail(e){const p=node('p',undefined,'notice alert');p.textContent=explain(e);panel.replaceChildren(p)}
-   host.replaceChildren(filters,toolbar(apply),tabs,panel);
+   host.replaceChildren(filters,auditFilterBar,tabs,panel);
    host.parentElement.addEventListener('toggle',ev=>{if(ev.currentTarget.open&&!panel.childElementCount)show('connections')});
+  }
+  /** Open the application log console for an accounts administrator. Reads
+   * use the protected log route and optional history contract. Closing the
+   * window detaches pending responses and restores the invoking control. */
+  async function openLog(opener){
+   const modal=node('dialog',undefined,'engine-settings-dialog authority-log-dialog');
+   modal.dataset.authorityLogDialog='';
+   const title=node('h2','Logs applicatifs');title.id='authority-application-log-title';
+   modal.setAttribute('aria-labelledby',title.id);
+   const close=button('Fermer');close.dataset.authorityLogClose='';
+   const header=node('header',undefined,'modal-header');header.append(title,close);
+   const view=node('section',undefined,'modal-body authority-log-view');
+   const state=node('p','Chargement des journaux…','authority-log-meta');
+   state.dataset.authorityLogStatus='';state.setAttribute('role','status');
+   modal.append(header,view);view.append(state);document.body.append(modal);
+   const done=()=>{modal.close();modal.remove();opener.focus()};
+   close.addEventListener('click',done);
+   modal.addEventListener('cancel',event=>{event.preventDefault();done()});
+   modal.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();done()}
+   });
+   modal.showModal();title.tabIndex=-1;title.focus();
+   const active=()=>modal.open&&modal.isConnected;
+   const report=(text,error=false)=>{
+    state.className='authority-log-meta'+(error?' notice alert':'');
+    state.textContent=text
+   };
+   try{
+    const [first,initialConfig]=await Promise.all([call('GET','/log'),call('GET','/config')]);
+    if(!active())return;
+    let cfg=initialConfig;
+    const policy=first.diagnostics,history=first.history_version===1;
+    const sourceScoping=history&&first.rotation_version===1;
+    const levels=first.log_levels||cfg.log_levels;
+    const choices=(items)=>{
+     const select=node('select');
+     for(const [value,label] of items){
+      const option=node('option',label);option.value=value;select.append(option)
+     }
+     return select
+    };
+    const selectLevels=empty=>choices([...(empty?[['','Tous les niveaux']]:[]),...levels.map(level=>[level,level])]);
+    const search=input('search'),filterLevel=selectLevels(true),level=selectLevels(false);
+    const order=choices([['newest','Les plus récents d’abord'],['oldest','Les plus anciens d’abord']]);
+    const position=choices([['end','Fin de l’historique'],['start','Début de l’historique'],['all','Tout l’historique']]);
+    const source=choices([['all','Journal actif et archives'],['active','Journal actif'],['archives','Archives conservées']]);
+    source.dataset.authorityLogSource='';
+    const rotation=node('section',undefined,'authority-log-rotation');
+    rotation.dataset.authorityLogRotation='';
+    rotation.hidden=true;
+    const rows=input('number',String(policy?.page_rows??'')),bytes=input('number',String(policy?.max_bytes??''));
+    for(const [control,max] of [[rows,policy?.page_rows],[bytes,policy?.max_bytes]]){
+     control.min='1';control.step='1';control.required=true;if(max!==undefined)control.max=String(max)
+    }
+    const wrapLines=button('Retour à la ligne');wrapLines.setAttribute('aria-pressed','true');
+    search.dataset.authorityLogSearch='';filterLevel.dataset.authorityLogLevel='';
+    order.dataset.authorityLogOrder='';wrapLines.dataset.authorityLogWrap='';
+    position.dataset.authorityLogPosition='';rows.dataset.authorityLogRows='';bytes.dataset.authorityLogBytes='';
+    level.value=cfg.config.log_level;
+    const filters=node('form',undefined,'authority-log-tools');
+    const selectors=node('div',undefined,'engine-settings-fields');
+    field(selectors,'Rechercher dans les journaux',search);
+    field(selectors,history?'Niveau minimum affiché':'Niveau affiché',filterLevel);
+    const options=node('details',undefined,'authority-log-options');
+    options.dataset.authorityLogOptions='';
+    if(history){
+     const choices=node('div',undefined,'engine-settings-fields');
+     options.append(node('summary','Options de lecture'),choices);
+     if(sourceScoping)field(choices,'Source des événements',source);
+     field(choices,'Position de lecture',position);
+     field(choices,'Lignes par page',rows);
+     field(choices,'Taille maximale de la fenêtre (octets)',bytes);
+     position.addEventListener('change',()=>{bytes.disabled=position.value==='all'})
+    }
+    const apply=button('Rechercher','primary'),refresh=button('Actualiser'),reset=button('Réinitialiser les filtres');
+    apply.type='submit';refresh.dataset.authorityLogRefresh='';reset.dataset.authorityLogReset='';
+    filters.append(selectors,...(history?[options]:[]),toolbar(apply,refresh,reset));
+
+    const reading=toolbar();
+    reading.classList.add('authority-log-reading');
+    field(reading,'Ordre d’affichage',order);reading.append(wrapLines);
+    const display=node('div',undefined,'authority-log-results');
+    display.dataset.authorityLogResults='';
+    const priorMatch=button('Occurrence précédente'),nextMatch=button('Occurrence suivante');
+    priorMatch.dataset.authorityLogPriorMatch='';nextMatch.dataset.authorityLogNextMatch='';
+    const matchStatus=node('span');matchStatus.setAttribute('role','status');
+    const matches=toolbar(priorMatch,nextMatch,matchStatus);
+    const firstPage=button('Première page'),prevPage=button('Page précédente');
+    const nextPage=button('Page suivante'),lastPage=button('Dernière page');
+    firstPage.dataset.authorityLogFirstPage='';prevPage.dataset.authorityLogPrevPage='';
+    nextPage.dataset.authorityLogNextPage='';lastPage.dataset.authorityLogLastPage='';
+    const pages=toolbar(firstPage,prevPage,nextPage,lastPage);
+    const text=button('Télécharger TXT'),html=button('Télécharger HTML');
+    text.dataset.authorityLogText='';html.dataset.authorityLogHtml='';
+    const exports=toolbar(text,html);
+    const heads=['Date','Niveau','Famille','Étape','Code','Résultat','Opération'];
+    if(sourceScoping)heads.push('Source');
+    let last=null,applied={},request=0,match=-1;
+    const number=value=>Number(value).toLocaleString(lang);
+    const phrase=(template,tokens)=>Object.entries(tokens).reduce((message,[key,value])=>message.replace('{'+key+'}',value),tr(template));
+    const updateActions=()=>{
+     const count=last?.lines.length??0;
+     const data=last?.total===undefined?null:last;
+     const matching=!!applied.q&&count>0;
+     priorMatch.disabled=nextMatch.disabled=!matching;
+     matchStatus.textContent=matching?(match<0
+      ?phrase('{n} correspondances sur cette page',{n:number(count)})
+      :phrase('Occurrence {current} sur {total} sur cette page',{current:number(match+1),total:number(count)})):'';
+     firstPage.disabled=prevPage.disabled=!data||data.offset===0;
+     nextPage.disabled=lastPage.disabled=!data||data.offset+data.limit>=data.total;
+     text.disabled=html.disabled=count===0
+    };
+    /** Render the observed rotation footprint separately from the view filter.
+     * The configured byte trigger and archive count remain operator settings. */
+    const renderRotation=result=>{
+     const usage=result.rotation, limits=result.diagnostics;
+     if(!usage||!limits)return;
+     const metrics=node('dl');
+     const metric=(title,value,detail,extra)=>{
+      const item=node('div'),label=node('dt',title),main=node('dd'),sub=node('dd',undefined,'authority-log-metric-detail');
+      main.textContent=value;sub.textContent=detail;item.append(label,main,sub);
+      if(extra)sub.append(extra);
+      metrics.append(item)
+     };
+     const octets=bytes=>phrase('{n} octets',{n:number(bytes)});
+     const bar=node('progress');bar.max=limits.max_bytes;bar.value=usage.active_bytes;
+     bar.setAttribute('aria-label',tr('Occupation du journal actif'));
+     const rotationAt=usage.last_rotation_at==null?tr('Aucune rotation observée'):when(usage.last_rotation_at);
+     metric('Journal actif',octets(usage.active_bytes),phrase('Seuil de rotation · {n}',{n:octets(limits.max_bytes)}),bar);
+     metric('Archives conservées',number(result.archives)+' / '+number(limits.archives),octets(usage.archived_bytes));
+     metric('Dernière rotation',rotationAt,phrase('Volume conservé · {n}',{n:octets(usage.active_bytes+usage.archived_bytes)}));
+     const overdue=Math.max(0,result.archives-limits.archives);
+     const note=node('p',undefined,'notice info');
+     if(overdue)note.textContent=phrase('Archives à retirer lors de la prochaine rotation · {n}',{n:number(overdue)});
+     rotation.replaceChildren(metrics,...(overdue?[note]:[]));
+     rotation.hidden=false
+    };
+    const render=result=>{
+     if(!Array.isArray(result.lines))throw Error('authority-response-unreadable');
+     const lines=result.total===undefined&&order.value==='newest'?[...result.lines].reverse():result.lines;
+     const count=lines.length;
+     renderRotation(result);
+     const summary=phrase(count===1?'{n} ligne affichée':'{n} lignes affichées',{n:number(count)});
+     const scope=result.total===undefined?'':phrase('Lignes {first} à {last} sur {total} · {bytes} octets consultés',{
+      first:number(count?result.offset+1:0),last:number(result.offset+count),total:number(result.total),bytes:number(result.window_bytes)
+     })+' · ';
+     const latest=result.newest_at==null?'':' · '+tr('Mise à jour')+' '+when(result.newest_at);
+     report(scope+summary+' · '+tr('Niveau courant')+' '+result.level+' · '+tr('Archives conservées')+' '+(result.archives??'—')+latest);
+     const {wrap,tb}=table(heads);
+     wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label',tr('Logs applicatifs'));
+     for(const [index,raw] of lines.entries()){
+      let entry;
+      try{entry=JSON.parse(raw)??{}}catch{entry={}}
+      const row=node('tr');row.tabIndex=-1;cell(row,entry.at==null?'—':when(entry.at));
+      cell(row,entry.level||'—');cell(row,entry.family||'—');
+      cell(row,entry.phase||entry.message||'—').classList.add('authority-log-detail');
+      cell(row,entry.code||'—');cell(row,entry.status==null?'—':String(entry.status));
+      cell(row,entry.operation||'—');
+      if(sourceScoping){
+       const archived=result.line_archive_at?.[index];
+       cell(row,archived==null?tr('Journal actif'):phrase('Archive du {date}',{date:when(archived)}))
+      }
+      tb.append(row)
+     }
+     display.replaceChildren(count?wrap:node('p','Aucune ligne correspondante.'));
+     last=result;match=-1;updateActions()
+    };
+    /** Reuse the applied input values. Explicit refresh starts a fresh snapshot,
+     * while page navigation retains the displayed snapshot and rejects drift. */
+    const read=async(offset=0,snapshot)=>{
+     const id=++request,query=new URLSearchParams();
+     if(applied.q)query.set('q',applied.q);
+     if(applied.level)query.set(history?'minimum_level':'level',applied.level);
+     if(history){
+      query.set('position',applied.position);query.set('order',order.value);
+      if(sourceScoping)query.set('source',applied.source);
+      query.set('offset',String(offset));query.set('limit',String(applied.rows));
+      if(applied.position!=='all')query.set('window_bytes',String(applied.bytes));
+      if(snapshot)query.set('snapshot',snapshot)
+     }
+     last=null;
+     display.replaceChildren();display.setAttribute('aria-busy','true');updateActions();
+     report(tr('Chargement des journaux…'));
+     try{
+      const page=await call('GET','/log'+(query.size?'?'+query:''));
+      if(active()&&id===request)render(page)
+     }catch(error){
+      if(active()&&id===request){
+       rotation.hidden=true;
+       report(tr('Échec du chargement des journaux.')+' '+explain(error),true)
+      }
+     }finally{
+      if(active()&&id===request)display.setAttribute('aria-busy','false')
+     }
+    };
+    const selection=()=>({q:search.value,level:filterLevel.value,position:position.value,source:source.value,rows:rows.valueAsNumber,bytes:bytes.valueAsNumber});
+    applied=selection();
+    filters.addEventListener('submit',event=>{event.preventDefault();applied=selection();void read()});
+    refresh.addEventListener('click',()=>void read());
+    reset.addEventListener('click',()=>{
+     search.value='';filterLevel.value='';position.value='end';source.value='all';
+     bytes.disabled=false;order.value='newest';
+     if(policy){rows.value=String(policy.page_rows);bytes.value=String(policy.max_bytes)}
+     applied=selection();void read()
+    });
+    order.addEventListener('change',()=>{
+     if(history){void read();return}
+     if(last)render(last)
+    });
+    wrapLines.addEventListener('click',()=>{
+     const unwrapped=display.classList.toggle('authority-log-no-wrap');
+     wrapLines.setAttribute('aria-pressed',String(!unwrapped))
+    });
+    priorMatch.addEventListener('click',()=>seekMatch(-1));
+    nextMatch.addEventListener('click',()=>seekMatch(1));
+    /** Select and focus another matching row on the currently displayed page. */
+    function seekMatch(direction){
+     const found=[...display.querySelectorAll('tbody tr')];
+     if(!found.length)return;
+     found[match]?.classList.remove('authority-log-match');
+     match=match===-1?(direction>0?0:found.length-1):(match+direction+found.length)%found.length;
+     found[match].classList.add('authority-log-match');
+     found[match].focus();found[match].scrollIntoView({block:'nearest'});updateActions()
+    }
+    firstPage.addEventListener('click',()=>void read(0,last.snapshot));
+    prevPage.addEventListener('click',()=>void read(Math.max(0,last.offset-last.limit),last.snapshot));
+    nextPage.addEventListener('click',()=>void read(last.offset+last.limit,last.snapshot));
+    lastPage.addEventListener('click',()=>void read(Math.floor((last.total-1)/last.limit)*last.limit,last.snapshot));
+    text.addEventListener('click',()=>downloadPage(false));
+    html.addEventListener('click',()=>downloadPage(true));
+    /** Download only the visible, already authorized page, escaping stored
+     * values as text for standalone HTML. No raw diagnostic fields or URLs. */
+    function downloadPage(asHtml){
+     const source=display.querySelector('table');
+     if(!source)return;
+     const doc=document.implementation.createHTMLDocument(tr('Logs applicatifs'));
+     doc.documentElement.lang=lang;
+     doc.body.append(doc.importNode(source,true));
+     for(const item of doc.querySelectorAll('[tabindex]'))item.removeAttribute('tabindex');
+     const plain=[...source.rows].map(row=>[...row.cells].map(cell=>cell.textContent.replace(/[\t\r\n]+/g,' ')).join('\t')).join('\n');
+     const url=URL.createObjectURL(new Blob([asHtml?'<!doctype html>\n'+doc.documentElement.outerHTML:plain+'\n'],{
+      type:asHtml?'text/html;charset=utf-8':'text/plain;charset=utf-8'
+     }));
+     const link=node('a');link.href=url;link.download='swarm-application-logs.'+(asHtml?'html':'txt');
+     modal.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0)
+    }
+
+    const settings=node('details');settings.append(node('summary','Rotation et rétention'));
+    settings.append(node('p','Le démon ouvre une archive avant une écriture qui dépasserait le seuil. Une rétention réduite s’applique à la prochaine rotation.'));
+    const fields=node('div',undefined,'engine-settings-fields');settings.append(fields);
+    field(fields,'Niveau minimum',level);
+    const numeric=(label,key)=>{
+     const control=input('number',String(policy[key]));
+     control.min='1';control.step='1';control.dataset.authorityLogSetting=key;
+     return field(fields,label,control)
+    };
+    const inputs=policy?{max_bytes:numeric('Taille maximale par fichier (octets)','max_bytes'),
+     archives:numeric('Nombre d’archives à garder','archives'),
+     page_rows:numeric('Nombre maximal de lignes affichées','page_rows')}:null;
+    const save=button('Enregistrer','primary');save.dataset.authorityLogSave='';
+    const savedState=node('p');savedState.setAttribute('role','status');
+    save.addEventListener('click',async()=>{
+     save.disabled=true; savedState.className='';savedState.textContent='';
+     try{
+      const config=structuredClone(cfg.config);config.log_level=level.value;
+      if(inputs){
+       config.diagnostics=Object.fromEntries(Object.entries(inputs).map(([key,control])=>[key,control.valueAsNumber]));
+       if(Object.values(config.diagnostics).some(value=>!Number.isSafeInteger(value)||value<1))throw Error('authority-log-config-positive')
+      }
+      const saved=await call('POST','/config',{config,revision:cfg.revision});
+      if(!saved?.applied||typeof saved.revision!=='string')throw Error('authority-response-unreadable');
+      cfg={config,revision:saved.revision};
+      if(inputs){
+       Object.assign(policy,config.diagnostics);
+       rows.max=String(policy.page_rows);bytes.max=String(policy.max_bytes);
+       rows.value=String(Math.min(rows.valueAsNumber,policy.page_rows));bytes.value=String(Math.min(bytes.valueAsNumber,policy.max_bytes));
+       applied={...applied,rows:Math.min(applied.rows,policy.page_rows),bytes:Math.min(applied.bytes,policy.max_bytes)}
+      }
+      if(active()){savedState.textContent=tr('Réglages des journaux enregistrés.');await read()}
+     }catch(error){
+      if(active()){
+       savedState.className='notice alert';
+       savedState.textContent=error.message==='authority-log-config-positive'?
+        tr('Saisissez des entiers positifs pour les réglages des journaux.'):explain(error)
+      }
+     }finally{save.disabled=false}
+    });
+    settings.append(toolbar(save),savedState);
+    if(policy)view.prepend(rotation,filters);
+    else view.prepend(node('p','La recherche dans les archives exige une mise à jour du démon.','notice info'),toolbar(refresh));
+    view.append(reading,matches,display);
+    if(history)view.append(pages);
+    view.append(exports,settings);
+    if(history)await read();else render(first)
+   }catch(error){
+    if(!active())return;
+    report(tr('Échec du chargement des journaux.')+' '+explain(error),true);
+    const retry=button('Actualiser');
+    retry.addEventListener('click',()=>{done();void openLog(opener)});
+    view.replaceChildren(state,toolbar(retry))
+   }
   }
   if(me.permissions?.includes('audit.read'))buildAudit();
   jumpBar();

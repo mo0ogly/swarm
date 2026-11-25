@@ -20,6 +20,39 @@
 .authority-sort{white-space:nowrap}
 .authority-log{max-height:24rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--wattson-ligne);padding:.5rem;border-radius:5px}
 .authority-log-meta{overflow-wrap:anywhere}
+.authority-log-dialog{width:min(76rem,calc(100vw - 2rem))}
+.authority-log-view{display:grid;min-width:0;gap:.75rem;align-content:start}
+.authority-log-view .toolbar{flex-wrap:wrap;gap:.5rem}
+.authority-log-view button{min-height:44px}
+.authority-log-rotation dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.5rem;margin:0}
+.authority-log-rotation dl>div{border:1px solid var(--wattson-ligne);background:var(--wattson-carte-creuse);border-radius:.4rem;padding:.65rem .75rem;min-width:0}
+.authority-log-rotation dt{font-weight:600}
+.authority-log-rotation dd{margin:.15rem 0 0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.authority-log-rotation dt+dd{font-size:1.15rem;font-weight:700}
+.authority-log-metric-detail{font-size:.9rem}
+.authority-log-rotation progress{display:block;width:100%;margin-top:.35rem;accent-color:var(--swarm-cyan)}
+.authority-log-rotation>.notice{margin-bottom:0}
+.authority-log-match td{background:var(--wattson-carte-creuse);font-weight:600}
+.authority-log-view .authority-log-meta{margin:0}
+.authority-log-tools,.authority-log-reading{min-width:0}
+.authority-log-view .authority-log-tools{display:grid;gap:.65rem;overflow:visible;min-height:auto}
+.authority-log-options>summary{cursor:pointer;font-weight:600}
+.authority-log-options .engine-settings-fields{margin-top:.5rem}
+
+.authority-log-tools .toolbar,.authority-log-reading{flex-wrap:wrap}
+.authority-log-reading .engine-settings-field{min-width:min(100%,14rem)}
+.authority-log-results{min-width:0}
+.authority-log-results .engine-settings-table-wrap{max-height:min(60vh,36rem);overflow:auto}
+.authority-log-results table{width:100%;min-width:60rem;table-layout:fixed}
+.authority-log-results th:nth-child(1){width:8rem}
+.authority-log-results th:nth-child(2),.authority-log-results th:nth-child(6){width:5rem}
+.authority-log-results th:nth-child(3),.authority-log-results th:nth-child(7){width:6rem}
+.authority-log-results th:nth-child(5){width:8rem}
+.authority-log-results th:nth-child(8){width:10rem}
+.authority-log-no-wrap table{width:max-content;table-layout:auto}
+.authority-log-results thead th{position:sticky;top:0;text-align:start;white-space:nowrap;background:var(--wattson-carte-creuse)}
+.authority-log-results .authority-log-detail{min-width:10rem}
+.authority-log-no-wrap .engine-settings-table td.authority-log-detail{white-space:pre;overflow-wrap:normal}
 .native-session-user{align-self:center;overflow-wrap:anywhere}
 .authority-roles{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;border:1px solid var(--swarm-control-border);padding:.5rem 1rem}
 .authority-roles label{display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
