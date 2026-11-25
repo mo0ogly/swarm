@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La sélection d’un autre livrable réutilise le décodage de la mission si ses octets sont identiques. Le fichier sélectionné est toujours vérifié et relu.",
+        "en": "Selecting another deliverable reuses the decoded mission if its bytes match. The selected file is always verified and read again."
+      },
+      {
         "fr": "Le lecteur de livrables vérifie l’empreinte et la révision de la mission sans décoder une seconde fois le même enregistrement.",
         "en": "The deliverables viewer checks the mission digest and revision without decoding the same record twice."
       },

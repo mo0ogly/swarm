@@ -407,6 +407,8 @@ Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
 est illisible, les autres pièces restent dans **Livrables**.
 Si la mission change pendant la lecture, actualisez-la pour ouvrir les fichiers
 de sa nouvelle révision.
+En passant d’un livrable à l’autre, le serveur vérifie et lit le fichier choisi
+en réutilisant l’enregistrement décodé de la mission tant que ses octets restent identiques.
 Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
 referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
 tâche. Monaco offre une recherche en lecture seule. Les originaux Word,

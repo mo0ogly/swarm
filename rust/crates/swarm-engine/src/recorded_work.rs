@@ -3,7 +3,7 @@
 use crate::{decode_work_row, Work, WorkError};
 use rusqlite::{types::ValueRef, Connection, Params, Rows};
 use sha2::{Digest, Sha256};
-use std::fmt;
+use std::{fmt, sync::Arc};
 
 pub enum RecordedWorkError {
     Sql(rusqlite::Error),
@@ -129,17 +129,30 @@ pub(crate) struct ObservedWork {
     body_digest: sha2::digest::Output<Sha256>,
 }
 
-/// Decode and bind the Work once, capturing the digest of the same stored bytes.
-/// Invalid or missing rows retain the same errors as `read_recorded_work`.
+/// Observe the stored bytes and reuse a previous decode only for the exact ID,
+/// revision and digest. Missing or changed rows go through normal validation.
+/// The caller still owns the database binding and every authorization check.
 pub(crate) fn observe_work(
     connection: &Connection,
     id: &str,
-) -> Result<ObservedWork, RecordedWorkError> {
+    previous: Option<&Arc<ObservedWork>>,
+) -> Result<Arc<ObservedWork>, RecordedWorkError> {
     read_one(connection, id, |row| {
-        Ok(ObservedWork {
+        let raw = bytes(row, 2)?;
+        let body_digest = Sha256::digest(raw);
+        if let Some(previous) = previous {
+            let revision = crate::sqlite_value::integer(row.get_ref(1)?, 1)?;
+            if bytes(row, 0)? == previous.work.id.as_bytes()
+                && previous.work.revision == revision
+                && previous.body_digest == body_digest
+            {
+                return Ok(Arc::clone(previous));
+            }
+        }
+        Ok(Arc::new(ObservedWork {
             work: decode(row)?,
-            body_digest: Sha256::digest(bytes(row, 2)?),
-        })
+            body_digest,
+        }))
     })
 }
 
@@ -192,13 +205,18 @@ mod tests {
         let original = br#"{"schema_version":1,"id":"mission","revision":1,"title":"Original"}"#;
         db.execute("INSERT INTO works VALUES ('mission',1,?)", [&original[..]])
             .unwrap();
-        let observed = observe_work(&db, "mission").unwrap();
+        let observed = observe_work(&db, "mission", None).unwrap();
         assert!(observed.is_current(&db).unwrap());
+        let reused = observe_work(&db, "mission", Some(&observed)).unwrap();
+        assert!(Arc::ptr_eq(&observed, &reused));
 
         let changed = br#"{"schema_version":1,"id":"mission","revision":1,"title":"Changed"}"#;
         db.execute("UPDATE works SET body=?", [&changed[..]])
             .unwrap();
         assert!(!observed.is_current(&db).unwrap());
+        let changed = observe_work(&db, "mission", Some(&observed)).unwrap();
+        assert!(!Arc::ptr_eq(&observed, &changed));
+        assert_eq!(changed.work.title, "Changed");
 
         let later = br#"{"schema_version":1,"id":"mission","revision":2,"title":"Original"}"#;
         db.execute("UPDATE works SET revision=2,body=?", [&later[..]])
@@ -209,6 +227,13 @@ mod tests {
             .unwrap();
         assert_eq!(
             observed.is_current(&db).unwrap_err().code(),
+            "row-incoherent"
+        );
+        assert_eq!(
+            observe_work(&db, "mission", Some(&observed))
+                .err()
+                .unwrap()
+                .code(),
             "row-incoherent"
         );
         db.execute("DELETE FROM works", []).unwrap();

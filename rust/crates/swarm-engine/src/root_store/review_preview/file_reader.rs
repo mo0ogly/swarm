@@ -1,8 +1,13 @@
 //! Operator read of files bound to the task’s recorded submission and candidate.
 use super::{finished, task_validation, RootStore, E};
+use crate::recorded_work::ObservedWork;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde_json::{json, Value};
-use std::{collections::BTreeMap, path::Path};
+use std::{
+    collections::BTreeMap,
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
 /// Select the supported text and document formats. This reader has no
 /// executable renderer. Other declared kinds stay visible without bytes.
@@ -30,15 +35,42 @@ fn submitted_report(
     report: &crate::TaskReportRequest,
     limits: &crate::ContextPolicyLimits,
 ) -> Result<Value, E> {
-    let text = crate::read_review_delivery(root, &report.report_path, limits)
-        .map_err(E::Context)?;
-    if crate::provider_configuration::configuration_digest(text.as_bytes()) != report.report_sha256 {
+    let text =
+        crate::read_review_delivery(root, &report.report_path, limits).map_err(E::Context)?;
+    if crate::provider_configuration::configuration_digest(text.as_bytes()) != report.report_sha256
+    {
         return Err(E::Refused("task-review-file-digest-changed"));
     }
     Ok(json!({"id":"report","text":text}))
 }
 
+/// Retain one decoded Work for a service bound to a single Root. The cache
+/// holds no file bytes, decision, receipt or authorization. Each request checks
+/// the persisted Work digest before reuse and rechecks its file provenance.
+#[derive(Default)]
+pub struct TaskReviewFileReader {
+    last_work: Mutex<Option<Arc<ObservedWork>>>,
+}
+
 impl RootStore {
+    /// Read the requested inventory or named original without retaining a
+    /// decode between requests. The revision and all evidence are checked.
+    pub fn task_review_files(
+        &self,
+        work: &str,
+        raw: &[u8],
+        file: Option<&str>,
+        include_report: bool,
+    ) -> Result<Value, E> {
+        self.task_review_files_cached(
+            work,
+            raw,
+            file,
+            include_report,
+            &TaskReviewFileReader::default(),
+        )
+    }
+
     /// List the submitted report and the selected task's declared control inputs,
     /// or open one named original. An inventory caller may opt in to the report
     /// bytes in the same observation. A file-level read error remains explicit
@@ -47,22 +79,27 @@ impl RootStore {
     /// bind the allowlist, type and SHA-256 to exact Git bytes. Current policy
     /// limits and revision checks apply. Published controls are sufficient for
     /// this historical read without preparing a reviewer. No state is written.
-    pub fn task_review_files(
+    pub fn task_review_files_cached(
         &self,
         work: &str,
         raw: &[u8],
         file: Option<&str>,
         include_report: bool,
+        reader: &TaskReviewFileReader,
     ) -> Result<Value, E> {
         if include_report && file.is_some() {
             return Err(E::Refused("task-review-files-query-invalid"));
         }
         let request = task_validation::decode(raw).map_err(|error| E::Launch(Box::new(error)))?;
-        crate::root_store::material_path::with_material_read(self, || {
+        // Lock only to exchange namespaced immutable data, never while doing IO.
+        // Poisoning disables the optimization; it cannot authorize a read.
+        let previous = reader.last_work.lock().ok().and_then(|value| value.clone());
+        let (value, observed) = crate::root_store::material_path::with_material_read(self, || {
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
             let observed = (|| {
-                let observed = crate::recorded_work::observe_work(&tx, work).map_err(E::Work)?;
+                let observed = crate::recorded_work::observe_work(&tx, work, previous.as_ref())
+                    .map_err(E::Work)?;
                 let current = &observed.work;
                 if current.revision != request.expected_revision {
                     return Err(E::Refused("review-revision-conflict"));
@@ -124,7 +161,10 @@ impl RootStore {
                 }
             }
             let data = if file == Some("report") {
-                let limits = settings.values.context_policy_limits().map_err(E::Settings)?;
+                let limits = settings
+                    .values
+                    .context_policy_limits()
+                    .map_err(E::Settings)?;
                 submitted_report(&self.root, &report, &limits)?
             } else if let Some(path) = file {
                 let (display, hash) = files
@@ -168,7 +208,10 @@ impl RootStore {
                         "readable":hash.is_some() && category != "unsupported"})
                 }).collect();
                 if include_report {
-                    let limits = settings.values.context_policy_limits().map_err(E::Settings)?;
+                    let limits = settings
+                        .values
+                        .context_policy_limits()
+                        .map_err(E::Settings)?;
                     let report = submitted_report(&self.root, &report, &limits)
                         .unwrap_or_else(|error| json!({"id":"report","error":error.code()}));
                     json!({"files":entries,"report":report})
@@ -179,8 +222,15 @@ impl RootStore {
             if !observed.is_current(&self.db).map_err(E::Work)? {
                 return Err(E::Refused("review-revision-conflict"));
             }
-            Ok(json!({"schema_version":1,"work":work,"task":task,
-                "revision":current.revision,"data":data}))
-        })
+            Ok((
+                json!({"schema_version":1,"work":work,"task":task,
+                "revision":current.revision,"data":data}),
+                observed,
+            ))
+        })?;
+        if let Ok(mut last) = reader.last_work.lock() {
+            *last = Some(observed);
+        }
+        Ok(value)
     }
 }
