@@ -143,7 +143,7 @@ impl NativeHttpService {
         let store = RootStore::open(&self.root, false).map_err(|cause| root("open", cause))?;
         let result = (|| {
             self.check_binding(&store)?;
-            let value = store.task_review_files(work, &raw, fields.get("file").map(String::as_str), include_report)
+            let value = store.task_review_files_cached(work, &raw, fields.get("file").map(String::as_str), include_report, &self.task_review_reader)
                 .map_err(|cause| root("task-review-files-read", cause))?;
             serde_json::to_vec(&value).map(RouteBody::plain).map_err(E::ResponseJson)
         })();

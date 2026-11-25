@@ -5232,6 +5232,13 @@ de refus et les écritures de validation restent natives.
 Le premier affichage doit réutiliser le rapport fourni par l’inventaire.
 Une réouverture explicite relit le fichier. Un rapport en erreur laisse les
 autres pièces accessibles.
+Le contrôle unitaire `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+vérifie séparément la comparaison de la révision et des octets de la mission.
+Il vérifie aussi que deux lectures identiques réutilisent le même décodage et
+qu’une divergence à révision égale impose un nouveau décodage. Les lectures de
+fichiers et leurs contrôles ne sont pas mis en cache.
+Sur le parcours français, la sélection d’une autre pièce déclenche uniquement
+sa lecture et conserve l’inventaire. Le navigateur utilise une réponse contrôlée.
 Avec la preuve rattachée, il valide la tâche et relit le
 nouvel état après un seul enregistrement. La recette vérifie aussi le refus
 d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
@@ -5246,6 +5253,12 @@ Monaco report, search, the mobile reader and recovery from a failed read.
 It checks that the inventory response supplies the initial report without a
 second request, that explicit reopening revalidates it, and that a report
 error leaves the rest of the inventory available.
+The unit test `recorded_work::tests::observed_work_rejects_revision_and_body_drift`
+separately checks the mission revision and body comparison.
+It also checks reuse of an identical decoded record and a fresh decode when bytes
+change at the same revision. File data and evidence checks remain uncached.
+The French browser path selects a different item and checks that only its
+original is requested, using a controlled response.
 The browser also checks cockpit help in FR/EN, Escape and focus return,
 the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.

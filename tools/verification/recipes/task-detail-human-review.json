@@ -13,6 +13,7 @@
     "web/task-detail-files.js",
     "rust/crates/swarm-web/src/service/native_admin.rs",
     "rust/crates/swarm-engine/src/root_store/review_preview/file_reader.rs",
+    "rust/crates/swarm-engine/src/recorded_work.rs",
     "tests/rust_task_detail_review.cjs",
     "web/i18n-en.js",
     "tests/rust_planning_activation.py",
@@ -39,6 +40,7 @@
         "PASS protected read-only precheck, stale revision and CSRF refusal",
         "PASS fr cockpit help, keyboard return and read-only guidance",
         "PASS fr submitted report opens first, Monaco search and responsive file tree",
+        "PASS selecting another deliverable reads only that original",
         "PASS click recorded one task.update and public readback confirmed acceptance"
       ],
       "required_stderr": [],

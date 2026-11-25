@@ -17,7 +17,7 @@ async function verify(){
   const errors=[],writes=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(request.method()==='POST')writes.push(new URL(request.url()).pathname)});
-  let held,listReads=0,reportReads=0;
+  let held,listReads=0,reportReads=0,supportReads=0;
   let failInterception;
   const interceptionFailure=new Promise((_,reject)=>{failInterception=reject});
   interceptionFailure.catch(()=>{});
@@ -40,14 +40,17 @@ async function verify(){
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
-     if(file){assert.equal(file,'report');reportReads++;}
+     if(file==='report')reportReads++;
+     else if(file==='support.md')supportReads++;
+     else if(file)assert.fail('unexpected original file '+file);
      else assert.equal(uri.searchParams.get('include_report'),'1');
      if(!file&&++listReads===1&&!cfg.eligible){
       await request.respond({status:503,contentType:'application/json',body:'{}'});return;
      }
      const report={id:'report',text:'# Review proof\n\nReadable result review-task',language:'markdown'};
      const unavailable=!file&&!cfg.eligible&&listReads===3;
-     const data=file?{...report,text:report.text+'\n\nRevalidated'}
+     const data=file==='support.md'?{id:file,text:'# Supporting evidence',language:'markdown'}
+      :file?{...report,text:report.text+'\n\nRevalidated'}
       :{files:[{id:'report',path:'Report.md',kind:'markdown',readable:true},
        {id:'support.md',path:'support.md',kind:'markdown',readable:true}],
        report:unavailable?{id:'report',error:'task-review-file-digest-changed'}:report};
@@ -140,6 +143,12 @@ async function verify(){
   await page.screenshot({path:cfg.screenshot});
   console.log('PASS '+cfg.lang+' submitted report opens first, Monaco search and responsive file tree');
   if(cfg.eligible){
+   await page.click(dialog+' [data-file-id="original:support.md"]');
+   await observe(page.waitForFunction(()=>/Supporting\s+evidence/.test(document.querySelector('.monaco-editor .view-lines')?.textContent||'')));
+   assert.equal(supportReads,1,'switching files reads only the selected original');
+   assert.equal(listReads,1,'switching files does not reload the inventory');
+   assert.equal(reportReads,0,'switching files does not read the submitted report again');
+   console.log('PASS selecting another deliverable reads only that original');
    await page.waitForFunction(selector=>document.querySelector(selector)?.disabled===false,{},button);
    await page.click(button);
    await page.waitForSelector(dialog+' .task-detail-header [data-task-state=accepted]');

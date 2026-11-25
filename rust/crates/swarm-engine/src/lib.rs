@@ -747,6 +747,7 @@ mod planning_scope_context;
 
 #[cfg(target_os = "linux")]
 pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_gate, TaskReviewOutcome};
+pub use root_store::TaskReviewFileReader;
 
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;

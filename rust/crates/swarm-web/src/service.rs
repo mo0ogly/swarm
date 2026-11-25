@@ -773,6 +773,7 @@ pub struct NativeHttpService {
     /// v52 access gate read at start (owner key or authority assertions).
     access: AccessGate,
     probe_shutdown: std::sync::atomic::AtomicBool,
+    task_review_reader: swarm_engine::TaskReviewFileReader,
 }
 /// Read-only identity/readiness probes of the local launcher (`swarm.sh
 /// status|restart`): GET/HEAD of the compiled version and native capabilities
@@ -934,6 +935,7 @@ impl NativeHttpService {
                 cookie_max_age_seconds,
                 access,
                 probe_shutdown:std::sync::atomic::AtomicBool::new(false),
+                task_review_reader: swarm_engine::TaskReviewFileReader::default(),
             }),
             (Err(primary), cleanup) => close(Err(primary), cleanup),
             (Ok((_, binding)), Err(cause)) => {
@@ -1004,6 +1006,7 @@ impl NativeHttpService {
                     cookie_max_age_seconds,
                     access,
                     probe_shutdown:std::sync::atomic::AtomicBool::new(false),
+                    task_review_reader: swarm_engine::TaskReviewFileReader::default(),
                 }),
                 Err(cause) => close(Err(root("bootstrap-close", cause)), binding.close()),
             },
