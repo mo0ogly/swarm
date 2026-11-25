@@ -144,7 +144,7 @@ async function verify(){
   console.log('PASS '+cfg.lang+' submitted report opens first, Monaco search and responsive file tree');
   if(cfg.eligible){
    await page.click(dialog+' [data-file-id="original:support.md"]');
-   await observe(page.waitForFunction(()=>document.querySelector('.monaco-editor .view-lines')?.textContent.includes('Supporting evidence')));
+   await observe(page.waitForFunction(()=>/Supporting\s+evidence/.test(document.querySelector('.monaco-editor .view-lines')?.textContent||'')));
    assert.equal(supportReads,1,'switching files reads only the selected original');
    assert.equal(listReads,1,'switching files does not reload the inventory');
    assert.equal(reportReads,0,'switching files does not read the submitted report again');
