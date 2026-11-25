@@ -1,5 +1,40 @@
 # Native worker completion and retry
 
+### Attach a control after submission
+
+For an already submitted managed worker, `task update WORK --input FILE --json`
+can complete an authorized `human` policy with no controls. The request carries
+the task ID, expected revision, `validation_policy` with the first controls,
+`confirm_contract_revision: true`, `expected_contract` (current task-contract
+digest), and `contract_revision_reason`. A request that also changes status,
+criteria, or ownership still follows the ordinary contract-edit rules.
+
+The engine requires an active mission, an open scope with no holder and no active worker in the mission, and a task with no active controller or reviewer and no current validation evidence. It rereads
+the submission and latest completed attempt, then checks the retained report
+bytes before authorizing the controls under the Admin policy. It preserves
+the submission, criteria, attempts, caps, and human mode. The new control
+authorization records the time and actor of the operation. A new event cannot
+overwrite the already attached controls.
+
+```mermaid
+flowchart LR
+    A["Managed submission and retained report"] --> B["Explicit revision and control confirmation"]
+    B --> C["Candidate and control execution"]
+    C --> D["Evidence pending human validation"]
+    D --> E["Independent review and guarded publication"]
+```
+
+`task validation-candidate` verifies Git provenance again, then
+`task validate` runs the declared controls on the candidate. A passing
+human-mode control provides auxiliary evidence. Independent review and the
+human decision remain required before publication. A refused attachment leaves
+the submission intact. If execution records failed or incomplete controls, the
+engine retains the report and blocks the task with
+`controls-failed-or-incomplete`. Recovery requires an explicit decision before
+preparing another validation candidate.
+Attachment starts no execution. An already authorized mission driver may
+select the submission for a later control.
+
 ### Cost of candidate rechecks
 
 Before and after a managed control runs, Swarm verifies candidate inputs

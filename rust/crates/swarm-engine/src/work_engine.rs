@@ -1232,7 +1232,23 @@ fn apply<E: WorkEnvironment>(
                 .ok_or_else(|| refused("gate-task-not-found"))?[index] = prepared;
         }
         "task.update" => {
-            if !r.status.is_empty() {
+            if candidate.planning.as_ref().is_some_and(|p| p.repository.is_some())
+                && crate::mutation_guard::managed_submission_controls_only(r)
+            {
+                #[cfg(target_os = "linux")]
+                {
+                    require_native_task_idle(tx, &candidate.id, &r.id, "managed-submission-controls-worker-active")?;
+                    let settings = planning_settings.ok_or(WorkEngineError::TaskReport(
+                        crate::AgentLaunchError::Refused("task-report-settings-required")))?;
+                    let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
+                    let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
+                    crate::root_store::attach_managed_submission_controls(
+                        tx, root, &mut candidate, r, settings, at, actor,
+                    ).map_err(WorkEngineError::TaskReport)?;
+                }
+                #[cfg(not(target_os = "linux"))]
+                return Err(WorkEngineError::Lifecycle(crate::TaskLifecycleError::HierarchyNotPorted));
+            } else if !r.status.is_empty() {
                 let context = crate::TaskLifecycleContext {
                     root,
                     quality_policy,

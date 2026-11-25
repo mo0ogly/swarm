@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "native-managed-human-controls",
+  "inputs": [
+    "tests/rust_agent_model_route.py",
+    "tests/rust_managed_human_controls.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_memory_files.py",
+    "tests/rust_native_managed_candidate.py",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "rust/crates/swarm-engine/src/managed_repository_controls.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/managed_receipt.rs",
+    "docs/architecture/NATIVE-WORKER-RECOVERY.md",
+    "version_history.json",
+    "docs/en/NATIVE-WORKER-RECOVERY.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "managed-human-controls-on-retained-submission",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; names=['binary','producer','profile','output','projection-probe']; subprocess.run(['python3','tests/rust_managed_human_controls.py',*[part for name in names for part in ('--'+name,os.environ['SWARM_HUMAN_CONTROLS_'+name.upper().replace('-','_')])]],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS managed-human-controls-original-preserved",
+        "PASS managed-human-controls-stay-pending-human",
+        "PASS managed-human-controls-require-independent-review"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

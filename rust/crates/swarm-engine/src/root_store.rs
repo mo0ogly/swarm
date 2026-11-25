@@ -71,7 +71,7 @@ pub use planning_step::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
 pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence, ReviewRefreshOutcome};
 #[cfg(target_os = "linux")]
-pub(crate) use task_validation::require_validation_idle;
+pub(crate) use task_validation::{require_validation_idle, attach_managed_submission_controls};
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
