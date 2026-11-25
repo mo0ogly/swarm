@@ -306,6 +306,8 @@ When you switch deliverables, the server verifies and reads the selected file.
 It reuses the decoded mission record while its bytes remain identical.
 For a managed original, the same validation receipt is decoded once per read.
 Its digest, supporting evidence and the selected file's bytes are still checked.
+The engine reuses the receipt's verified control mapping within the read and
+checks the recorded evidence again on the next request.
 On phones, **Files** expands the tree. Selecting a file closes the tree and
 returns to the viewer. **Technical details** groups the task JSON files. Monaco
 provides read-only search. Available Word, OpenDocument and PDF originals can
@@ -314,6 +316,9 @@ items use Logs view permissions. **Approve** and its status stay above the
 viewer. On a refusal, **Diagnosis** shows the engine code.
 When the server is already handling other reads, the dialog explains why and
 keeps the tree available. **Try again** resumes the selected file.
+To diagnose a delay, add `fileTiming=1` to the cockpit URL. The viewer records
+the latest successful read in its `data-review-timing` attribute. Milliseconds
+cover engine checks, Git commands and browser rendering.
 
 In the side menu, **AI cockpit help** explains how to open a deliverable, see why
 approval is blocked, and find Logs or Resume. Shortcuts open the views you have

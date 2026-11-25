@@ -326,7 +326,9 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
  /** Read one declared file. Retry stays attached to that selection and late
   * responses cannot overwrite a newer file or a closed dialog. */
  async function select(file){
+  const started=performance.now();
   const ticketValue=++ticket;
+  delete viewer.dataset.reviewTiming;
   currentId=String(file.id);
   for(const selected of treeList.querySelectorAll('[aria-current=true]'))selected.removeAttribute('aria-current');
   [...treeList.querySelectorAll('[data-file-id]')].find(row=>row.dataset.fileId===file.id)?.setAttribute('aria-current','true');
@@ -387,7 +389,17 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   }
   truncated.hidden=!result.truncated;
   if(result.text===''){setStatus(viewerStatus,tr('Le fichier est vide.'));return;}
+  const renderStarted=performance.now();
   await show(result,file.kind,ticketValue);
+  // The opt-in sample is retained on the current viewer only. Two frames give
+  // Monaco a paint opportunity without blocking normal selection or retries.
+  if(result.timing)requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   if(!alive||ticketValue!==ticket)return;
+   const rendered=performance.now();
+   viewer.dataset.reviewTiming=JSON.stringify({...result.timing,
+    request:renderStarted-started,render:rendered-renderStarted,total:rendered-started,
+    mode:editorHost.hidden?'text':'monaco'});
+  }));
  }
 
  async function show(result,kind,ticketValue){

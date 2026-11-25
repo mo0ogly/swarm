@@ -121,7 +121,7 @@ fn verify<'a>(
     r: &Receipt,
 ) -> Result<Binding<'a>, A> {
     // Full candidate self-binding: schema, nonempty plan, recorded digest.
-    candidate.verify_binding()?;
+    let candidate_sha256 = candidate.verified_binding_digest()?;
     if candidate.work != r.job.work_id
         || candidate.task != r.job.task_id
         || candidate.agent != r.producer_agent_id
@@ -139,9 +139,6 @@ fn verify<'a>(
     if plan.contract != candidate.contract {
         return Err(A::Refused("task-validation-managed-receipt-contract-mismatch"));
     }
-    let candidate_sha256 = candidate
-        .binding_digest()
-        .map_err(|e| caused("task-validation-managed-candidate-digest", e))?;
     origin.verify_candidate_binding(Some(candidate_sha256.as_str()))?;
     origin.verify_controls(&r.job.id, plan)?;
     cohort(plan, &r.policy, &r.job.task_id)?;

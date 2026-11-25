@@ -413,6 +413,8 @@ En passant d’un livrable à l’autre, le serveur vérifie et lit le fichier c
 en réutilisant l’enregistrement décodé de la mission tant que ses octets restent identiques.
 Pour un original géré, le même reçu de validation est décodé une fois par
 lecture. Son empreinte, les preuves associées et les octets du fichier restent vérifiés.
+Le moteur réutilise la vérification des contrôles de ce reçu pendant la lecture.
+Chaque nouvelle lecture vérifie de nouveau les preuves enregistrées.
 Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
 referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
 tâche. Monaco offre une recherche en lecture seule. Les originaux Word,
@@ -421,6 +423,10 @@ OpenDocument et PDF disponibles se téléchargent. Si une lecture échoue,
 droits de la vue Journaux. **Valider** et son motif restent au-dessus du lecteur.
 Si le serveur traite déjà d’autres lectures, la modale indique ce motif et
 conserve l’arborescence. **Réessayer** reprend le fichier sélectionné.
+Pour diagnostiquer un délai, ajoutez `fileTiming=1` à l’adresse du cockpit.
+Le lecteur conserve les durées de la dernière lecture réussie dans l’attribut
+`data-review-timing` de l’aperçu. Les durées sont en millisecondes et incluent
+les vérifications du moteur, les commandes Git et le rendu dans le navigateur.
 En cas de refus, **Diagnostic** montre le code du moteur.
 
 Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un

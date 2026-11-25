@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le lecteur de livrables réutilise les contrôles déjà vérifiés au sein d’une lecture. Le diagnostic de lecture distingue les temps des vérifications, de Git et de l’affichage.",
+        "en": "The file viewer reuses verified controls within a single read. The file timing diagnostic distinguishes verification, Git, and display times."
+      },
+      {
         "fr": "En cas de saturation des lectures, le lecteur conserve l’arborescence et propose de réessayer le fichier sélectionné.",
         "en": "When read workers are busy, the viewer keeps the file tree available and lets you retry the selected file."
       },
