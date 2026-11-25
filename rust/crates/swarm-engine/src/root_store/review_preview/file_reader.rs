@@ -62,7 +62,8 @@ impl RootStore {
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
             let observed = (|| {
-                let current = crate::read_recorded_work(&tx, work).map_err(E::Work)?;
+                let observed = crate::recorded_work::observe_work(&tx, work).map_err(E::Work)?;
+                let current = &observed.work;
                 if current.revision != request.expected_revision {
                     return Err(E::Refused("review-revision-conflict"));
                 }
@@ -78,16 +79,17 @@ impl RootStore {
                     .is_some_and(|planning| planning.repository.is_some());
                 let candidate = if managed {
                     Some(task_validation::published_managed_candidate(
-                        self, &current, &task.id,
+                        self, current, &task.id,
                     )?)
                 } else {
                     None
                 };
-                let report = task_validation::submission(&tx, &current, &request.task_id)
+                let report = task_validation::submission(&tx, current, &request.task_id)
                     .map_err(|e| E::Launch(Box::new(e)))?;
-                Ok((current, candidate, report))
+                Ok((observed, candidate, report))
             })();
-            let (current, candidate, report) = finished(observed, tx.rollback().map_err(E::Sql))?;
+            let (observed, candidate, report) = finished(observed, tx.rollback().map_err(E::Sql))?;
+            let current = &observed.work;
             let candidate = candidate.as_ref();
             let task = &request.task_id;
             let mut files = BTreeMap::new();
@@ -141,7 +143,7 @@ impl RootStore {
                 let candidate = candidate.ok_or(E::Refused("task-review-file-unavailable"))?;
                 let bytes = crate::managed_repository::read_original_blob(
                     &self.root,
-                    &current,
+                    current,
                     candidate,
                     path,
                     &settings,
@@ -174,7 +176,7 @@ impl RootStore {
                     json!({"files":entries})
                 }
             };
-            if self.read_work(work)?.revision != current.revision {
+            if !observed.is_current(&self.db).map_err(E::Work)? {
                 return Err(E::Refused("review-revision-conflict"));
             }
             Ok(json!({"schema_version":1,"work":work,"task":task,
