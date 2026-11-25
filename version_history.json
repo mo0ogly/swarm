@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "L’ouverture d’un livrable géré décode son reçu de validation une seule fois et revérifie l’empreinte avant de lire le fichier.",
+        "en": "Opening a managed deliverable decodes its validation receipt once and rechecks its digest before reading the file."
+      },
+      {
         "fr": "Le profil Rust local optimise SHA-256 pour les relectures de candidats gérés. Les empreintes, contrôles d’origine et délais configurés sont conservés.",
         "en": "The local Rust profile optimizes SHA-256 for managed candidate reads. Digests, original checks, and configured deadlines are preserved."
       },

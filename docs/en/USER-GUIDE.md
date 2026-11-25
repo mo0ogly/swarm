@@ -302,6 +302,8 @@ If the mission changes during the read, refresh it to open the files for its
 new revision.
 When you switch deliverables, the server verifies and reads the selected file.
 It reuses the decoded mission record while its bytes remain identical.
+For a managed original, the same validation receipt is decoded once per read.
+Its digest, supporting evidence and the selected file's bytes are still checked.
 On phones, **Files** expands the tree. Selecting a file closes the tree and
 returns to the viewer. **Technical details** groups the task JSON files. Monaco
 provides read-only search. Available Word, OpenDocument and PDF originals can
