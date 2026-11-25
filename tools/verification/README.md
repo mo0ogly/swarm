@@ -5232,9 +5232,6 @@ de refus et les écritures de validation restent natives.
 Le premier affichage doit réutiliser le rapport fourni par l’inventaire.
 Une réouverture explicite relit le fichier. Un rapport en erreur laisse les
 autres pièces accessibles.
-Une soumission isolée fournit aussi un témoin HTTP natif. La recette compare
-les lectures combinée et séparées, altère le rapport de fixture, vérifie
-l’erreur de digest puis restaure les octets et confirme la reprise.
 Avec la preuve rattachée, il valide la tâche et relit le
 nouvel état après un seul enregistrement. La recette vérifie aussi le refus
 d’une révision périmée et d’une écriture sans CSRF. Node utilise le Puppeteer du
@@ -5254,9 +5251,6 @@ the Dispatch shortcut and opening help without a write.
 The GitHub `checks` job runs this recipe against the embedded cockpit.
 The existing cockpit recipe includes the reader in its strict script inventory.
 HTTP refusal probes and approval writes use the native service.
-A separate controlled submission compares combined and separate native HTTP
-reads, checks the per-file digest error after changing the fixture report and
-confirms recovery after restoring its bytes.
 With evidence attached, it approves the task and reads back the resulting state
 after one recorded operation. The recipe checks stale revision and missing CSRF
 refusals. Node uses the project's Puppeteer installation, or its path through

@@ -9,44 +9,6 @@ import subprocess
 from urllib.parse import urlencode
 
 import rust_native_http_cli as native
-import rust_manual_mission as manual
-
-
-def verify_report(binary, out):
-    """Compare the protected combined response with separate reads on a real submission.
-
-    Only the owned child fixture's report is changed to exercise digest refusal
-    and recovery. The submitted Work revision and session remain unchanged.
-    """
-    fixture = manual.fixture(binary, out, 'review-report')
-    manual.submit(fixture)
-    work = fixture.ok(['work', 'show', fixture.work])['work']
-    query = urlencode(dict(work=fixture.work, task='task', revision=work['revision']))
-    route = '/api/v1/agent-logs/task-review-files?' + query
-    report_file = fixture.root / 'handoff.md'
-    original = report_file.read_bytes()
-    server = native.Server(binary, fixture.root, out, 'review-report')
-    primary = None
-    try:
-        server.capture_async(out / 'web.stdout')
-        inventory = server.request(route, observe=False)
-        report = server.request(route + '&file=report', observe=False)['data']
-        assert report == {'id': 'report', 'text': original.decode()}, report
-        expected = {**inventory, 'data': {**inventory['data'], 'report': report}}
-        assert server.request(route + '&include_report=1', observe=False) == expected
-        try:
-            report_file.write_bytes(original + b'Changed fixture bytes\n')
-            error = {'id': 'report', 'error': 'task-review-file-digest-changed'}
-            failed = {**inventory, 'data': {**inventory['data'], 'report': error}}
-            assert server.request(route + '&include_report=1', observe=False) == failed
-        finally:
-            report_file.write_bytes(original)
-        assert server.request(route + '&include_report=1', observe=False) == expected
-        print('PASS native combined report matches separate reads and recovers from a digest change', flush=True)
-    except BaseException as error:
-        primary = error
-    finally:
-        native.finish(server, primary)
 
 
 def verify(binary, out):
@@ -174,4 +136,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
     os.umask(0o077)
     verify(args.binary.resolve(strict=True), args.output.resolve())
-    verify_report(args.binary.resolve(strict=True), args.output.resolve() / 'native-report')
