@@ -119,7 +119,7 @@ impl NativeHttpService {
                     swarm_engine::encode_model(&current).map_err(E::Model)?
                 }
             };
-            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None,
+            Ok(RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, preparation_receipt:None,
                 trust_publication:None,
                 observation_causes: Vec::new(),
                 bytes,

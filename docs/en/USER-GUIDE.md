@@ -318,7 +318,12 @@ When the server is already handling other reads, the dialog explains why and
 keeps the tree available. **Try again** resumes the selected file.
 To diagnose a delay, add `fileTiming=1` to the cockpit URL. The viewer records
 the latest successful read in its `data-review-timing` attribute. Milliseconds
-cover engine checks, Git commands and browser rendering.
+cover engine checks, Git commands and browser rendering. Receipt timings cover
+its read and decode, original observations, publication and final recheck.
+The browser console also records the sample as `swarm-task-review-file-timing`
+without paths or payloads. Engine or gateway unavailability is shown in the viewer.
+The engine log records server-side durations under `task_review_timing` in
+the existing `web-outcome` event.
 
 In the side menu, **AI cockpit help** explains how to open a deliverable, see why
 approval is blocked, and find Logs or Resume. Shortcuts open the views you have

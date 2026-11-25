@@ -10,3 +10,11 @@ swarm-confidentiality = { path = "crates/swarm-confidentiality" }
 # checks affordable without altering the algorithms, guards or saved deadlines.
 [profile.dev.package.sha2]
 opt-level = 3
+
+# Optimize the JSON hot paths of the local delivery profile without changing
+# wire bytes, digest algorithms, or the default safety assertions of dev.
+[profile.dev.package.serde_json]
+opt-level = 2
+
+[profile.dev.package.swarm-wire-json]
+opt-level = 2

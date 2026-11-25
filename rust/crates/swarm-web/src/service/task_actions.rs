@@ -113,7 +113,8 @@ impl NativeHttpService {
     /// Read task review originals under the existing Logs view and Root binding.
     /// GET/HEAD accept one Work, task, revision and optional declared file key.
     /// GET may opt into elapsed phase times on a named original.
-    /// The engine owns admission and byte integrity; this adapter records nothing.
+    /// The engine owns admission and byte integrity. An explicitly profiled
+    /// success carries only its timings to the existing native outcome observer.
     pub(super) fn task_review_files(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, E> {
         if !matches!(*request.method(), Method::GET | Method::HEAD) {
             return Err(E::Method("GET, HEAD"));
@@ -151,7 +152,9 @@ impl NativeHttpService {
             self.check_binding(&store)?;
             let value = store.task_review_files_profiled(work, &raw, fields.get("file").map(String::as_str), include_report, &self.task_review_reader, profile)
                 .map_err(|cause| root("task-review-files-read", cause))?;
-            serde_json::to_vec(&value).map(RouteBody::plain).map_err(E::ResponseJson)
+            let mut body = RouteBody::plain(serde_json::to_vec(&value).map_err(E::ResponseJson)?);
+            body.task_review_timing = value.get("timing_ms").cloned().map(super::observation::TaskReviewTiming);
+            Ok(body)
         })();
         close(result, store.close())
     }

@@ -16,7 +16,12 @@ function diagnostic(error){
 }
 /** Translate the known transport refusal without displaying its response body. */
 function readFailure(error,fallback){
- return tr(error?.code==='web-workers-saturated'?'Le serveur traite déjà d’autres lectures.':fallback);
+ switch(error?.code){
+  case 'web-workers-saturated':return tr('Le serveur traite déjà d’autres lectures.');
+  case 'authority-engine-unavailable':return tr('Le moteur Swarm est indisponible.');
+  case 'authority-engine-handshake':return tr('La passerelle ne peut pas établir la connexion au moteur Swarm.');
+  default:return tr(fallback);
+ }
 }
 const el=(tag,text,cls)=>{
  const node=document.createElement(tag);
@@ -391,14 +396,16 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   if(result.text===''){setStatus(viewerStatus,tr('Le fichier est vide.'));return;}
   const renderStarted=performance.now();
   await show(result,file.kind,ticketValue);
-  // The opt-in sample is retained on the current viewer only. Two frames give
-  // Monaco a paint opportunity without blocking normal selection or retries.
+  // The opt-in sample stays on the current viewer and in the browser console.
+  // Two frames give Monaco a paint opportunity without blocking normal reads.
   if(result.timing)requestAnimationFrame(()=>requestAnimationFrame(()=>{
    if(!alive||ticketValue!==ticket)return;
    const rendered=performance.now();
-   viewer.dataset.reviewTiming=JSON.stringify({...result.timing,
+   const timing={...result.timing,
     request:renderStarted-started,render:rendered-renderStarted,total:rendered-started,
-    mode:editorHost.hidden?'text':'monaco'});
+    mode:editorHost.hidden?'text':'monaco'};
+   viewer.dataset.reviewTiming=JSON.stringify(timing);
+   console.info('swarm-task-review-file-timing',timing);
   }));
  }
 

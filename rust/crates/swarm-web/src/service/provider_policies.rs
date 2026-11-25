@@ -48,7 +48,7 @@ impl NativeHttpService {
                 let view = store.provider_policies().map_err(|e| root("provider-policy-read", e))?;
                 serde_json::to_vec(&view).map_err(E::ResponseJson)?
             };
-            Ok(RouteBody { auxiliary_effects:Vec::new(), provider_probe:None, bytes, configuration_recorded: configuration_known, recorded_work: None,
+            Ok(RouteBody { task_review_timing:None, auxiliary_effects:Vec::new(), provider_probe:None, bytes, configuration_recorded: configuration_known, recorded_work: None,
                 recorded_configuration: None, trust_publication: None,
                 preparation_receipt: None, observation_causes: Vec::new() })
         })();

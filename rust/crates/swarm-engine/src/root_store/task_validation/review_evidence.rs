@@ -10,6 +10,17 @@ use crate::{
     root_store::{RootStore, RootStoreError as E},
 };
 use serde::Serialize;
+use std::time::Instant;
+
+/// Opt-in stage durations for an authenticated named file read, in milliseconds.
+/// Contains no identifiers or evidence contents and grants no reuse across reads.
+#[derive(Default, Serialize)]
+pub(in crate::root_store) struct ReceiptTiming {
+    pub receipt_decode: f64,
+    pub receipt_originals: f64,
+    pub receipt_publication: f64,
+    pub receipt_recheck: f64,
+}
 /// Engine-read evidence coordinates, without private PID/host or control text.
 /// Hashes bind observed data; they authenticate neither a human nor an account.
 #[derive(Clone, Serialize)]
@@ -71,16 +82,19 @@ fn recorded(
     task_id: &str,
     origin: Origin<'_>,
 ) -> Result<NativeValidationEvidence, E> {
-    recorded_receipt(root, work, task_id, origin).map(|(evidence, _)| evidence)
+    recorded_receipt(root, work, task_id, origin, None).map(|(evidence, _)| evidence)
 }
 
 /// Return the decoded job receipt alongside its verified coordinates so the
-/// file reader can reuse it after checking the same framed body again.
+/// file reader can reuse it after checking the same framed body again. Optional
+/// durations distinguish anchored decoding, original verification and publication
+/// checks on success without altering the original refusal path.
 fn recorded_receipt(
     root: &RootStore,
     work: &crate::Work,
     task_id: &str,
     origin: Origin<'_>,
+    mut timing: Option<&mut ReceiptTiming>,
 ) -> Result<(NativeValidationEvidence, Receipt), E> {
     let launch = |e| E::Launch(Box::new(e));
     let task = work
@@ -103,8 +117,15 @@ fn recorded_receipt(
         store::recorded_id_for_receipt(&root.db, &work.id, &task.id, &actual.ok_or(E::Refused("review-native-controls-required"))?.receipt)
             .map_err(launch)?.ok_or(E::Refused("review-native-controls-required"))?
     };
+    let decode_started = Instant::now();
     let (receipt, hash): (Receipt, String) = journal::read(root, &journal::name("job", &id))?;
+    let originals_started = Instant::now();
     let (job, slots) = publication::recorded_original_with_slots(root, &receipt, &hash)?;
+    let publication_started = Instant::now();
+    if let Some(timing) = timing.as_deref_mut() {
+        timing.receipt_decode = (originals_started - decode_started).as_secs_f64() * 1000.0;
+        timing.receipt_originals = (publication_started - originals_started).as_secs_f64() * 1000.0;
+    }
     let revision = job
         .published_revision
         .ok_or(E::Refused("review-native-publication-required"))?;
@@ -183,6 +204,9 @@ fn recorded_receipt(
     if !valid {
         return Err(E::Refused("review-native-publication-event-changed"));
     }
+    if let Some(timing) = timing {
+        timing.receipt_publication = publication_started.elapsed().as_secs_f64() * 1000.0;
+    }
     Ok((NativeValidationEvidence {
         job_id: id,
         receipt_sha256: hash,
@@ -214,11 +238,14 @@ pub(in crate::root_store) fn recorded_managed_candidate(
 
 /// Read the previously published managed checkpoint from its original job and
 /// slot receipts. The current Work must carry that exact public control
-/// observation. This does not requalify a worktree or admit a reviewer.
+/// observation. The optional diagnostic also measures the final frame and
+/// candidate recheck. This does not requalify a worktree or admit a reviewer.
 pub(in crate::root_store) fn published_managed_candidate(
-    root: &RootStore, work: &crate::Work, task: &str,
+    root: &RootStore, work: &crate::Work, task: &str, mut timing: Option<&mut ReceiptTiming>,
 ) -> Result<crate::managed_repository::ManagedCandidate, E> {
-    let (evidence, receipt) = recorded_receipt(root, work, task, Origin::PublishedControls)?;
+    let (evidence, receipt) =
+        recorded_receipt(root, work, task, Origin::PublishedControls, timing.as_deref_mut())?;
+    let recheck_started = Instant::now();
     if !journal::recheck::<Receipt>(root, &journal::name("job", &evidence.job_id), &evidence.receipt_sha256)? {
         return Err(E::Refused("review-native-controls-stale"));
     }
@@ -226,6 +253,9 @@ pub(in crate::root_store) fn published_managed_candidate(
     candidate.verify_binding().map_err(|error| E::Launch(Box::new(error)))?;
     if candidate.work != work.id || candidate.task != task {
         return Err(E::Refused("review-managed-candidate-mismatch"));
+    }
+    if let Some(timing) = timing {
+        timing.receipt_recheck = recheck_started.elapsed().as_secs_f64() * 1000.0;
     }
     Ok(candidate)
 }

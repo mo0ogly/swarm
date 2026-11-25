@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le contrôle des reçus sérialise plus efficacement les mêmes octets canoniques. Le diagnostic détaille les étapes du reçu, et le lecteur explique une indisponibilité du moteur.",
+        "en": "Receipt verification builds the same canonical bytes more efficiently. The diagnostic breaks down receipt stages, and the viewer explains engine unavailability."
+      },
+      {
         "fr": "La console distingue le journal actif des archives et affiche le seuil, la rétention, le volume conservé et la dernière rotation.",
         "en": "The console distinguishes the active log from archives and shows the threshold, retention, retained volume and last rotation."
       },

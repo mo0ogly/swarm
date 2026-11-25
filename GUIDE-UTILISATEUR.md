@@ -427,6 +427,12 @@ Pour diagnostiquer un délai, ajoutez `fileTiming=1` à l’adresse du cockpit.
 Le lecteur conserve les durées de la dernière lecture réussie dans l’attribut
 `data-review-timing` de l’aperçu. Les durées sont en millisecondes et incluent
 les vérifications du moteur, les commandes Git et le rendu dans le navigateur.
+Le reçu distingue sa lecture et son décodage, ses preuves originales, sa
+publication et la vérification finale. Le même relevé est écrit dans la console
+du navigateur sous `swarm-task-review-file-timing`, sans chemins ni contenu.
+Le journal du moteur conserve les durées serveur dans le champ
+`task_review_timing` de l’événement `web-outcome`.
+Une indisponibilité du moteur ou de sa connexion est indiquée dans l’aperçu.
 En cas de refus, **Diagnostic** montre le code du moteur.
 
 Dans le menu latéral, **Aide du cockpit IA** rappelle comment ouvrir un
