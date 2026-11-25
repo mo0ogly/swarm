@@ -1613,6 +1613,9 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
         _ => None,
     };
     let mut response=response(error.status(),body,head,allow);
+    if let Some(code) = swarm_authority::diag::engine_code(error.code()) {
+        response.headers_mut().insert(swarm_authority::diag::ENGINE_CODE_HEADER, HeaderValue::from_static(code));
+    }
     if let Some(receipt)=preparation_receipt {response.extensions_mut().insert(observation::PreparationReceipt(receipt));}
     Ok(HttpReply {
         response,

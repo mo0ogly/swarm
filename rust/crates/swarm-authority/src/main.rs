@@ -311,6 +311,11 @@ mod linux {
             "serve" => {
                 let (Some(listen), Some(engine)) = (opt.get("--listen"), opt.get("--engine").and_then(|e| e.parse().ok())) else { return usage() };
                 let config = match AuthorityConfig::load(&loaded.dir) { Ok(c) => c, Err(c) => return fail(c) };
+                // Start the sink at the same validated level that the Admin persists.
+                let diagnostics = match config.diagnostics() { Ok(value) => value, Err(code) => return fail(code) };
+                let Some(log_level) = swarm_authority::diag::level_static(&config.log_level) else {
+                    return fail("authority-config-invalid");
+                };
                 let policy = match Policy::load(&loaded.dir) { Ok(p) => p, Err(c) => return fail(c) };
                 let key = match pinned_seed(&loaded) { Ok(k) => k, Err(c) => return fail(c) };
                 let a = match accounts(&loaded, key.clone()) { Ok(a) => a, Err(c) => return fail(c) };
@@ -320,7 +325,7 @@ mod linux {
                     let listener = match tokio::net::TcpListener::bind(listen).await { Ok(l) => l, Err(_) => return fail("authority-listen") };
                     let own_host = match listener.local_addr() { Ok(a) => a.to_string(), Err(_) => return fail("authority-listen") };
                     eprintln!("{}", serde_json::json!({"schema_version": 1, "listening": own_host, "engine": engine}));
-                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config.clone()), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit, diag: swarm_authority::diag::Diag::open(&loaded.dir, "info"), purge_slots: Default::default(), reset_requests: Default::default() });
+                    let front = Arc::new(server::Front { accounts: a, sessions: Sessions::new(config.clone()), signer: key, config: std::sync::RwLock::new(config), dir: loaded.dir.clone(), own_host, engine, policy: std::sync::RwLock::new(policy), audit, diag: swarm_authority::diag::Diag::open(&loaded.dir, log_level, diagnostics), purge_slots: Default::default(), reset_requests: Default::default() });
                     server::spawn_maintenance(Arc::clone(&front));
                     tokio::select! {
                         r = server::serve(listener, front) => if r.is_err() { return fail("authority-serve") },
