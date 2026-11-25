@@ -652,6 +652,12 @@
     field(reading,'Ordre d’affichage',order);reading.append(wrapLines);
     const display=node('div',undefined,'authority-log-results');
     display.dataset.authorityLogResults='';
+    const activeFilters=node('div',undefined,'toolbar authority-log-filters');
+    activeFilters.setAttribute('role','group');
+    activeFilters.setAttribute('aria-label',tr('Filtres appliqués'));
+    activeFilters.hidden=true;
+    const retry=button('Reprendre la lecture');
+    retry.dataset.authorityLogRetry='';retry.hidden=true;
     const priorMatch=button('Occurrence précédente'),nextMatch=button('Occurrence suivante');
     priorMatch.dataset.authorityLogPriorMatch='';nextMatch.dataset.authorityLogNextMatch='';
     const matchStatus=node('span');matchStatus.setAttribute('role','status');
@@ -669,6 +675,39 @@
     let last=null,applied={},request=0,match=-1;
     const number=value=>Number(value).toLocaleString(lang);
     const phrase=(template,tokens)=>Object.entries(tokens).reduce((message,[key,value])=>message.replace('{'+key+'}',value),tr(template));
+    const chipFields=[
+     ['q',search,'','Recherche'],
+     ['level',filterLevel,'','Niveau'],
+     ...(sourceScoping?[['source',source,'all','Source']]:[]),
+     ...(history?[['position',position,'end','Position de lecture']]:[])
+    ];
+    /** Show only applied criteria. Removing a criterion starts at the first
+     * page and keeps drafts in the other controls intact. */
+    const renderFilters=()=>{
+     const chips=[];
+     for(const [key,control,initial,label] of chipFields){
+      if(applied[key]===initial)continue;
+      const value=control.tagName==='SELECT'
+       ? [...control.options].find(option=>option.value===applied[key])?.textContent??applied[key]
+       : applied[key];
+      const description=tr(label)+' · '+value;
+      const chip=button();
+      chip.dataset['authorityLogFilter'+key[0].toUpperCase()+key.slice(1)]='';
+      chip.textContent=description+' ×';
+      chip.setAttribute('aria-label',phrase('Retirer le filtre {filter}',{filter:description}));
+      chip.addEventListener('click',()=>{
+       applied={...applied,[key]:initial};control.value=initial;
+       if(key==='position')bytes.disabled=false;
+       const details=control.closest('details');
+       if(details)details.open=true;
+       control.focus();
+       renderFilters();
+       void read()
+      });
+      chips.push(chip)
+     }
+     activeFilters.replaceChildren(...chips);activeFilters.hidden=!chips.length
+    };
     const updateActions=()=>{
      const count=last?.lines.length??0;
      const data=last?.total===undefined?null:last;
@@ -733,7 +772,10 @@
       }
       tb.append(row)
      }
-     display.replaceChildren(count?wrap:node('p','Aucune ligne correspondante.'));
+     const empty=sourceScoping&&applied.source==='archives'&&result.archives===0
+      ? 'Aucune archive conservée.'
+      : 'Aucune ligne correspondante.';
+     display.replaceChildren(count?wrap:node('p',empty));
      last=result;match=-1;updateActions()
     };
     /** Reuse the applied input values. Explicit refresh starts a fresh snapshot,
@@ -750,6 +792,7 @@
       if(snapshot)query.set('snapshot',snapshot)
      }
      last=null;
+     retry.hidden=true;
      display.replaceChildren();display.setAttribute('aria-busy','true');updateActions();
      report(tr('Chargement des journaux…'));
      try{
@@ -759,6 +802,10 @@
       if(active()&&id===request){
        rotation.hidden=true;
        report(tr('Échec du chargement des journaux.')+' '+explain(error),true)
+       if(error.message==='authority-log-snapshot-stale'){
+        retry.hidden=false;
+        if(document.activeElement===document.body||pages.contains(document.activeElement))retry.focus()
+       }
       }
      }finally{
       if(active()&&id===request)display.setAttribute('aria-busy','false')
@@ -766,13 +813,14 @@
     };
     const selection=()=>({q:search.value,level:filterLevel.value,position:position.value,source:source.value,rows:rows.valueAsNumber,bytes:bytes.valueAsNumber});
     applied=selection();
-    filters.addEventListener('submit',event=>{event.preventDefault();applied=selection();void read()});
+    retry.addEventListener('click',()=>{refresh.focus();void read()});
+    filters.addEventListener('submit',event=>{event.preventDefault();applied=selection();renderFilters();void read()});
     refresh.addEventListener('click',()=>void read());
     reset.addEventListener('click',()=>{
      search.value='';filterLevel.value='';position.value='end';source.value='all';
      bytes.disabled=false;order.value='newest';
      if(policy){rows.value=String(policy.page_rows);bytes.value=String(policy.max_bytes)}
-     applied=selection();void read()
+     applied=selection();renderFilters();void read()
     });
     order.addEventListener('change',()=>{
      if(history){void read();return}
@@ -859,7 +907,7 @@
     settings.append(toolbar(save),savedState);
     if(policy)view.prepend(rotation,filters);
     else view.prepend(node('p','La recherche dans les archives exige une mise à jour du démon.','notice info'),toolbar(refresh));
-    view.append(reading,matches,display);
+    view.append(reading,activeFilters,matches,retry,display);
     if(history)view.append(pages);
     view.append(exports,settings);
     if(history)await read();else render(first)

@@ -76,6 +76,12 @@ fn reply(status: StatusCode, v: Value) -> http::Response<Body> {
 fn refuse(status: StatusCode, code: &str) -> http::Response<Body> {
     reply(status, json!({"error": code}))
 }
+
+/// Return the original history-read refusal and record its safe code out of band.
+fn refuse_log_read(status: StatusCode, code: &'static str) -> http::Response<Body> {
+    crate::diag::Diag::report_read_failure(code, status.as_u16());
+    refuse(status, code)
+}
 fn ok(v: Value) -> http::Response<Body> {
     reply(StatusCode::OK, v)
 }
@@ -798,15 +804,15 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
         (Method::GET, ["log"]) => {
             let query = match crate::diag::LogQuery::parse(&query) {
                 Ok(query) => query,
-                Err(code) => return refuse(StatusCode::BAD_REQUEST, code),
+                Err(code) => return refuse_log_read(StatusCode::BAD_REQUEST, code),
             };
             // Keep synchronous retained-file reads out of the HTTP runtime.
             match tokio::task::spawn_blocking(move || front.diag.query(&query)).await {
                 Ok(Ok(page)) => ok(page),
-                Ok(Err(code @ crate::diag::SNAPSHOT_STALE)) => refuse(StatusCode::CONFLICT, code),
-                Ok(Err(code @ "authority-log-filter-invalid")) => refuse(StatusCode::BAD_REQUEST, code),
-                Ok(Err(code)) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
-                Err(_) => refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-diag-io"),
+                Ok(Err(code @ crate::diag::SNAPSHOT_STALE)) => refuse_log_read(StatusCode::CONFLICT, code),
+                Ok(Err(code @ "authority-log-filter-invalid")) => refuse_log_read(StatusCode::BAD_REQUEST, code),
+                Ok(Err(code)) => refuse_log_read(StatusCode::INTERNAL_SERVER_ERROR, code),
+                Err(_) => refuse_log_read(StatusCode::INTERNAL_SERVER_ERROR, "authority-diag-io"),
             }
         }
         (Method::POST, ["config", "preview"]) | (Method::POST, ["config"]) => {

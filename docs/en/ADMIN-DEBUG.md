@@ -75,9 +75,20 @@ navigation, line wrapping and counts guide reading. TXT and HTML downloads
 contain the visible columns on the displayed page. Escape closes the console
 and restores focus to its shortcut.
 
-**Refresh** repeats the applied criteria on a new read. Rotation or an append
-between pages can make the previous read stale. The console then asks for a
-refresh. Refusals and read errors are visible and clear the displayed results.
+Applied search, severity, source and read position appear above the table.
+Selecting a filter chip clears that criterion and returns to the first page.
+**Refresh** repeats the applied criteria. When rotation or an append expires
+the snapshot between pages, **Resume reading** requests the first page with
+those same criteria. The Archives source reports an empty archive store
+separately from a search with no matching rows. Read errors clear the displayed
+results.
+
+The Rust authority daemon records the start of its listener at Info in the
+application journal. Invalid or stale history reads emit a Warn event to the
+daemon's standard error. Internal read failures emit an Error there. These
+events carry the HTTP status and stable code. Keeping them outside
+`authority.log` preserves its snapshots and excludes filter text and snapshot
+values from the diagnostic.
 
 The active `authority.log` lives in the daemon's declared directory. The
 whole active file is archived before the next event would exceed the saved
