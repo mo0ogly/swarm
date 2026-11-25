@@ -177,13 +177,13 @@ fn cohort(
         {
             return Err(A::Refused("task-validation-managed-receipt-cohort-invalid"));
         }
-        if crate::text::trim_space(&policy.original.mode) != "automatic"
+        if !matches!(crate::text::trim_space(&policy.original.mode), "automatic" | "human")
             || crate::text::trim_space(&policy.original.actor).is_empty()
             || crate::text::trim_space(&policy.original.authorized_at).is_empty()
         {
             return Err(A::Refused("task-validation-managed-receipt-policy-unauthorized"));
         }
-        if policy.normalized.mode != "automatic"
+        if !matches!(policy.normalized.mode.as_str(), "automatic" | "human")
             || !policy.normalized.actor.is_empty()
             || !policy.normalized.authorized_at.is_empty()
         {

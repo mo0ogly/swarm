@@ -1,5 +1,52 @@
 # Fin native du worker et reprise
 
+### Ajouter un contrôle après la soumission
+
+Sur un worker géré déjà soumis, `task update WORK --input FILE --json`
+peut compléter une politique `human` autorisée sans contrôles. La requête
+contient l’identifiant de tâche, la révision attendue, `validation_policy`
+avec le premier ensemble de contrôles, `confirm_contract_revision: true`,
+`expected_contract` (empreinte courante du contrat) et
+`contract_revision_reason` (motif de la modification). Une requête mêlant
+statut, critères ou propriétaires garde les règles de modification ordinaires.
+
+Le moteur exige une mission active, un périmètre ouvert sans détenteur, aucun worker actif dans la mission, et une tâche sans contrôleur ni reviewer actif et sans preuve de validation courante. Il relit
+la soumission et la dernière tentative terminée, puis vérifie les octets
+conservés du rapport avant d’autoriser le contrôle selon les réglages Admin.
+Il conserve la soumission, les critères, les tentatives, les plafonds et le
+mode humain. La nouvelle autorisation de contrôle porte la date et
+l’acteur de l’opération. Une deuxième modification avec un identifiant
+différent ne remplace pas les contrôles déjà enregistrés.
+
+```mermaid
+flowchart LR
+    A["Soumission gérée + rapport conservé"] --> B["Révision et contrôle explicitement confirmés"]
+    B --> C["Candidat et exécution des contrôles"]
+    C --> D["Preuve en attente de validation humaine"]
+    D --> E["Revue indépendante et publication protégée"]
+```
+
+`task validation-candidate` relit la provenance Git, puis `task validate`
+exécute les contrôles déclarés sur le candidat. En mode humain, un contrôle
+réussi reste une preuve auxiliaire. La revue indépendante et la décision
+humaine restent exigées avant la publication. Un refus de rattachement laisse
+la soumission intacte. Si l’exécution enregistre des contrôles en échec ou
+incomplets, le moteur conserve le rapport et bloque la tâche avec
+`controls-failed-or-incomplete`. La reprise passe par une décision explicite
+avant un nouveau candidat de validation.
+Le rattachement ne déclenche aucune exécution. Un conducteur de mission déjà
+autorisé peut sélectionner cette soumission pour un contrôle ultérieur.
+
+### Relire le journal d’un worker terminé
+
+Le journal original conserve le dernier instantané des actions en direct.
+À la fin du worker, le moteur efface cette projection de la fiche terminale.
+La relecture du journal applique le même effacement avant de comparer
+l’état attendu à la fiche enregistrée. La recette de rattachement des contrôles
+vérifie cette reprise sur le binaire candidat, après un premier worker. Elle
+compare le journal d’origine avec la fiche terminale. Le mode de comparaison
+historique conserve le refus du binaire précédent dans une exécution distincte.
+
 ### Coût des relectures du candidat
 
 Avant et après l’exécution d’un contrôle géré, Swarm vérifie les entrées et

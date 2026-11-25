@@ -237,6 +237,9 @@ fn verify_terminal(db: &rusqlite::Connection, journal: &Journal, current: &Agent
     expected.progress = journal.progress.clone();
     expected.reply = journal.public_reply.clone();
     expected.native_execution_result = Some(journal.details.clone());
+    // Settlement clears the live heartbeat projection. Its frozen snapshot
+    // remains in the original and is not valid on a terminal Agent.
+    expected.native_task_actions = None;
     journal.facts.apply(&mut expected);
     expected.activity = "Processus récolté ; tâche non acceptée, validation requise".into();
     if expected.status == "interrupted" {

@@ -216,6 +216,21 @@ pub(crate) fn edits_definition(r: &Request) -> bool {
         || r.max_tool_calls != 0
         || r.validation_policy.is_some()
 }
+/// Identify an explicitly confirmed, policy-only update for managed submissions.
+/// This class selects stricter submission-specific checks in the Work writer.
+pub(crate) fn managed_submission_controls_only(r: &Request) -> bool {
+    r.confirm_contract_revision && r.validation_policy.is_some() && *r == Request {
+        schema_version: r.schema_version,
+        event_id: r.event_id.clone(),
+        expected_revision: r.expected_revision,
+        id: r.id.clone(),
+        confirm_contract_revision: true,
+        expected_contract: r.expected_contract.clone(),
+        contract_revision_reason: r.contract_revision_reason.clone(),
+        validation_policy: r.validation_policy.clone(),
+        ..Request::default()
+    }
+}
 fn paused(db: &Connection, work: &str) -> Result<bool, MutationGuardError> {
     statement(
         db,
@@ -339,7 +354,10 @@ pub fn inspect_recorded_mutation(
     if matches!(kind, "task.update" | "task.submit") {
         let r = decode_stored_request(request)?;
         let definition = edits_definition(&r);
-        if w.planning.is_some() && definition {
+        let managed_controls = kind == "task.update"
+            && w.planning.as_ref().is_some_and(|p| p.repository.is_some())
+            && managed_submission_controls_only(&r);
+        if w.planning.is_some() && definition && !managed_controls {
             if kind != "task.update" {
                 return Err(MutationGuardError::ContractRevision(
                     ContractRevisionRefusal::ExplicitUpdateRequired,
