@@ -48,6 +48,7 @@
         "PASS en cockpit help, keyboard return and read-only guidance",
         "PASS en submitted report opens first, Monaco search and responsive file tree",
         "PASS failed initial report keeps other files and retries with a fresh read",
+        "PASS task detail explains exhausted review budget without enabling approval",
         "PASS blocked dialog preserves submitted revision",
         "PASS protected read-only precheck, stale revision and CSRF refusal",
         "PASS fr cockpit help, keyboard return and read-only guidance",

@@ -18,6 +18,7 @@ async function verify(){
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(request.method()==='POST')writes.push(new URL(request.url()).pathname)});
   let held,heldCatalog,linkedReads=0,catalogReads=0,listReads=0,reportReads=0,supportReads=0;
+  let reviewBudgetBlocked=false;
   let catalogRequested;
   const initialCatalog=new Promise(resolve=>{catalogRequested=resolve});
   let failInterception;
@@ -43,7 +44,16 @@ async function verify(){
      const task=work.id===cfg.work&&work.tasks.find(task=>task.id===cfg.task);
      assert(task);
      if(task.status==='submitted')task.automatic_validation={receipt:'fixture-read-only'};
+     if(!cfg.eligible){
+      work.planning={...work.planning,reviewer:{provider:'fixture',calls:5,max_calls:5}};
+      task.previous_reviews=[{state:'error',reason:'native-review-helper-waited-before-grant'}];
+     }
      await request.respond({contentType:'application/json',body:JSON.stringify(work)});return;
+    }
+    if(reviewBudgetBlocked&&request.method()==='GET'&&uri.pathname==='/api/v1/action'){
+     await request.respond({status:409,contentType:'application/json',body:JSON.stringify({
+      failure:{reason:'native-scoped-submitted-review-required'},
+     })});return;
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
@@ -207,7 +217,15 @@ async function verify(){
    await page.waitForSelector(dialog,{hidden:true});
    assert.equal(await page.$eval(see,node=>node===document.activeElement),true);
    assert.deepEqual(writes,[]);
+   reviewBudgetBlocked=true;
    await page.click(see);
+   const budgetContext=dialog+' [data-review-context]:not([hidden])';
+   await observe(page.waitForSelector(budgetContext,{visible:true}));
+   assert.match(await page.$eval(budgetContext,node=>node.textContent),
+    /5\/5 review calls used\. The review budget is exhausted\. The last review stopped before calling the provider because the helper process exited\./);
+   assert.equal(await page.$eval(button,node=>node.disabled),true);
+   assert.deepEqual(writes,[]);
+   console.log('PASS task detail explains exhausted review budget without enabling approval');
    await page.waitForSelector(dialog+' .task-detail-file-retry',{visible:true});
    assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/task-review-file-digest-changed/);
    assert.equal(await page.$$eval(dialog+' [data-file-id="original:support.md"]',nodes=>nodes.length),1);

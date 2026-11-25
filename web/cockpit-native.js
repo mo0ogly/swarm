@@ -279,7 +279,7 @@
   const shortcuts=[];
   for(const [label,description,links] of [
    ['Lire un livrable','Dans Conduite, choisissez Voir sous À vérifier. Le rapport remis s’ouvre dès qu’il est disponible. Utilisez Rechercher pour trouver un passage.',[['conduite','Ouvrir Conduite']]],
-   ['Comprendre la validation','Après lecture, utilisez Valider si le bouton est actif. En cas de blocage, lisez le motif à côté du bouton et ouvrez Diagnostic pour voir le code.',[]],
+   ['Comprendre la validation','Après lecture, utilisez Valider si le bouton est actif. En cas de blocage, le détail indique le motif et, pour une revue manquante, les appels utilisés si la mission les enregistre. Ouvrez Diagnostic pour voir le code.',[]],
    ['Consulter les journaux et la reprise','Journaux affiche les événements des agents. Reprise présente les éléments enregistrés pour reprendre le travail.',[['logs','Ouvrir les journaux'],['resume','Ouvrir Reprise']]],
   ]){
    const section=document.createElement('section'),subtitle=document.createElement('h3');

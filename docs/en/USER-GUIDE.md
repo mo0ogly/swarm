@@ -288,7 +288,9 @@ In the **Dispatch** summary, use **View** under **Needs review** to open the
 task details. A submitted task in human review shows **Approve**. The engine
 checks the revision and the required evidence. For a planned task, this
 includes the original independent review and current delivery evidence.
-The details show the reason for a block.
+The details show the reason for a block. If the independent review is missing,
+they show recorded mission review call consumption, whether the limit was
+reached, and the latest known failure before provider invocation when available.
 
 Click **Approve** after reviewing the deliverable. The action requires
 permission to modify the mission. The details confirm the state after reading
