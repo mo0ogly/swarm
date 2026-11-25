@@ -104,6 +104,7 @@ impl RootStore {
         profile: bool,
     ) -> Result<Value, E> {
         let started = Instant::now();
+        let mut receipt_timing = task_validation::ReceiptTiming::default();
         let (mut work_elapsed, mut receipt_elapsed, mut submission_elapsed, mut git_elapsed) =
             (Duration::ZERO, Duration::ZERO, Duration::ZERO, Duration::ZERO);
         if include_report && file.is_some() {
@@ -138,7 +139,7 @@ impl RootStore {
                 let receipt_started = Instant::now();
                 let candidate = if managed {
                     Some(task_validation::published_managed_candidate(
-                        self, current, &task.id,
+                        self, current, &task.id, profile.then_some(&mut receipt_timing),
                     )?)
                 } else {
                     None
@@ -266,6 +267,7 @@ impl RootStore {
                 "checks_and_preparation": millis(elapsed.saturating_sub(git_elapsed)),
                 "work_snapshot": millis(work_elapsed),
                 "receipt": millis(receipt_elapsed),
+                "receipt_phases": receipt_timing,
                 "submission": millis(submission_elapsed),
                 "git": millis(git_elapsed),
             });

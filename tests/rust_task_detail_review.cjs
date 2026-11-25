@@ -56,6 +56,9 @@ async function verify(){
      if((!file&&++listReads===1&&!cfg.eligible)||(file==='support.md'&&supportReads===1)){
       await request.respond({status:503,contentType:'text/plain; charset=utf-8',body:'web-workers-saturated'});return;
      }
+     if(file==='support.md'&&supportReads===2){
+      await request.respond({status:502,contentType:'text/plain; charset=utf-8',body:'authority-engine-unavailable'});return;
+     }
      const report={id:'report',text:'# Review proof\n\nReadable result review-task',language:'markdown'};
      const unavailable=!file&&!cfg.eligible&&listReads===3;
      const data=file==='support.md'?{id:file,text:'# Supporting evidence',language:'markdown'}
@@ -65,7 +68,8 @@ async function verify(){
        report:unavailable?{id:'report',error:'task-review-file-digest-changed'}:report};
      await request.respond({contentType:'application/json',body:JSON.stringify({
       schema_version:1,work:cfg.work,task:cfg.task,revision:Number(uri.searchParams.get('revision')),data,
-      ...(timed?{timing_ms:{engine:120,checks_and_preparation:116,work_snapshot:6,receipt:90,submission:2,git:4}}:{}),
+      ...(timed?{timing_ms:{engine:120,checks_and_preparation:116,work_snapshot:6,receipt:90,submission:2,git:4,
+       receipt_phases:{receipt_decode:15,receipt_originals:50,receipt_publication:5,receipt_recheck:20}}}:{}),
      })});return;
     }
     await request.continue();
@@ -167,19 +171,26 @@ async function verify(){
    assert.equal(await page.$$eval(dialog+' .task-detail-file-row',rows=>rows.filter(row=>row.dataset.fileId.startsWith('original:')).length),2);
    assert.equal(supportReads,1,'saturation never starts an automatic retry');
    await page.locator(dialog+' .task-detail-file-retry').click();
+   await observe(page.waitForFunction(selector=>document.querySelector(selector)?.textContent.includes('authority-engine-unavailable'),
+    {},dialog+' .task-detail-file-viewer [role=status]'));
+   assert.match(await page.$eval(dialog+' .task-detail-file-viewer [role=status]',node=>node.textContent),/Le moteur Swarm est indisponible/);
+   assert.equal(supportReads,2,'authority failure never starts an automatic retry');
+   await page.locator(dialog+' .task-detail-file-retry').click();
    await observe(page.waitForFunction(()=>/Supporting\s+evidence/.test(document.querySelector('.monaco-editor .view-lines')?.textContent||'')));
    const readTiming=await observe(page.waitForSelector(dialog+' [data-review-timing]'));
    const timing=await readTiming.evaluate(node=>JSON.parse(node.dataset.reviewTiming));
    assert.equal(timing.receipt,90);
+   assert.equal(timing.receipt_phases.receipt_originals,50);
    assert.equal(timing.git,4);
    assert.equal(timing.mode,'monaco');
    assert(timing.total>=timing.request&&timing.render>=0);
    console.log('PASS named read distinguishes verification, Git and Monaco timing');
-   assert.equal(supportReads,2,'the retry reads the same original once');
+   assert.equal(supportReads,3,'each retry reads the same original once');
    assert.equal(listReads,1,'switching files does not reload the inventory');
    assert.equal(reportReads,0,'switching files does not read the submitted report again');
    console.log('PASS selecting another deliverable reads only that original');
    console.log('PASS saturation preserves the file tree and retries the selected original');
+   console.log('PASS plain authority outage explains the error and retries the same file');
    await heldCatalog.continue();
    await page.waitForFunction(selector=>document.querySelector(selector)?.disabled===false,{},button);
    await page.click(button);

@@ -8,21 +8,35 @@ use serde::{de::DeserializeOwned, Serialize};
 
 pub fn encode(value: &impl Serialize) -> Result<Vec<u8>, serde_json::Error> {
     let raw = serde_json::to_string(value)?;
+    Ok(escape_go_json(&raw))
+}
+
+/// Apply Go's default HTML and JavaScript separator escaping to one validated
+/// JSON value, preserving all other bytes, including opaque numeric lexemes.
+/// The input's syntax has already been checked by RawValue.
+pub fn encode_raw(value: &serde_json::value::RawValue) -> Vec<u8> {
+    escape_go_json(value.get())
+}
+
+/// Copy unchanged UTF-8 spans in bulk. Match positions identify scalar
+/// boundaries, so multi-byte text and all existing escapes remain intact.
+fn escape_go_json(raw: &str) -> Vec<u8> {
     let mut output = Vec::with_capacity(raw.len());
-    for character in raw.chars() {
-        match character {
-            '<' => output.extend_from_slice(b"\\u003c"),
-            '>' => output.extend_from_slice(b"\\u003e"),
-            '&' => output.extend_from_slice(b"\\u0026"),
-            '\u{2028}' => output.extend_from_slice(b"\\u2028"),
-            '\u{2029}' => output.extend_from_slice(b"\\u2029"),
-            value => {
-                let mut buffer = [0; 4];
-                output.extend_from_slice(value.encode_utf8(&mut buffer).as_bytes());
-            }
-        }
+    let mut start = 0;
+    for (index, matched) in raw.match_indices(['<', '>', '&', '\u{2028}', '\u{2029}']) {
+        let escaped = match matched.as_bytes()[0] {
+            b'<' => b"\\u003c",
+            b'>' => b"\\u003e",
+            b'&' => b"\\u0026",
+            _ if matched == "\u{2028}" => b"\\u2028",
+            _ => b"\\u2029",
+        };
+        output.extend_from_slice(&raw.as_bytes()[start..index]);
+        output.extend_from_slice(escaped);
+        start = index + matched.len();
     }
-    Ok(output)
+    output.extend_from_slice(&raw.as_bytes()[start..]);
+    output
 }
 
 fn unicode_unit(raw: &[u8], position: usize) -> Option<u16> {
@@ -174,6 +188,30 @@ mod tests {
         ] {
             assert!(decode::<String>(raw).is_err());
         }
+    }
+
+    #[test]
+    fn bulk_escaping_preserves_the_previous_canonical_bytes() {
+        let raw = serde_json::value::RawValue::from_string(
+            format!(
+                "{{\"text\":\"<&é😀{}\u{2028}\u{2029}\\u003c>>\",\"number\":1.2300e+02}}",
+                "a".repeat(65536)
+            ),
+        )
+        .unwrap();
+        let mut previous = String::new();
+        for ch in raw.get().chars() {
+            match ch {
+                '<' => previous.push_str(r"\u003c"),
+                '>' => previous.push_str(r"\u003e"),
+                '&' => previous.push_str(r"\u0026"),
+                '\u{2028}' => previous.push_str(r"\u2028"),
+                '\u{2029}' => previous.push_str(r"\u2029"),
+                _ => previous.push(ch),
+            }
+        }
+        assert_eq!(encode_raw(&raw), previous.as_bytes());
+        assert_eq!(encode(&raw).unwrap(), previous.as_bytes());
     }
 }
 

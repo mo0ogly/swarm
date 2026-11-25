@@ -2,6 +2,9 @@
   "schema_version": 1,
   "id": "task-detail-human-review",
   "inputs": [
+    "rust/Cargo.toml",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-wire-json/src/lib.rs",
     "rust/crates/swarm-engine/src/root_store/task_actions.rs",
     "rust/crates/swarm-engine/src/task_lifecycle.rs",
     "rust/crates/swarm-web/src/service.rs",
@@ -51,6 +54,7 @@
         "PASS selecting another deliverable reads only that original",
         "PASS named read distinguishes verification, Git and Monaco timing",
         "PASS saturation preserves the file tree and retries the selected original",
+        "PASS plain authority outage explains the error and retries the same file",
         "PASS click recorded one task.update and public readback confirmed acceptance"
       ],
       "required_stderr": [],
