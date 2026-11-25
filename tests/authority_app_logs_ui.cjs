@@ -76,11 +76,12 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
             if (q === 'held') await new Promise(resolve => { window.releaseOlderRead = resolve; });
             if (window.refuseLog) return json({error: 'authority-diag-io'}, 500);
             if (snapshot && window.staleLog) return json({error: 'authority-log-snapshot-stale'}, 409);
-            const matches = rows.filter(row => !level || levels.indexOf(row.level) <= levels.indexOf(level))
+            const matches = rows.filter(row => !window.noArchives || !row.archiveAt)
+              .filter(row => !level || levels.indexOf(row.level) <= levels.indexOf(level))
               .filter(row => source==='active'?!row.archiveAt:source==='archives'?!!row.archiveAt:true)
               .filter(row => JSON.stringify(row).includes(q));
             if (order === 'newest') matches.reverse();
-            const base = {level: config.log_level, diagnostics, archives: 1, log_levels: levels, history_version: 1, rotation_version: 1};
+            const base = {level: config.log_level, diagnostics, archives: window.noArchives ? 0 : 1, log_levels: levels, history_version: 1, rotation_version: 1};
             const page = matches.slice(offset, offset + limit);
             return limit === 0 ? json({...base, lines: matches.map(row=>JSON.stringify(row))}) : json({
               ...base, lines: page.map(row=>JSON.stringify(row)),
@@ -134,6 +135,11 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     assert.equal((await lastRequest()).source, 'archives');
     assert.deepEqual(await values(), ['archived']);
     assert.match(await page.$eval(control('results') + ' tbody tr', row => row.cells[7].textContent), /Archive du/);
+    assert.match(await page.$eval(control('filter-source'), button => button.textContent), /Archives conservées/);
+    await page.evaluate(() => { window.noArchives = true; });
+    await page.click(control('refresh'));
+    assert.match(await page.$eval(control('results'), e => e.textContent), /Aucune archive conservée/);
+    await page.evaluate(() => { window.noArchives = false; });
     await page.$eval(control('reset'), button => button.click());
 
     await page.select(control('order'), 'oldest');
@@ -148,8 +154,12 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     await page.click(control('prev-page'));
     assert.match(await page.$eval(control('status'), e => e.textContent), /authority-log-snapshot-stale/);
     await page.evaluate(() => { window.staleLog = false; });
-    await page.$eval(control('refresh'), button => button.click());
+    await page.type(search, 'draft');
+    const expired = await lastRequest();
+    await page.click(control('retry'));
+    assert.deepEqual(await lastRequest(), {...expired, snapshot: null, offset: 0});
     assert.deepEqual(await values(), ['archived']);
+    await page.$eval(search, field => { field.value = ''; });
     await page.select(control('position'), 'all');
     await page.$eval(control('rows'), field => { field.value = '10'; field.form.requestSubmit(); });
     assert.equal((await lastRequest()).windowBytes, null);
@@ -186,6 +196,11 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     await page.$eval(control('refresh'), button => button.click());
     assert.deepEqual(await criteria(), {q: 'archived', level: 'warn'});
 
+    await page.click(control('filter-position'));
+    assert.equal((await lastRequest()).position, 'end');
+    assert.deepEqual(await criteria(), {q: 'archived', level: 'warn'});
+    assert.equal(await page.$eval(search, field => field.value), 'archived-draft');
+
     await page.evaluate(() => { window.refuseLog = true; });
     await page.$eval(control('refresh'), button => button.click());
     assert.match(await page.$eval(control('status'), e => e.textContent), /authority-diag-io/);
@@ -210,6 +225,10 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     await page.keyboard.press('Enter');
     assert.deepEqual(await values(), []);
     assert.match(await page.$eval(control('status'), e => e.textContent), /0/);
+    assert.match(await page.$eval(control('results'), e => e.textContent), /Aucune ligne correspondante/);
+    await page.click(control('filter-q'));
+    assert.deepEqual(await criteria(), {q: '', level: ''});
+    assert.equal(await page.$eval(search, field => field === document.activeElement), true);
     assert.deepEqual(errors, []);
 
     await page.keyboard.press('Escape');
@@ -224,15 +243,22 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
       await page.click(control('jump'));
       await page.waitForFunction(() => document.querySelector('[data-authority-log-results] tbody'));
       assert.equal(await page.$eval(control('refresh'), b => b.textContent), lang === 'en' ? 'Refresh' : 'Actualiser');
+      await page.$eval(search, field => { field.value = '<long-filter>'.repeat(12); field.form.requestSubmit(); });
+      assert.match(await page.$eval(control('filter-q'), b => b.getAttribute('aria-label')),
+        lang === 'en' ? /^Remove filter Search/ : /^Retirer le filtre Recherche/);
+      assert.equal(await page.$eval(control('results'), e => e.textContent), lang === 'en' ? 'No matching lines.' : 'Aucune ligne correspondante.');
       for (const theme of ['etat', 'sombre']) {
         await page.evaluate(theme => { document.documentElement.dataset.theme = theme; }, theme);
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no viewport overflow');
+        assert.ok(await page.$eval(control('filter-q'), b => b.scrollWidth <= b.clientWidth), 'long filter text wraps inside its button');
+        await page.$eval(control('filter-q'), b => b.click());
         assert.ok(await page.$eval(control('results'), display => {
           const region = display.querySelector('[role="region"]');
           const heading = region.querySelector('th');
           return region.scrollWidth > region.clientWidth && getComputedStyle(heading).whiteSpace === 'nowrap';
         }), 'readable columns scroll inside their own region');
         await page.screenshot({path: path.join(output, `logs-${lang}-${theme}-mobile.png`)});
+        if (theme === 'etat') await page.$eval(search, field => { field.value = '<long-filter>'.repeat(12); field.form.requestSubmit(); });
       }
       await page.keyboard.press('Escape');
     }
@@ -242,7 +268,7 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     });
     assert.equal(await page.$(control('jump')), null);
     assert.equal(await page.$('[data-audit-tab="log"]'), null);
-    console.log('PASS Admin application logs: keyboard, language, themes, order, wrap, search, level, refresh, revision, safe refusal, recovery, race, rotation, source, pagination, window, matches, TXT/HTML, reset, empty and visibility');
+    console.log('PASS Admin application logs: applied filter chips, empty archives, stale snapshot resume, keyboard, language, themes, order, wrap, search, level, refresh, revision, safe refusal, recovery, race, rotation, source, pagination, window, matches, TXT/HTML, reset and visibility');
     console.log('SCREENSHOTS ' + output);
   } finally {
     await browser.close();

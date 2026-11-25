@@ -84,9 +84,22 @@ Les téléchargements TXT et HTML contiennent les colonnes de la page affichée.
 Échap ferme la console et replace le focus sur son raccourci.
 
 **Actualiser** rejoue les critères appliqués et ouvre une nouvelle lecture.
-Entre deux pages, une rotation ou de nouvelles écritures rendent la lecture
-précédente obsolète. La console demande alors d’actualiser. Un refus ou une
-erreur de lecture s’affiche sans présenter les anciennes lignes comme actuelles.
+Entre deux pages, une rotation ou de nouvelles écritures peuvent rendre la
+lecture précédente obsolète. Un refus ou une erreur de lecture s’affiche et
+efface les anciennes lignes.
+
+Les filtres appliqués de recherche, de niveau, de source et de position
+s’affichent au-dessus du tableau. Retirer une pastille relance la première page
+avec les autres critères appliqués. Si l’instantané expire entre deux pages,
+**Reprendre la lecture** recharge la première page avec ces mêmes critères.
+La source Archives signale explicitement l’absence d’archives conservées.
+
+Le démon Rust inscrit le démarrage de son écoute au niveau Info dans le
+journal applicatif. Une lecture invalide ou un instantané expiré émet un
+événement Warn sur la sortie d’erreur du démon. Un échec interne de lecture
+y émet un événement Error. Le diagnostic contient le statut HTTP et le code
+stable. Cette destination préserve les instantanés de `authority.log`.
+Le texte des filtres et la valeur de l’instantané restent hors de ces événements.
 
 Le journal actif reste dans le répertoire déclaré du démon, sous
 `authority.log`. Lorsque l’événement suivant dépasserait la taille configurée,

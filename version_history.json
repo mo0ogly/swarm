@@ -11,6 +11,10 @@
         "en": "Reviewer preflight leaves the dossier check before execution to the helper. Large dossiers focus on relevant evidence and failures before authorization are closed."
       },
       {
+        "fr": "La console des logs affiche les filtres amovibles, distingue l’absence d’archives et reprend la première page si l’instantané expire. Le démon Rust journalise son démarrage et les refus de lecture.",
+        "en": "The log console shows removable filters, reports when no archives are retained and resumes at the first page on snapshot expiry. The Rust daemon logs listener startup and rejected reads."
+      },
+      {
         "fr": "Le détail d’une tâche en attente d’avis indépendant affiche les appels de revue utilisés, le plafond atteint et le dernier échec connu avant l’appel.",
         "en": "Task details show recorded review call usage, an exhausted budget and the last known pre-invocation failure when an independent review is missing."
       },

@@ -168,6 +168,23 @@ impl Diag {
         Ok(())
     }
 
+    /// Report a history-read refusal using a daemon-owned code and HTTP status.
+    /// Use stderr so an error cannot alter the journal being paged. A failure to
+    /// write the operational diagnostic leaves the original HTTP error intact.
+    pub(crate) fn report_read_failure(code: &'static str, status: u16) {
+        let mut stderr = std::io::stderr().lock();
+        let _ = writeln!(stderr, "{}", serde_json::json!({
+            "at": crate::server::now(),
+            "level": if status >= 500 { "error" } else { "warn" },
+            "component": "swarm-authority",
+            "family": "application-log",
+            "operation": "read-history",
+            "phase": "refused",
+            "status": status,
+            "code": code
+        }));
+    }
+
     /// Append one JSON line when it passes the level. Diagnostics failures
     /// go to stderr and never change the originating request result.
     pub fn log(&self, level: &str, message: &str, fields: serde_json::Value) {
