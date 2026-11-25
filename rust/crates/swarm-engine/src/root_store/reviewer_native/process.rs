@@ -379,6 +379,7 @@ impl OwnedProcessControl for Control<'_> {
 /// wait/cleanup, independent gate errors and last known job all remain in the
 /// Observation. No global watchdog, silent timeout, retry, receipt, refund or
 /// publication is introduced. Output failure must invalidate the caller's parser.
+#[cfg(test)]
 pub(super) fn run(
     root: &RootStore,
     job: &Job,
@@ -386,17 +387,23 @@ pub(super) fn run(
     stdout: &mut dyn Write,
     stderr: &mut dyn Write,
 ) -> Result<Observation, E> {
-    run_using(root,job,command,stdout,stderr,None)
-}
-/// Retain the exact owned process lifecycle while carrying a borrowed owning
-/// mission lease solely to the parent permission writer. No timer, process
-/// policy, unknown wait/grant/stream semantics or manual signature changes.
-pub(super) fn run_using(root:&RootStore,job:&Job,command:Command,stdout:&mut dyn Write,stderr:&mut dyn Write,lease:Option<&crate::MissionLease>)->Result<Observation,E>{
     if job.phase != Phase::Claimed || job.permission != 0 {
         return Err(E::Refused("review-process-new-claim-required"));
     }
     let material =
         observe(root, job, true)?.ok_or(E::Refused("review-process-material-required"))?;
+    run_using(root,job,&material,command,stdout,stderr,None)
+}
+/// Retain the exact owned process lifecycle while carrying a borrowed owning
+/// mission lease to the permission writer. The caller supplies the material
+/// from the exact committed claim for scheduling only. Registration checks
+/// identity and freshness; the permission writer and child revalidate inputs.
+pub(super) fn run_using(root:&RootStore,job:&Job,material:&Material,command:Command,stdout:&mut dyn Write,stderr:&mut dyn Write,lease:Option<&crate::MissionLease>)->Result<Observation,E>{
+    if job.phase != Phase::Claimed || job.permission != 0 {
+        return Err(E::Refused("review-process-new-claim-required"));
+    }
+    guard::owner(job)?;
+    guard::original_fresh(&job.preflight_until)?;
     let policy = material
         .settings
         .values

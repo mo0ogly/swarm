@@ -52,13 +52,15 @@ pub(super) fn register(
     job: &Job,
     pid: u32,
 ) -> Result<Job, E> {
-register_using(root,tx,settings,job,pid,None)
+register_using(root,tx,settings,job,pid)
 }
-/// Source-aware stage under caller snapshot; custody stays external and all
-/// owner/child/current-input checks precede the unchanged ledger transition.
-pub(super) fn register_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job, pid: u32,source:Option<&crate::root_store::task_validation::ReviewCandidate>)->Result<Job,E>{
+/// Register ownership under the exact persisted frame and freshness boundary.
+/// Full materials are revalidated before permission and again by the child.
+fn register_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job, pid: u32)->Result<Job,E>{
     guard::owner(job)?;
-    guard::fresh_using(root,tx,settings,job,source)?;
+    guard::frame(root, tx, &settings, job)?;
+    super::mission_authority::observe(root,tx,job,&settings).map_err(|e|E::Launch(Box::new(e)))?;
+    guard::original_fresh(&job.preflight_until)?;
     if job.phase != Phase::Claimed || job.permission != 0 {
         return Err(E::Refused("review-gate-registration-state"));
     }
@@ -74,25 +76,24 @@ pub(super) fn register_using(root:&RootStore,tx:&Transaction<'_>,settings:Engine
     store::change(tx, job, &next).map_err(|error| E::Launch(Box::new(error)))?;
     Ok(next)
 }
-/// Stage permission separately from registration after current owner/source/child
-/// checks. Caller must successfully commit before releasing its private channel;
-/// this method never sends a byte, launches a provider or accepts a task. Any
-/// failure requires rollback and owned process cleanup, without refunding calls.
-#[cfg(test)]
+/// Authorize only the registered helper to enter its private admission check.
+/// The transaction verifies the saved job, funding, settings, lease, Root and
+/// child identity, with the original preflight deadline still in force. The
+/// actual child independently verifies the complete current dossier before exec.
+/// No source custody, provider launch, quota update or acceptance happens here.
 pub(super) fn permit(
     root: &RootStore,
     tx: &Transaction<'_>,
-    settings: EngineSettingsDocument,
+    settings: &EngineSettingsDocument,
     job: &Job,
+    lease: Option<&crate::MissionLease>,
 ) -> Result<Job, E> {
-permit_using(root,tx,settings,job,None)
-}
-/// Source-aware stage under caller snapshot; custody stays external and all
-/// owner/child/current-input checks precede the unchanged ledger transition.
-pub(super) fn permit_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job,source:Option<&crate::root_store::task_validation::ReviewCandidate>)->Result<Job,E>{
     guard::owner(job)?;
-    guard::fresh_using(root,tx,settings,job,source)?;
+    guard::frame(root, tx, settings, job)?;
+    super::mission_authority::permission(root, tx, lease, job, settings)
+        .map_err(|e| E::Launch(Box::new(e)))?;
     child(job)?;
+    guard::original_fresh(&job.preflight_until)?;
     if job.phase != Phase::Registered || job.permission != 0 {
         return Err(E::Refused("review-gate-permission-state"));
     }
@@ -265,32 +266,17 @@ pub(super) fn execute_reported(
     finished(Err(error), report)
 }
 
-/// Apply one child transition through the existing saved storage policy. The
-/// caller's mutable row changes only after known commit, before settings release,
-/// so cleanup can retain a registered tuple even when lock release later fails.
-/// Commit uncertainty leaves the prior observation, never a fabricated permit;
-/// caller must preserve that uncertainty and reconcile actual storage. No grant
-/// byte, process invocation, monetary reservation or Work revision is produced.
-fn transition(
-    root: &RootStore,
-    job: &mut Job,
-    prepare: impl Fn(&RootStore, &Transaction<'_>, EngineSettingsDocument, &Job,Option<&crate::root_store::task_validation::ReviewCandidate>) -> Result<Job, E>,
-) -> Result<(), E> {
-    let original=job.clone();
-    super::sources::job(root,&original,|source|crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
-        let next = super::transaction::apply(root, |tx| {
-            prepare(root, tx, settings.clone(), job,source).map(super::transaction::Change::Mutate)
-        })?;
-        *job = next;
-        Ok(())
-    }))
-}
 /// Record this actual owned PID under fresh saved storage policy. A known child
 /// commit survives later settings-release failure in the caller's job value.
 /// No socket release or provider execution occurs; failure requires owned cleanup.
 pub(super) fn register_recorded(root: &RootStore, job: &mut Job, pid: u32) -> Result<(), E> {
-    transition(root, job, |root, tx, settings, job,source| {
-        register_using(root, tx, settings, job, pid,source)
+    crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
+        let next = super::transaction::apply(root, |tx| {
+            register_using(root, tx, settings.clone(), job, pid)
+                .map(super::transaction::Change::Mutate)
+        })?;
+        *job = next;
+        Ok(())
     })
 }
 /// Record permission separately from registration under fresh saved storage
@@ -299,12 +285,20 @@ pub(super) fn register_recorded(root: &RootStore, job: &mut Job, pid: u32) -> Re
 pub(super) fn permit_recorded(root: &RootStore, job: &mut Job) -> Result<(), E> {
     permit_recorded_using(root,job,None)
 }
-/// Recheck the actual owning lease inside the permission writer before the
-/// existing transition. No socket grant, fresh budget or acceptance occurs;
-/// commit uncertainty and actual caller job observations remain unchanged.
-pub(super) fn permit_recorded_using(root:&RootStore,job:&mut Job,lease:Option<&crate::MissionLease>)->Result<(),E>{
-    transition(root,job,|root,tx,settings,job,source|{
-        super::mission_authority::permission(root,tx,lease,job,&settings).map_err(|e|E::Launch(Box::new(e)))?;
-        permit_using(root,tx,settings,job,source)
+/// Commit the private helper admission handshake under saved storage policy.
+/// Assign the new job only after a known commit, before settings release. On
+/// error the caller closes the channel and waits for the owned helper. This
+/// function grants no provider exec, mutates no Work and reserves no call.
+pub(super) fn permit_recorded_using(
+    root: &RootStore,
+    job: &mut Job,
+    lease: Option<&crate::MissionLease>,
+) -> Result<(), E> {
+    crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
+        let next = super::transaction::apply(root, |tx| {
+            permit(root, tx, settings, job, lease).map(super::transaction::Change::Mutate)
+        })?;
+        *job = next;
+        Ok(())
     })
 }

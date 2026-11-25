@@ -14,7 +14,7 @@ import rust_native_review_inputs as ordinary
 from rust_native_task_validation import invoke
 
 
-def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context_bytes=None,pending_dependent=False,cumulative_fixture=False):
+def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context_bytes=None,pending_dependent=False,cumulative_fixture=False,extra_tracked=0):
     """Run one complete readonly inspection or an explicitly unsupported source.
 
     Existing setup reuse retains actual Root/control originals, not copied state.
@@ -25,6 +25,8 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
     cumulative_fixture declares disjoint worker output paths and repeatable
     source-reading controls before initial authorization;
     saved production policies and historical originals are never edited.
+    extra_tracked adds unrelated committed text and uses a small fixture-only
+    delivery limit to exercise the focused dossier before native review.
     Every injected refusal follows a valid applicable witness and restores exact
     bytes/settings. A successful read grants no provider call or verdict. Reused inspection
     preserves prior review calls and opinions instead of assuming fresh counters.
@@ -35,6 +37,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
         setup=json.loads((reuse/'setup.json').read_bytes());root=Path(setup['root']);work=setup['work'];workspace=Path(setup['workspace']);checkpoint=setup['candidate'];binary_source=setup['binary_source']
     else:
         entries={'whole-source.txt':b'Complete extra tracked source for candidate inspection.\n','literal-link':('symlink','../../do-not-read-link-target')}
+        entries.update((f'bulk/source-{i:05}.txt',f'Unrelated retained source {i}\n'.encode()) for i in range(extra_tracked))
         if binary_source:entries['binary-input.bin']=b'\xff\xfe\x00Not a text review input'
         controls=json.loads(json.dumps(native.CONTROLS))
         if cumulative_fixture:
@@ -81,7 +84,36 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
         assert 'review-managed-candidate-unported' in json.dumps(refused),refused
         fixture.publish(out/'result.json',dict(status='BASELINE_REFUSAL',actual_controls_passed=True,root=str(root),work=work,task_accepted=False));print('MANAGED_REVIEW_BASELINE_REFUSAL');return
     if context_bytes is not None:set_quotas('explicit-fixture-prompt-cap',review_context_bytes=context_bytes)
-    inspect('valid-preview',action='review-preview')
+    if extra_tracked:
+        set_quotas('fixture-small-delivery-limit',review_delivery_files=32)
+        inputs=inspect('focused-large-witness')
+        assert len(checkpoint['tracked']) >= extra_tracked
+        documents=[item for item in inputs['materials'] if item['kind']=='document']
+        assert 0 < len(documents) <= 32 and all('/bulk/' not in item['name'] for item in documents)
+        fixture.publish(out/'result.json',dict(status='PASS',tracked_count=len(checkpoint['tracked']),
+            document_count=len(documents),candidate_commit=checkpoint['commit'],task_accepted=False))
+        print('PASS managed-review-large-focused-inspection',flush=True)
+        return
+    preview=inspect('valid-preview',action='review-preview')
+    inventory=preview['managed_inventory']
+    assert inventory['candidate_commit']==checkpoint['commit'] and inventory['parent_commit']==checkpoint['previous']
+    assert inventory['tracked_count']==len(checkpoint['tracked'])
+    assert inventory['changed_count']==len(inventory['changes'])>0
+    assert inventory['changed_count']<inventory['tracked_count']
+    assert all(change['path']!='app/whole-source.txt' for change in inventory['changes'])
+    expected_inputs=[]
+    for slot in checkpoint['control_plan']['slots']:
+        for name in slot['control'].get('inputs',[]):
+            path='app/'+name
+            entry=checkpoint['tracked'].get(path,{})
+            expected_inputs.append({'task_id':slot['task_id'],'control_id':slot['control']['id'],
+                'path':path,'tracked_sha256':entry.get('sha256'),'tracked_mode':entry.get('mode')})
+    assert expected_inputs and inventory['control_inputs']==expected_inputs
+    assert any(item['path'] not in {c['path'] for c in inventory['changes']} and item['tracked_sha256']
+               for item in inventory['control_inputs'])
+    print('PASS managed-review-inventory-binds-unchanged-control-inputs',flush=True)
+    assert not preview['invocation_authorized'] and not preview['provider_started']
+    print('PASS managed-review-inventory-separates-delta-and-full-tree',flush=True)
     if binary_source:
         refused=inspect('nontext-refusal',expected=False);assert 'source-utf8-required' in json.dumps(refused),refused
         checks=['actual-controls-before-nontext-inspection','valid-readonly-preview-before-nontext-refusal','nontext-candidate-refuses-without-provider-or-work-change']

@@ -44,6 +44,16 @@ impl Session {
     pub fn repository(&self) -> PathBuf {
         self.witness.repository_path()
     }
+    /// Return the hash observed at this acquisition for an exact Root-relative
+    /// input. The retained session is a preimage, not authority for later reads.
+    pub fn observed_artifact(&self, name: &str) -> Option<&str> {
+        self.data.artifacts.get(name).map(String::as_str)
+    }
+    /// Check current selected bytes under the held candidate. This does not
+    /// upgrade the control journal's historical inventory to current evidence.
+    pub fn verify_review_source(&self, name: &str) -> Result<(), E> {
+        self.witness.verify_review_source(name).map_err(launch)
+    }
     /// Read a retained link literal without following it; the review materializer
     /// must compare its exact digest and apply saved context caps before output.
     pub fn review_link(&self, name: &str) -> Result<String, E> {
@@ -64,6 +74,8 @@ impl Session {
             &self.data.repository_sha256,
             &self.data.root_instance,
             Some(&self.data.artifacts),
+            false,
+            false,
         )? != self.data
         {
             return Err(E::Refused("task-validation-managed-inputs-changed"));
@@ -208,12 +220,16 @@ fn relative(root: &Path, path: &Path) -> Result<String, E> {
 /// Every input must first resolve inside the candidate project; Root-relative
 /// remapping preserves that real file for the existing gate/evidence consumers.
 /// No copied artifact, hidden size cap, Git, permission or Root mutation is added.
+/// Review acquisition may reuse the regular hashes verified by the immediately
+/// preceding pin. Deferred observers must re-open their retained inputs.
 fn capture(
     root: &Path,
     witness: &CandidateWitness,
     repository_sha256: &str,
     root_instance: &crate::root_store::RootInstanceIdentity,
     initial: Option<&BTreeMap<String,String>>,
+    reuse_verified_tree: bool,
+    opinion_only: bool,
 ) -> Result<Captured, E> {
     witness.verify_retained_identities().map_err(launch)?;
     let candidate = witness.record();
@@ -234,6 +250,14 @@ fn capture(
     let links=candidate.review_entries().filter(|(_,mode,_)| *mode=="120000")
         .map(|(name,_,_)|repository.join(name)).collect();
     let mut artifacts = match initial {
+        Some(expected) if opinion_only => expected.clone(),
+        Some(expected) if reuse_verified_tree => {
+            super::input_inventory::observe_with(&base, &workspace, expected, |path| {
+                let relative = path.strip_prefix(&repository).ok()?.to_str()?;
+                let (mode, digest) = candidate.review_entry(relative)?;
+                matches!(mode, "100644" | "100755").then_some(digest)
+            })?
+        }
         Some(expected)=>super::input_inventory::observe(&base,&workspace,expected)?,
         None=>super::input_inventory::collect(&base,&workspace,&links)?,
     };
@@ -278,12 +302,15 @@ fn capture(
 /// Prepare or inspect under released Root locks, then retain owned custody.
 /// Existing-job inspection is read-only and must equal its complete preimage.
 /// Any post-pin failure explicitly releases newly owned witnesses.
+/// Only the review caller can reuse the fresh pin for this acquisition pass.
 fn acquire(
     store: &RootStore,
     input: Inputs,
     create: bool,
     expected: Option<&ManagedCandidate>,
     initial: Option<&BTreeMap<String,String>>,
+    reuse_verified_tree: bool,
+    opinion_only: bool,
 ) -> Result<Session, E> {
     let observation = input.observation;
     let repository_sha256 = super::digest(
@@ -316,7 +343,12 @@ fn acquire(
         )
         .map_err(launch)?;
     }
-    let witness = crate::managed_repository::pin_candidate(
+    let pin = if opinion_only {
+        crate::managed_repository::pin_for_opinion
+    } else {
+        crate::managed_repository::pin_candidate
+    };
+    let witness = pin(
         &store.root,
         &observation.work,
         &observation.producer,
@@ -333,6 +365,8 @@ fn acquire(
             &repository_sha256,
             &input.root_instance,
             initial,
+            reuse_verified_tree,
+            opinion_only,
         )
     })();
     match observed {
@@ -350,7 +384,7 @@ pub(super) fn acquire_fresh(
     create: bool,
 ) -> Result<Option<Session>, E> {
     inputs(store, work, request, None)?
-        .map(|i| acquire(store, i, create, None, None))
+        .map(|i| acquire(store, i, create, None, None, false, false))
         .transpose()
 }
 /// Inspect only the exact existing candidate of a real registered job. No stage
@@ -369,17 +403,17 @@ pub(super) fn acquire_job(
     let input = inputs(store, &job.work_id, &request, Some(job))?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     let initial=initial_artifacts(store,job,candidate)?;
-    acquire(store, input, false, Some(candidate),Some(&initial))
+    acquire(store, input, false, Some(candidate),Some(&initial), false, false)
 }
 /// Pin an existing completed control job for an internally selected current
 /// running reviewer or readonly completed opinion. Full submission equality and immutable checkpoint guards
 /// remain; fresh public controls still use None and cannot name this allowance.
-pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,review:Option<&crate::IndependentReview>)->Result<Session,E>{
+pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,review:Option<&crate::IndependentReview>, opinion_only: bool)->Result<Session,E>{
     let request=Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:job.work_revision,task_id:job.task_id.clone()};
     let input=inputs_using(store,&job.work_id,&request,Some(job),review)?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     let initial=initial_artifacts(store,job,candidate)?;
-    acquire(store,input,false,Some(candidate),Some(&initial))
+    acquire(store,input,false,Some(candidate),Some(&initial), true, opinion_only)
 }
 /// Persist one candidate preimage before SQL claim. A later failed claim can
 /// leave this immutable orphan; it grants nothing and never replaces an original.

@@ -463,6 +463,42 @@ mod tests {
         };
         (db, job)
     }
+    /// The exact waited/no-grant receipt can only archive a never-permitted claim.
+    #[test]
+    fn reviewer_waited_before_grant_original_is_recoverable_only_without_a_grant() {
+        use super::super::{capture::Capture, journal::{Receipt, waited_before_grant}};
+        let (_, job) = fixture();
+        let policy = crate::EngineSettingsValues::installation_defaults().unwrap()
+            .agent_execution_policy().unwrap();
+        let captured = Capture::new(policy).unwrap().snapshot();
+        let mut receipt = Receipt {
+            schema_version: 2, managed_review: None, job,
+            finished_at: "2026-10-21T00:00:01Z".into(),
+            process_attempted: true, grant_attempted: false, channel_closed: false,
+            waited: true, exit_code: None, signal: Some(15), unresolved_pid: None,
+            ownership_lost_pid: None, failed: true, output_complete: false,
+            duration_expired: false, drain_expired: false, source_interrupted: false,
+            original_reply: None, provider_facts: Default::default(),
+            raw_capture: Some(captured), causes: Vec::new(), gate: None,
+        };
+        assert!(waited_before_grant(&receipt));
+        receipt.waited = false;
+        assert!(!waited_before_grant(&receipt));
+        receipt.waited = true;
+        receipt.grant_attempted = true;
+        assert!(!waited_before_grant(&receipt));
+        receipt.grant_attempted = false;
+        receipt.original_reply = Some(b"unexpected".to_vec());
+        assert!(!waited_before_grant(&receipt));
+        receipt.original_reply = None;
+        assert!(waited_before_grant(&receipt));
+        receipt.job = registered(&receipt.job);
+        assert!(waited_before_grant(&receipt));
+        receipt.job.phase = Phase::Permitted;
+        receipt.job.permission = 1;
+        assert!(!waited_before_grant(&receipt));
+    }
+
     /// Stage the actual candidate ledger, not a seeded fake positive execution.
     fn claimed(db: &Connection, value: &Job) {
         let tx = db.unchecked_transaction().unwrap();

@@ -11,6 +11,8 @@ pub(in crate::root_store) struct ReviewCandidate {
     job: store::Job,
     metadata: serde_json::Value,
     review:Option<crate::IndependentReview>,
+    focused_inventory: Option<crate::root_store::review_preview::ManagedReviewInventory>,
+    opinion_only: bool,
 }
 impl ReviewCandidate {
     /// Recompute current Root source and bind its initial input inventory to the
@@ -32,14 +34,42 @@ impl ReviewCandidate {
     /// Retained public-shaped control observations, without kernel/host/path data.
     /// Full original mapping is separately checked before readonly context output.
     pub(in crate::root_store) fn metadata(&self) -> &serde_json::Value { &self.metadata }
+    /// Share the bound control inventory. In focused mode this attests the
+    /// original control receipt, not current unselected checkout bytes.
+    pub(in crate::root_store) fn observed_artifact(&self, name: &str) -> Option<&str> {
+        self.session.observed_artifact(name)
+    }
+    /// Compare the original parent and candidate outside SQL locks when the
+    /// complete tracked tree cannot fit the configured delivery limit.
+    /// Small candidates preserve their historical context and receipt bytes.
+    pub(in crate::root_store) fn focused_inventory(
+        &self,
+    ) -> Option<&crate::root_store::review_preview::ManagedReviewInventory> {
+        self.focused_inventory.as_ref()
+    }
     /// Read only a tracked symlink's literal target, never a linked file.
     pub(in crate::root_store) fn link(&self, name:&str) -> Result<String,E> { self.session.review_link(name) }
-    /// Reinspect complete raw tracked sources/checkpoint outside Root locks after
-    /// materialization, refusing drift. This runs no provider and grants no lease.
+    /// Reinspect the same source perimeter after materialization. Reacquisition
+    /// binds the original Git identities and confirms current selected bytes.
     pub(in crate::root_store) fn refresh(&self,root:&RootStore)->Result<(),E>{
-        let fresh=managed_execution::acquire_for_review(root,&self.job,self.candidate(),self.review.as_ref())?;
-        let result=if fresh.data==self.session.data{Ok(())}else{Err(E::Refused("task-validation-managed-inputs-changed"))};
+        let fresh=managed_execution::acquire_for_review(root,&self.job,self.candidate(),self.review.as_ref(),self.opinion_only)?;
+        let result=if fresh.data==self.session.data {
+            self.verify_scope(&fresh)
+        } else {
+            Err(E::Refused("task-validation-managed-inputs-changed"))
+        };
         finished(result,fresh.close())
+    }
+    /// Verify every selected raw path in an opinion session before use.
+    /// Full publication sessions already verified the full tree.
+    fn verify_scope(&self, session: &managed_execution::Session) -> Result<(), E> {
+        if self.opinion_only {
+            let scope = self.focused_inventory.as_ref().ok_or(E::Refused("review-focused-inventory-required"))?;
+            for (name, _) in scope.focused_paths()? {
+                session.verify_review_source(name)?;
+            }
+        }
+        Ok(())
     }
     /// Release every held candidate descriptor and preserve explicit close errors.
     pub(in crate::root_store) fn close(self)->Result<(),E>{self.session.close()}
@@ -56,6 +86,18 @@ pub(in crate::root_store) fn acquire(root:&RootStore,work:&str,request:&Request)
 /// exact running record; publication inspection may select a completed opinion
 /// only after verifying its actual original. Source equality grants no permission.
 pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Request,review:Option<&crate::IndependentReview>)->Result<Option<ReviewCandidate>,E>{
+    acquire_bound(root, work, request, review, false)
+}
+
+/// A task publication always rechecks all original files before an effect.
+/// The reviewer may have seen a focused context on the same bound candidate.
+pub(in crate::root_store) fn acquire_final(root:&RootStore,work:&str,request:&Request,review:Option<&crate::IndependentReview>)->Result<Option<ReviewCandidate>,E>{
+    acquire_bound(root, work, request, review, true)
+}
+
+/// Pin the verified control origin, then verify either the reviewer selection
+/// or the complete publication preimage outside Root transactions.
+fn acquire_bound(root:&RootStore,work:&str,request:&Request,review:Option<&crate::IndependentReview>,full:bool)->Result<Option<ReviewCandidate>,E>{
     let reservation=root.directory.reserve(false,false).map_err(E::Storage)?;
     let observed=(||{
         let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
@@ -67,22 +109,43 @@ pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Re
             let validation=task.automatic_validation.as_deref().ok_or(E::Refused("review-native-controls-required"))?;
             let id=store::recorded_id_for_receipt(&tx,work,&task.id,&validation.receipt).map_err(launch)?
                 .ok_or(E::Refused("review-native-controls-required"))?;
-            let (receipt,hash):(Receipt,String)=journal::read(root,&journal::name("job",&id))?;
-            let job=publication::recorded_original(root,&receipt,&hash)?;
+            let (receipt, hash): (Receipt, String) = journal::read(root, &journal::name("job", &id))?;
+            let job = publication::recorded_original(root, &receipt, &hash)?;
             if receipt.schema_version!=3 || !publication::all_passed(&receipt){return Err(E::Refused("review-managed-controls-required"));}
             let candidate=receipt.managed_candidate.as_ref().ok_or(E::Refused("review-managed-candidate-required"))?;
             if job.work_id!=work || job.task_id!=request.task_id || candidate.work!=work || candidate.task!=request.task_id {
                 return Err(E::Refused("review-managed-candidate-mismatch"));
             }
             let metadata=recorded_metadata(&receipt,&job,&hash)?;
-            Ok(Some((job,candidate.clone(),metadata)))
+            let planning = current.planning.as_deref().ok_or(E::Refused("review-managed-plan-required"))?;
+            let focus = planning.reviewer.as_deref()
+                .and_then(|reviewer| reviewer.max_files.as_deref())
+                .copied()
+                .filter(|limit| *limit > 0)
+                .filter(|limit| usize::try_from(*limit).is_ok_and(|cap| candidate.review_entries().len() > cap))
+                .and_then(|limit| planning.repository.as_deref().map(|repository| (limit, repository.project_subdir.clone())));
+            Ok(Some((job,candidate.clone(),metadata,focus)))
         })();
         finished(result,tx.rollback().map_err(E::Sql))
     })();
     let observed=finished(observed,reservation.close().map_err(E::Storage))?;
-    observed.map(|(job,candidate,metadata)|{
-        let session=managed_execution::acquire_for_review(root,&job,&candidate,review)?;
-        Ok(ReviewCandidate{session,job,metadata,review:review.cloned()})
+    observed.map(|(job,candidate,metadata,focus)|{
+        let opinion_only = focus.is_some() && !full;
+        let session=managed_execution::acquire_for_review(root,&job,&candidate,review,opinion_only)?;
+        let mut held = ReviewCandidate{session,job,metadata,review:review.cloned(),focused_inventory:None,opinion_only};
+        if let Some((limit, subdir)) = focus {
+            let inventory = root.read_settings().and_then(|settings| {
+                crate::root_store::review_preview::inventory::observe(&held, &settings, Some(limit), &subdir)
+            });
+            match inventory {
+                Ok(inventory) => held.focused_inventory = Some(inventory),
+                Err(error) => return finished(Err(error), held.close()),
+            }
+        }
+        if let Err(error) = held.verify_scope(&held.session) {
+            return finished(Err(error), held.close());
+        }
+        Ok(held)
     }).transpose()
 }
 /// Rebuild the exact public-shaped current review metadata from verified native

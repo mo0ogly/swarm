@@ -87,7 +87,9 @@ fn recover(root: &RootStore, id: &str, action: Recovery) -> Result<TaskReviewOut
     let mode = match action {
         Recovery::RetireStale => publication::Mode::StaleOriginal,
         Recovery::ApplyOriginal => {
-            if original.failed {
+            if journal::no_grant_original(&original) {
+                publication::Mode::Unstarted
+            } else if original.failed {
                 publication::Mode::FailedOriginal
             } else {
                 publication::Mode::Verdict
@@ -188,10 +190,7 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
         .arg("--json");
     let observed = {
         let (mut stdout, mut stderr) = transport.sinks();
-        match lease {
-            None=>process::run(root,&staged.job,command,&mut stdout,&mut stderr)?,
-            Some(lease)=>process::run_using(root,&staged.job,command,&mut stdout,&mut stderr,Some(lease))?,
-        }
+        process::run_using(root, &staged.job, &staged.material, command, &mut stdout, &mut stderr, lease)?
     };
     let local_stop_transport_complete=matches!(observed.interruption.as_ref(),Some(E::Refused("review-execution-interrupted")))
         && observed.process.as_ref().is_ok_and(|p|!p.timed_out&&!p.output_drain_timed_out&&crate::execution_interrupt::stopped_status(&p.usage.status))
@@ -254,7 +253,16 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
         let primary = error
             .take()
             .unwrap_or(E::Refused("review-call-failed-original-retained"));
-        return match publication::reconcile_failed(root, &receipt.job.id) {
+        let settled = if journal::waited_before_grant(&receipt) {
+            publication::record_mode(
+                root, &receipt.job.id, publication::Mode::Unstarted,
+                publication::OwnerBoundary::CurrentOriginal,
+                crate::root_store::native_review_context::CertificateFormat::ContentV2,
+            )
+        } else {
+            publication::reconcile_failed(root, &receipt.job.id)
+        };
+        return match settled {
             Ok(v) => Err(E::WorkRecorded {
                 primary: Box::new(if local_stop_complete{crate::execution_interrupt::completed(crate::execution_interrupt::InterruptedRole::Reviewer,primary)}else{primary}),
                 work: v.work.id,
@@ -331,6 +339,25 @@ impl RootStore {
     /// from arbitrary IO errors and no current favorable verdict is produced.
     pub fn retire_stale_task_review(&self, id: &str) -> Result<TaskReviewOutcome, E> {
         recover(self, id, Recovery::RetireStale)
+    }
+
+    /// Close and archive a confirmed departed reservation whose helper was
+    /// never authorized. Exact terminal replay returns the recorded result.
+    /// No provider call, quota adjustment or task acceptance occurs.
+    pub fn retire_unstarted_task_review(&self, id: &str) -> Result<TaskReviewOutcome, E> {
+        if !swarm_identity_contract::name(id.as_bytes()) {
+            return Err(E::Refused("review-recovery-id-invalid"));
+        }
+        publication::record_mode(
+            self, id, publication::Mode::Unstarted, publication::OwnerBoundary::ConfirmedDeparted,
+            crate::root_store::native_review_context::CertificateFormat::ContentV2,
+        ).map(Into::into)
+    }
+
+    /// Recognize the verified archived no-grant review in a current snapshot.
+    /// It carries no provider failure and grants no retry by itself.
+    pub(in crate::root_store) fn archived_unstarted_review(&self, tx: &rusqlite::Transaction<'_>, work: &str, task: &str, id: &str) -> Result<bool, E> {
+        publication::verified_unstarted(self, tx, work, task, id)
     }
 }
 /// Private current-image helper: require an actual Unix socket before reporting

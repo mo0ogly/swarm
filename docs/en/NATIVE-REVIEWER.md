@@ -43,6 +43,34 @@ Both task previews accept `schema_version`, `event_id`, `expected_revision`,
 preview refuses an ongoing review; internal readback permits only the exact review
 attached to its normalized job.
 
+The parent verifies the dossier when it claims the review. Startup reuses
+the committed scheduling data. The parent registers the helper, then grants
+entry to private admission after checking its identity, Root, claim, funding,
+lease, settings and original expiry. The helper independently rebuilds and
+compares the current dossier, verifies the route and executable, and checks
+expiry again before provider exec. The original deadline remains in force.
+
+```mermaid
+sequenceDiagram
+    participant P as Parent engine
+    participant H as Registered helper
+    participant R as Provider
+    P->>P: Verify dossier and claim review
+    P->>H: Verify identity and allow private admission
+    H->>H: Recheck sources, route and expiry
+    alt Every check passes
+        H->>R: Execute within the authorized boundary
+    else Refusal
+        H-->>P: Return diagnostics for receipt-based closure
+    end
+```
+
+If a reaped helper fails before any grant, its original
+receipt can close exactly that claim as a non-verdict. The report, candidate
+and consumed quota are retained.
+The `native-reviewer-pregrant-recovery` recipe checks the accepted receipt
+shape and refusals with a previously admitted Cargo target.
+
 ## Native control source mapping
 
 Before public conversion, original readback and replay, the engine verifies
@@ -827,8 +855,62 @@ declares `inspection_only=true`, `native_invocation_supported=false`,
 it does not claim historical accepted-verdict verification. Truncated control
 output stays explicitly marked as such, never invented as complete evidence.
 
-Existing settings govern: `review_delivery_files` bounds the full presented Git
-inventory; `review_context_files` counts every material including attributed
+`task review-preview` returns a compact inventory (`managed_inventory`).
+It separates the candidate’s total tree entries from paths changed against its
+recorded parent. The list shows added, deleted, modified and type-changed paths.
+A rename appears as an addition and a deletion. The configured delivery file
+limit and over-limit indicator describe the full candidate inventory. When it
+exceeds the cap, the dossier includes added or changed files and declared
+control inputs, deduplicated. Deletions appear in the delta. Unchanged non-text
+control inputs retain their verified digest, path and control attribution.
+Their contents are unavailable for citation. Missing declared originals refuse.
+The existing count and byte limits apply to the selected files. The reviewer
+must return `unknown` if required evidence is unavailable. The engine still
+verifies the entire retained candidate and original control receipts. Dossiers
+that fit the file cap retain their historical representation. The focused
+dossier carries the attributed cohort receipt and control results in its
+review protocol without copying the validation receipt's full artifact digest
+table. Inspection grants
+no invocation or acceptance.
+
+A focused review acquisition verifies the Git identities and the binding
+to the original control receipt. It reopens only selected paths, declared
+inputs and related evidence. Other file digests describe the historical
+control preimage. Task publication requires reading and verifying the
+complete candidate. Full acquisitions reuse digests checked in the same pass.
+
+Each read of a published control opens its private receipt once. The engine
+compares its actual digest with the ledger and checks every step receipt.
+A later pass reads its originals again to confirm their current state.
+
+When Codex is the reviewer, preflight binds the local announcement of the
+selected model and effort. A cache rewrite that changes its timestamp or other
+models preserves that evidence. Withdrawal of the announcement, an unreadable
+cache and executable drift are still detected. Admission of an outstanding
+claim holding the old whole-cache digest can refuse after an upgrade. Use the
+recovery operation that matches the observed process state.
+Worker reservations retain their original whole-cache fingerprint.
+
+`task review-retire-unstarted REVIEW_ID` closes a claim with a confirmed
+departed local owner, no grant and no registered child. A private version 3
+original records the observation. The transaction archives the refusal,
+releases the task exclusion and retains consumption. Any subsequent start
+requires a fresh operation and admission. Started reviews retain their
+own wait evidence requirements. Live owners and uncertain observations refuse.
+
+In Dispatch, **Approve** uses native publication for a managed candidate
+whose policy requires human approval. The precheck is read-only. The protected
+write checks identity and revision, then records candidate publication and
+task acceptance together. Dispatch reads back the Work state.
+
+In `managed_inventory.control_inputs`, each declared control input carries
+its task, control and repository-relative path. A Git-tracked input includes
+its mode and its digest from the retained candidate, including unchanged paths.
+An input outside the Git inventory remains listed without a tracked digest.
+The list does not open the input files.
+
+Existing settings govern: `review_delivery_files` bounds the presented Git
+files; `review_context_files` counts every material including attributed
 duplicates; `review_source_bytes` counts UTF-8 source bytes, and
 `review_context_bytes` the final prompt including framing/escaping. Global delivery
 read limits also apply to sources. Zero explicitly means no additional bound;

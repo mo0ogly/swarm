@@ -12,7 +12,7 @@ mod result;
 pub(crate) use result::{retain_bound_result, retain_result, verify_result};
 #[path = "managed_repository_candidate_store.rs"]
 mod candidate_store;
-pub(crate) use candidate_store::{prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate};
+pub(crate) use candidate_store::{prepare_candidate, verify_candidate, pin_candidate, pin_for_opinion, CandidateWitness, ManagedCandidate};
 
 /// Private attribution v1: first attempt only; schema version is not operator policy.
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq)]

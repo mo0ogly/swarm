@@ -135,7 +135,7 @@ def read_reviewer_marker(root,event_id,expected_owner=None):
   raise
 
 
-def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dependent=False,cumulative_fixture=False):
+def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dependent=False,cumulative_fixture=False,extra_tracked=0):
  """Run one owned native lifecycle; preserve original refusal before recovery.
 
  Optional reuse names actual retained setup/control originals, never copied
@@ -149,11 +149,12 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
  publishes its marker in the engine's I0 reviewer leaf named by the request
  event id. The publish-refusal fault is injected by this PARENT fixture owner
  before the public call, inside `.swarm` next to the i0 tree, with restoration
- preserved; the source fault writes the declared ABSOLUTE tracked file. No
+ preserved; the source fault writes the declared ABSOLUTE tracked file. extra_tracked exercises
+ the focused dossier on an isolated large candidate. No
  product binary, guard, UID or privilege is modified.
  """
  out.mkdir(mode=0o700,parents=True,exist_ok=False);fixture=inspection.native.fixture
- inspection.run(binary,profile,out/'inspection',reuse=reuse,context_bytes=0,pending_dependent=pending_dependent,cumulative_fixture=cumulative_fixture)
+ inspection.run(binary,profile,out/'inspection',reuse=reuse,context_bytes=0,pending_dependent=pending_dependent,cumulative_fixture=cumulative_fixture,extra_tracked=extra_tracked)
  setup=json.loads((out/'inspection/setup.json').read_bytes());root=Path(setup['root']);work=setup['work']
  environment=dict(os.environ,CODEX_HOME=str(root/'codex-home'));checks=[]
  def call(label,args,value=None,success=True,exe=binary):
@@ -290,12 +291,13 @@ def main():
  """Freeze actual normal-profile binary and the maintained helper import closure."""
  parser=argparse.ArgumentParser(description=__doc__)
  for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
+ parser.add_argument('--extra-tracked',type=int,default=0)
  parser.add_argument('--case',choices=['pass','partial','publish-refusal','source'],default='pass');parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before-binary',type=Path);parser.add_argument('--recover-from',type=Path)
  a=parser.parse_args();out=a.output.resolve();fixture=inspection.native.fixture
  inputs=dict(binary=str(a.binary.resolve()),binary_sha256=fixture.digest(a.binary.read_bytes()),profile_sha256=fixture.digest(a.profile.read_bytes()),helpers=inspection.native.helper_inputs(Path(__file__)),global_watchdog=None)
  try:
   if a.recover_from:recover_original(a.binary.resolve(),a.profile.resolve(),out,a.recover_from.resolve())
-  else:run(a.binary.resolve(),a.profile.resolve(),out,a.case,reuse=a.reuse_from.resolve() if a.reuse_from else None,before_binary=a.before_binary.resolve() if a.before_binary else None)
+  else:run(a.binary.resolve(),a.profile.resolve(),out,a.case,reuse=a.reuse_from.resolve() if a.reuse_from else None,before_binary=a.before_binary.resolve() if a.before_binary else None,extra_tracked=a.extra_tracked)
   assert fixture.digest(a.binary.read_bytes())==inputs['binary_sha256'] and all(fixture.digest(Path(f).read_bytes())==h for f,h in inputs['helpers'].items())
   fixture.publish(out/'inputs.json',inputs)
  except BaseException:

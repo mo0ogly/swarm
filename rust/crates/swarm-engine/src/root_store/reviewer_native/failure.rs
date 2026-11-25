@@ -28,11 +28,30 @@ pub(super) fn prepare(
     id: &str,
     owner: publication::OwnerBoundary,
 ) -> Result<Ready, E> {
-    let (receipt, hash) = journal::read(root, id)?;
+    prepare_using(root, tx, id, owner, false)
+}
+
+/// Record a terminal no-grant observation for an exact departed claim. All
+/// current intent, Root, reservation and Work bindings are rechecked.
+pub(super) fn prepare_unstarted(
+    root: &RootStore, tx: &Transaction<'_>, id: &str, owner: publication::OwnerBoundary,
+) -> Result<Ready, E> {
+    prepare_using(root, tx, id, owner, true)
+}
+
+/// Project either an actual waited failure or a verified no-grant claim onto
+/// the same non-verdict contract without inventing a subprocess observation.
+fn prepare_using(root: &RootStore, tx: &Transaction<'_>, id: &str,
+    owner: publication::OwnerBoundary, unstarted: bool) -> Result<Ready, E> {
     let job = store::job(tx, id)
         .map_err(|e| E::Launch(Box::new(e)))?
         .ok_or(E::Refused("review-failure-job-required"))?;
-    if job != receipt.job
+    if unstarted {
+        super::guard::retirement_frame(root, tx, &job)?;
+        journal::retire_unstarted(root, &job, owner)?;
+    }
+    let (receipt, hash) = journal::read(root, id)?;
+    if !unstarted && (job != receipt.job
         || job.phase != Phase::Permitted
         || job.permission != 1
         || receipt.schema_version != 2
@@ -40,11 +59,13 @@ pub(super) fn prepare(
         || !receipt.process_attempted
         || !receipt.grant_attempted
         || !receipt.channel_closed
-        || !receipt.waited
+        || !receipt.waited)
     {
         return Err(E::Refused("review-failure-original-not-applicable"));
     }
-    publication::quiescent(&job, owner)?;
+    if !unstarted || job.child_pid.is_some() {
+        publication::quiescent(&job, owner)?;
+    }
     let work = crate::read_recorded_work(tx, &job.work_id).map_err(E::Work)?;
     if work.revision < job.work_revision {
         return Err(E::Refused("review-failure-work-before-claim"));
@@ -105,7 +126,11 @@ pub(super) fn prepare(
         reasons.push("response-incomplete-or-invalid");
     }
     review.state = "error".into();
-    review.reason = if reasons.is_empty() {
+    review.reason = if unstarted && journal::waited_before_grant(&receipt) {
+        "native-review-helper-waited-before-grant".into()
+    } else if unstarted {
+        "native-review-owner-departed-before-grant".into()
+    } else if reasons.is_empty() {
         "native-review-call-failed".into()
     } else {
         format!("native-review-call-failed: {}", reasons.join(", "))

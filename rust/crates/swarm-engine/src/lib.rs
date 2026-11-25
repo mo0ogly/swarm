@@ -752,7 +752,7 @@ pub use root_store::TaskReviewFileReader;
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview, ManagedPublicationOutcome, ManagedBaselinePreview, ManagedBaselineTask};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, ManagedReviewControlInput, ManagedReviewInventory, ManagedReviewPath, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview, ManagedPublicationOutcome, ManagedBaselinePreview, ManagedBaselineTask};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};

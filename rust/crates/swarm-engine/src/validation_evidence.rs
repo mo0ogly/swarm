@@ -92,6 +92,20 @@ pub fn check_validation_evidence(
     quality: Option<&QualityPolicySnapshot>,
     max_review_output_bytes: Option<usize>,
 ) -> Result<Option<ValidationEvidenceObservation>, ValidationEvidenceError> {
+    check_validation_evidence_with(root, task, quality, max_review_output_bytes, |_| None)
+}
+
+/// Check the same receipt with exact Root-relative artifact hashes obtained
+/// by the current managed review custody pass. Every unmatched artifact is
+/// reopened, including the receipt. Known mismatches refuse without fallback.
+/// The caller remains responsible for reobservation at later boundaries.
+pub(crate) fn check_validation_evidence_with<'a>(
+    root: &Path,
+    task: &Task,
+    quality: Option<&QualityPolicySnapshot>,
+    max_review_output_bytes: Option<usize>,
+    observed: impl Fn(&str) -> Option<&'a str>,
+) -> Result<Option<ValidationEvidenceObservation>, ValidationEvidenceError> {
     use ValidationEvidenceError as E;
     let Some(policy) = task
         .validation_policy
@@ -180,6 +194,12 @@ pub fn check_validation_evidence(
         }
     }
     for (name, expected) in artifacts {
+        if let Some(actual) = observed(name) {
+            if actual != expected {
+                return Err(E::Refused("validation-artifact-stale"));
+            }
+            continue;
+        }
         let (_, actual) = crate::gate_evaluation::artifact_hash(root, name).map_err(E::Artifact)?;
         if &actual != expected {
             return Err(E::Refused("validation-artifact-stale"));

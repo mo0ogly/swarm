@@ -39,6 +39,15 @@ pub(crate) struct ModelRoutePreparation {
     provider: Provider,
     route: Option<ModelRoute>,
     scope: Option<String>,
+    catalogue_binding: CatalogueBinding,
+}
+
+/// The tool-free reviewer binds only its selected announcement. Other
+/// launch contracts retain the whole catalogue for their recorded preflight.
+#[derive(Clone, Copy)]
+enum CatalogueBinding {
+    Complete,
+    ReviewerSelection,
 }
 impl ModelRoutePreparation {
     /// Borrow the effective argv/configuration; never execute it here.
@@ -86,7 +95,7 @@ impl ModelRoutePreparation {
         settings: &EngineSettingsValues,
         policy: &AgentLaunchPolicy,
     ) -> Result<(), AgentLaunchError> {
-        let fresh = resolve(&self.original, launch, settings, policy)?;
+        let fresh = resolve_with_binding(&self.original, launch, settings, policy, self.catalogue_binding)?;
         if fresh.provider != self.provider || fresh.route != self.route || fresh.scope != self.scope
         {
             return Err(AgentLaunchError::Refused(
@@ -113,6 +122,21 @@ struct CacheModel {
 #[serde(default)]
 struct CacheEffort {
     effort: String,
+}
+
+impl ModelCache {
+    /// Check the decoded, untrusted catalogue for evidence of this exact
+    /// selection. Other models, timestamps and ordering are irrelevant to the
+    /// route. Malformed catalogues are rejected by the caller before this check.
+    fn announces(&self, choice: &crate::ModelChoice) -> bool {
+        self.models.iter().flatten().any(|model| {
+            model.visibility == "list"
+                && model.slug == choice.model
+                && (choice.effort.is_empty()
+                    || model.supported_reasoning_levels.iter().flatten()
+                        .any(|effort| effort.effort == choice.effort))
+        })
+    }
 }
 /// External Codex cache field shape only. Unknown metadata stays ignored through
 /// the existing iterative Go projection; nil/string/type behavior stays explicit.
@@ -289,7 +313,11 @@ struct ModelSources<'a> {
     automatic: bool,
     adapter: &'a str,
     cache_state: &'a str,
-    cache_sha256: Option<String>,
+    // Preserve the original serialized slot on the complete catalogue contract.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cache_sha256: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cache_selection_announced: Option<bool>,
     configured_model: Option<&'a str>,
     selected_announcement: &'a str,
     policy_hash: &'a str,
@@ -309,6 +337,29 @@ pub(crate) fn resolve(
     settings: &EngineSettingsValues,
     policy: &AgentLaunchPolicy,
 ) -> Result<ModelRoutePreparation, AgentLaunchError> {
+    resolve_with_binding(provider, launch, settings, policy, CatalogueBinding::Complete)
+}
+
+/// Resolve the existing tool-free reviewer route using its relevant Codex
+/// announcement. The same operator, provider, parsing and execution checks apply.
+pub(crate) fn resolve_reviewer(
+    provider: &Provider,
+    launch: &Launch,
+    settings: &EngineSettingsValues,
+    policy: &AgentLaunchPolicy,
+) -> Result<ModelRoutePreparation, AgentLaunchError> {
+    resolve_with_binding(provider, launch, settings, policy, CatalogueBinding::ReviewerSelection)
+}
+
+/// Run execution checks before the shared read-only observation. The engine's
+/// retained caller role determines the fingerprint used at observation and recheck.
+fn resolve_with_binding(
+    provider: &Provider,
+    launch: &Launch,
+    settings: &EngineSettingsValues,
+    policy: &AgentLaunchPolicy,
+    binding: CatalogueBinding,
+) -> Result<ModelRoutePreparation, AgentLaunchError> {
     if !policy.allow_unverified {
         return Err(AgentLaunchError::Refused(
             "agent-provider-verified-context-required",
@@ -325,7 +376,7 @@ pub(crate) fn resolve(
             "agent-provider-adapter-or-model-route-unported",
         ));
     }
-    resolve_configuration_metadata(provider, launch, settings, policy)
+    resolve_metadata(provider, launch, settings, policy, "work", binding)
 }
 /// Validate inherited policy-v1 structural vocabulary only. No model names,
 /// catalogue availability, defaults adoption or execution permission is inferred.
@@ -436,6 +487,19 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
     policy: &AgentLaunchPolicy,
     purpose: &str,
 ) -> Result<ModelRoutePreparation, AgentLaunchError> {
+    resolve_metadata(provider, launch, settings, policy, purpose, CatalogueBinding::Complete)
+}
+
+/// Observe the saved selection and source evidence under the caller's fixed
+/// fingerprint contract. No process, permission or provider availability is inferred.
+fn resolve_metadata(
+    provider: &Provider,
+    launch: &Launch,
+    settings: &EngineSettingsValues,
+    policy: &AgentLaunchPolicy,
+    purpose: &str,
+    catalogue_binding: CatalogueBinding,
+) -> Result<ModelRoutePreparation, AgentLaunchError> {
     if !valid_purpose(purpose) {
         return Err(AgentLaunchError::Refused("provider-model-purpose-invalid"));
     }
@@ -459,6 +523,7 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
             provider: provider.clone(),
             route: None,
             scope: None,
+            catalogue_binding,
         });
     };
     let levels = policy_levels(model_policy)?;
@@ -500,6 +565,7 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
     let configured = configured_model(args, syntax);
     let mut cache_state = "not_applicable";
     let mut cache_sha256 = None;
+    let mut cache_selection_announced = None;
     let mut announced = false;
     if adapter == "codex" {
         cache_state = "no_effective_home";
@@ -507,25 +573,13 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
             cache_state = "absent";
             if let Some(raw) = read_cache(&path, policy.provider_bytes)? {
                 cache_state = "observed_unverified";
-                cache_sha256 = Some(hash(&raw));
                 let cache: ModelCache = crate::work::decode_mode(&raw, cache_shape(), false)
                     .map_err(|e| AgentLaunchError::caused("agent-model-catalogue-invalid", e))?;
-                announced = cache
-                    .models
-                    .as_deref()
-                    .unwrap_or_default()
-                    .iter()
-                    .any(|model| {
-                        model.visibility == "list"
-                            && model.slug == choice.model
-                            && (choice.effort.is_empty()
-                                || model
-                                    .supported_reasoning_levels
-                                    .as_deref()
-                                    .unwrap_or_default()
-                                    .iter()
-                                    .any(|effort| effort.effort == choice.effort))
-                    });
+                announced = cache.announces(choice);
+                match catalogue_binding {
+                    CatalogueBinding::Complete => cache_sha256 = Some(hash(&raw)),
+                    CatalogueBinding::ReviewerSelection => cache_selection_announced = Some(announced),
+                }
             }
         }
     }
@@ -541,12 +595,13 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
     let rules=crate::encode_model(&serde_json::json!({"automatic":settings.agent_model_automatic_levels,"restricted":settings.agent_model_restricted_levels,"rules":settings.agent_model_restriction_rules})).map_err(|e|AgentLaunchError::caused("agent-model-rules-encoding",e))?;
     let scope = hash(
         &crate::encode_model(&ModelSources {
-            schema_version: 1,
+            schema_version: if cache_selection_announced.is_some() { 2 } else { 1 },
             requested_level: &launch.level,
             automatic,
             adapter,
             cache_state,
-            cache_sha256,
+            cache_sha256: cache_selection_announced.is_none().then_some(cache_sha256),
+            cache_selection_announced,
             configured_model: configured,
             selected_announcement,
             policy_hash: &policy_hash,
@@ -562,12 +617,41 @@ pub(crate) fn resolve_configuration_metadata_for_purpose(
         provider: effective,
         route: Some(route),
         scope: Some(scope),
+        catalogue_binding,
     })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Rewriting cache metadata or an unrelated route preserves the selected
+    /// announcement. A hidden model or withdrawn effort cannot supply it.
+    #[test]
+    fn codex_catalogue_binds_only_the_selected_announcement() {
+        let selected = crate::ModelChoice {
+            model: "fixture-selected".into(),
+            effort: "high".into(),
+        };
+        let cache = |stamp: &str, unrelated: &str, visibility: &str, effort: &str| {
+            let raw = serde_json::to_vec(&serde_json::json!({
+                "fetched_at": stamp,
+                "models": [
+                    {"slug": unrelated, "visibility": "list"},
+                    {"slug": selected.model, "visibility": visibility,
+                     "supported_reasoning_levels": [{"effort": effort}]}
+                ]
+            })).unwrap();
+            let decoded: ModelCache = crate::work::decode_mode(&raw, cache_shape(), false).unwrap();
+            (hash(&raw), decoded.announces(&selected))
+        };
+        let original = cache("one", "unrelated-1", "list", "high");
+        let refreshed = cache("two", "unrelated-2", "list", "high");
+        assert_ne!(original.0, refreshed.0);
+        assert!(original.1 && refreshed.1);
+        assert!(!cache("two", "unrelated-2", "hide", "high").1);
+        assert!(!cache("two", "unrelated-2", "list", "low").1);
+    }
+
     /// A real checked custom-policy candidate, with no host/cache IO or child.
     /// Literal model/levels are fixture data; scope is computed by production code.
     fn candidate(routed: bool) -> ModelRoutePreparation {

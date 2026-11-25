@@ -64,7 +64,7 @@ pub(super) fn departed(job: &Job) -> Result<(), E> {
 /// in the caller snapshot. This is not admission: original preflight TTL belongs
 /// separately to fresh() before any new grant. No process, debit, workspace probe
 /// or future lease is created here; IO/SQL/codec refusal remains explicit.
-fn frame(
+pub(super) fn frame(
     root: &RootStore,
     tx: &Transaction<'_>,
     settings: &EngineSettingsDocument,
@@ -367,10 +367,11 @@ pub(super) fn fresh_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSet
     if !bound_inputs_match(tx,&material.inputs, job)? {
         return Err(E::Refused("review-guard-preparation-changed"));
     }
-    if material.host.executable_digest != job.executable_sha256
-        || material.host.preflight.scope != job.host_scope
-    {
-        return Err(E::Refused("review-guard-preparation-changed"));
+    if material.host.executable_digest != job.executable_sha256 {
+        return Err(E::Refused("review-guard-executable-changed"));
+    }
+    if material.host.preflight.scope != job.host_scope {
+        return Err(E::Refused("review-guard-host-scope-changed"));
     }
     material
         .fresh(&root.root)

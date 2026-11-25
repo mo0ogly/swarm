@@ -17,7 +17,7 @@ pub use candidate_preparation::TaskValidationCandidate;
 mod retirement;
 mod reconstruction;
 mod review_candidate;
-pub(super) use review_candidate::{acquire as acquire_review_candidate, acquire_using as acquire_claimed_review_candidate, ReviewCandidate};
+pub(super) use review_candidate::{acquire as acquire_review_candidate, acquire_using as acquire_claimed_review_candidate, acquire_final as acquire_publication_candidate, ReviewCandidate};
 mod review_evidence;
 pub(super) use review_evidence::{published_managed_candidate, recorded_managed_candidate, recorded_evidence, recorded_evidence_for_review_result, recorded_evidence_for_prior_review, ReceiptTiming};
 pub use review_evidence::NativeValidationEvidence;

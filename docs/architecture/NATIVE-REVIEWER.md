@@ -46,6 +46,34 @@ Les deux aperçus de tâche prennent `schema_version`, `event_id`,
 l’appelant n’est pas une autorité. L’aperçu public refuse une revue déjà en cours ;
 la relecture interne n’autorise que l’exacte revue liée au job normalisé.
 
+Le parent vérifie le dossier à la réservation. Au démarrage, il réutilise les
+données de planification. Il enregistre l’auxiliaire puis lui permet d’entrer
+dans son contrôle d’admission privé après vérification de son identité, de la
+racine, de la réservation, du financement, du bail, des réglages et de l’échéance
+initiale. L’auxiliaire reconstitue et compare le dossier courant, vérifie la
+route et l’exécutable et vérifie encore l’échéance avant d’exécuter le fournisseur.
+Le ticket reste lié à son échéance d’origine.
+
+```mermaid
+sequenceDiagram
+    participant P as Moteur parent
+    participant A as Auxiliaire enregistré
+    participant F as Fournisseur
+    P->>P: Vérifier le dossier et réserver
+    P->>A: Vérifier l’identité et ouvrir l’admission privée
+    A->>A: Revérifier les sources, la route et l’échéance
+    alt Tous les contrôles passent
+        A->>F: Exécuter dans le périmètre autorisé
+    else Refus
+        A-->>P: Diagnostic, puis clôture selon le reçu
+    end
+```
+Si un auxiliaire déjà récolté échoue avant tout octroi, son reçu d’origine
+peut clore exactement cette réservation comme non-verdict. Le rapport et
+le candidat restent attribués, le quota consommé reste enregistré.
+La recette `native-reviewer-pregrant-recovery` vérifie la forme acceptée
+et les refus, avec une cible Cargo préalablement admise.
+
 ## Correspondance des contrôles natifs
 
 Avant conversion publique, lecture de l’original et rejeu, le moteur vérifie
@@ -867,6 +895,69 @@ tâche cible reste présent aussi. La projection déclare `inspection_only=true`
 `accepted_baseline_verdicts_verified=false` ; elle ne prétend pas vérifier les
 avis historiques acceptés. Un résultat de contrôle dont la sortie est tronquée
 reste une observation déclarée comme telle, pas une sortie complète inventée.
+
+`task review-preview` présente un inventaire compact (`managed_inventory`).
+Il distingue le nombre d’entrées du candidat et les chemins modifiés depuis
+son parent enregistré. La liste indique les ajouts, suppressions, modifications
+et changements de type. Un renommage apparaît comme un ajout et une suppression.
+Le plafond de fichiers en vigueur et son dépassement éventuel portent sur
+l’inventaire complet du candidat. Lorsque celui-ci dépasse le plafond, le
+dossier de revue utilise les fichiers ajoutés ou modifiés et les entrées
+déclarées des contrôles, sans doublons. Les suppressions figurent dans le delta.
+Une entrée de contrôle inchangée et non textuelle conserve son chemin, son
+empreinte vérifiée et son attribution au contrôle. Son contenu n’est pas
+fourni et ne peut pas être cité. Une entrée déclarée absente du candidat
+refuse. Le plafond et les bornes d’octets s’appliquent aux pièces sélectionnées.
+Le contexte précise sa portée et le réviseur doit déclarer `unknown` si une
+pièce requise par un critère lui manque. Le moteur continue de vérifier
+l’intégralité du candidat et les reçus d’origine. Les dossiers qui tiennent
+dans le plafond gardent leur représentation historique. Le dossier ciblé
+contient le reçu attribué de la cohorte et les résultats des contrôles dans
+le protocole de revue. Il ne répète pas la table intégrale des empreintes
+d’artefacts du reçu de validation. La préparation ne
+démarre aucun appel et ne valide aucune tâche.
+
+Une acquisition de dossier ciblé confirme les identités Git et la liaison
+au reçu des contrôles. Elle relit seulement les chemins du dossier, les
+entrées déclarées et les artefacts de preuve utiles. Les empreintes des
+autres fichiers décrivent les originaux au moment des contrôles. La
+publication du résultat exige une vérification complète en lecture réelle.
+Dans un dossier complet, les empreintes vérifiées dans le même passage
+sont réutilisées entre les contrôles d’artefacts.
+
+Chaque lecture du contrôle publié ouvre son reçu privé une fois. Le moteur
+compare l’empreinte réelle au registre et contrôle chaque reçu d’étape. Un
+nouveau passage relit ses originaux pour vérifier leur état courant.
+
+Lorsque Codex est le réviseur, le préflight lie l’annonce locale du modèle et du
+niveau d’effort sélectionnés. Une réécriture du cache portant sur son horodatage
+ou d’autres modèles laisse cette preuve inchangée. Le retrait de l’annonce, un
+cache illisible et une dérive de l’exécutable restent détectés. La première
+admission d’une réservation portant l’ancienne empreinte du cache entier peut
+refuser après une mise à jour. Utiliser la reprise correspondant à l’état du
+processus réellement observé.
+Les réservations des agents conservent leur empreinte historique du cache entier.
+
+`task review-retire-unstarted REVIEW_ID` clôture une réservation sans
+autorisation de lancement, sans enfant enregistré et dont le propriétaire
+a disparu sur le même hôte. L’original privé version 3 conserve ce constat.
+La transaction archive le refus, libère l’exclusion par tâche et conserve
+la consommation. Un nouveau départ exige une commande et une admission
+fraîches. Les opérations de reprise d’un processus lancé conservent leur
+preuve de fin propre. Un propriétaire vivant ou une preuve ambiguë refuse.
+
+Dans Conduite, « Valider » utilise la publication native pour un candidat
+géré dont la politique exige une validation humaine. Le précontrôle reste
+en lecture seule. Le clic est soumis aux contrôles d’identité et de révision
+de la route protégée. La publication enregistre ensemble le candidat et
+l’état accepté. La fiche relit ensuite l’état du travail.
+Elle n’autorise aucun appel au réviseur.
+
+Dans `managed_inventory.control_inputs`, chaque pièce déclarée par un contrôle
+est associée à sa tâche, au contrôle et à son chemin depuis le dépôt. Quand
+la pièce est suivie par Git, son mode et l’empreinte du candidat retenu sont
+fournis, même si le chemin est inchangé. Une pièce hors de l’inventaire Git
+reste listée avec une empreinte Git absente. Cette liste n’ouvre pas les pièces.
 
 Les réglages existants sont conservés : `review_delivery_files` borne l'inventaire
 Git complet présenté, `review_context_files` compte tous les matériaux, doublons

@@ -114,6 +114,28 @@
       "required_stderr": []
     },
     {
+      "id": "reviewer-codex-selection-evidence",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "codex_catalogue_binds_only_the_selected_announcement",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
       "id": "original-expiry-current",
       "command": [
         "cargo",

@@ -153,7 +153,7 @@ pub(super) fn prepare_for_job_using(
         }
         let readonly = crate::prepare_assistant_provider(&provider)
             .map_err(|e| A::caused("review-provider-assistant-unavailable", e))?;
-        let model = crate::provider_model_route::resolve(
+        let model = crate::provider_model_route::resolve_reviewer(
             &readonly,
             &launch_request,
             &settings.values,
