@@ -745,6 +745,24 @@
      rotation.replaceChildren(metrics,...(overdue?[note]:[]));
      rotation.hidden=false
     };
+    /** Mark literal matches in a visible cell. Search remains a server-side
+     * match on the original record. Hidden JSON fields stay out of the table. */
+    const highlightCell=(td,query)=>{
+     const value=td.textContent;
+     let index=value.indexOf(query);
+     if(index<0)return;
+     const marked=document.createDocumentFragment();
+     let from=0;
+     do{
+      marked.append(value.slice(from,index));
+      const mark=node('mark');
+      mark.textContent=value.slice(index,index+query.length);
+      marked.append(mark);
+      from=index+query.length;
+      index=value.indexOf(query,from)
+     }while(index>=0);
+     marked.append(value.slice(from));td.replaceChildren(marked)
+    };
     const render=result=>{
      if(!Array.isArray(result.lines))throw Error('authority-response-unreadable');
      const lines=result.total===undefined&&order.value==='newest'?[...result.lines].reverse():result.lines;
@@ -770,6 +788,7 @@
        const archived=result.line_archive_at?.[index];
        cell(row,archived==null?tr('Journal actif'):phrase('Archive du {date}',{date:when(archived)}))
       }
+      if(applied.q)for(const td of row.cells)highlightCell(td,applied.q);
       tb.append(row)
      }
      const empty=sourceScoping&&applied.source==='archives'&&result.archives===0
@@ -855,6 +874,7 @@
      const doc=document.implementation.createHTMLDocument(tr('Logs applicatifs'));
      doc.documentElement.lang=lang;
      doc.body.append(doc.importNode(source,true));
+     for(const mark of doc.querySelectorAll('mark'))mark.replaceWith(mark.textContent);
      for(const item of doc.querySelectorAll('[tabindex]'))item.removeAttribute('tabindex');
      const plain=[...source.rows].map(row=>[...row.cells].map(cell=>cell.textContent.replace(/[\t\r\n]+/g,' ')).join('\t')).join('\n');
      const url=URL.createObjectURL(new Blob([asHtml?'<!doctype html>\n'+doc.documentElement.outerHTML:plain+'\n'],{
@@ -864,8 +884,8 @@
      modal.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0)
     }
 
-    const settings=node('details');settings.append(node('summary','Rotation et rétention'));
-    settings.append(node('p','Le démon ouvre une archive avant une écriture qui dépasserait le seuil. Une rétention réduite s’applique à la prochaine rotation.'));
+    const settings=node('section',undefined,'authority-log-panel');
+    if(policy)settings.append(node('p','Le démon ouvre une archive avant une écriture qui dépasserait le seuil. Une rétention réduite s’applique à la prochaine rotation.'));
     const fields=node('div',undefined,'engine-settings-fields');settings.append(fields);
     field(fields,'Niveau minimum',level);
     const numeric=(label,key)=>{
@@ -905,11 +925,43 @@
      }finally{save.disabled=false}
     });
     settings.append(toolbar(save),savedState);
-    if(policy)view.prepend(rotation,filters);
-    else view.prepend(node('p','La recherche dans les archives exige une mise à jour du démon.','notice info'),toolbar(refresh));
-    view.append(reading,activeFilters,matches,retry,display);
-    if(history)view.append(pages);
-    view.append(exports,settings);
+    const journal=node('section',undefined,'authority-log-panel');
+    if(policy)journal.append(filters);
+    else journal.append(node('p','La recherche dans les archives exige une mise à jour du démon.','notice info'),toolbar(refresh));
+    journal.append(state,reading,activeFilters,matches,retry,display);
+    if(history)journal.append(pages);
+    journal.append(exports);
+    settings.prepend(rotation);
+    const tabs=node('div',undefined,'authority-log-tabs');
+    tabs.setAttribute('role','tablist');
+    tabs.setAttribute('aria-label',tr('Logs applicatifs'));
+    const journalTab=button('Journal'),rotationTab=button('Rotation et rétention');
+    journalTab.dataset.authorityLogJournalTab='';rotationTab.dataset.authorityLogRotationTab='';
+    const panels=[[journalTab,journal],[rotationTab,settings]];
+    /** Switch panels in place to preserve the search, read position and
+     * unsaved settings. Only the selected tab is in the tab order. */
+    const selectTab=selected=>{
+     for(const [tab,panel] of panels){
+      const current=tab===selected;
+      tab.setAttribute('aria-selected',String(current));tab.tabIndex=current?0:-1;
+      panel.hidden=!current
+     }
+    };
+    for(const [index,[tab,panel]] of panels.entries()){
+     tab.id=title.id+'-tab-'+index;panel.id=title.id+'-panel-'+index;
+     tab.setAttribute('role','tab');tab.setAttribute('aria-controls',panel.id);
+     panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',tab.id);panel.tabIndex=0;
+     tab.addEventListener('click',()=>selectTab(tab));
+     tab.addEventListener('keydown',event=>{
+      const target={ArrowLeft:1-index,ArrowRight:1-index,Home:0,End:panels.length-1}[event.key];
+      if(!Number.isInteger(target))return;
+      event.preventDefault();
+      const next=panels[target][0];selectTab(next);next.focus()
+     });
+     tabs.append(tab)
+    }
+    selectTab(journalTab);
+    view.append(tabs,journal,settings);
     if(history)await read();else render(first)
    }catch(error){
     if(!active())return;

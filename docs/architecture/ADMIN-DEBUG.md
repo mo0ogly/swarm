@@ -94,6 +94,14 @@ avec les autres critères appliqués. Si l’instantané expire entre deux pages
 **Reprendre la lecture** recharge la première page avec ces mêmes critères.
 La source Archives signale explicitement l’absence d’archives conservées.
 
+L’onglet **Journal** s’ouvre par défaut et regroupe la recherche, les résultats
+et les exports. L’onglet **Rotation et rétention** affiche les mesures et les
+réglages. Les flèches gauche et droite, Début et Fin changent d’onglet au clavier.
+La recherche surligne le texte exact dans les cellules affichées, avec la casse
+saisie. Un rapprochement dans un champ du journal non affiché peut produire une
+ligne sans surlignage. Les réglages commencés et les filtres restent disponibles
+quand on change d’onglet. Les exports conservent le texte des cellules.
+
 Le démon Rust inscrit le démarrage de son écoute au niveau Info dans le
 journal applicatif. Une lecture invalide ou un instantané expiré émet un
 événement Warn sur la sortie d’erreur du démon. Un échec interne de lecture

@@ -83,6 +83,13 @@ those same criteria. The Archives source reports an empty archive store
 separately from a search with no matching rows. Read errors clear the displayed
 results.
 
+The **Log** tab opens by default with search, results and exports. **Rotation
+and retention** contains the metrics and settings. Left, Right, Home and End
+switch tabs with the keyboard. The table highlights literal, case-sensitive
+matches in displayed cells. A match in an undisplayed log field can return
+a row without a highlight. Switching tabs preserves filters and settings in
+progress. Exports retain the cell text.
+
 The Rust authority daemon records the start of its listener at Info in the
 application journal. Invalid or stale history reads emit a Warn event to the
 daemon's standard error. Internal read failures emit an Error there. These

@@ -29,7 +29,7 @@
       "id": "browser-log-controls",
       "command": ["node", "tests/authority_app_logs_ui.cjs"],
       "expected_exit": 0,
-      "required_stdout": ["PASS Admin application logs: applied filter chips, empty archives, stale snapshot resume", "SCREENSHOTS "],
+      "required_stdout": ["PASS Admin application logs: keyboard tabs, literal highlights, applied filter chips, empty archives, stale snapshot resume", "SCREENSHOTS "],
       "required_stderr": []
     },
     {
