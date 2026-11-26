@@ -126,7 +126,7 @@
     if(value.provider_hint==='provider-reported-unix-stream-permission-denied')
      status.textContent=t('Le fournisseur signale un refus de création de canal Unix (EPERM).');
     if(Number.isInteger(value.exit_code))parts.push(t('Code de sortie {code}.').replace('{code}',value.exit_code));
-    if(value.managed_repository)parts.push(t('La reprise de cet échec sur le même candidat géré est indisponible.'));
+    if(value.managed_repository)parts.push(t('La relance directe est bloquée. Le reçu d’origine est conservé.'));
     incident.textContent=parts.join(' ');incident.hidden=false;
     codeLabel.textContent+=' · '+value.review_id;
    } catch {

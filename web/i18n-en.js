@@ -57,7 +57,7 @@ globalThis.SwarmEnglish = {
   "Le canal privé a été ouvert. La revue s’est arrêtée sans avis applicable.": "The private channel opened. The review stopped without an applicable opinion.",
   "Le fournisseur signale un refus de création de canal Unix (EPERM).": "The provider reported a Unix channel creation refusal (EPERM).",
   "Code de sortie {code}.": "Exit code {code}.",
-  "La reprise de cet échec sur le même candidat géré est indisponible.": "Recovery from this failure on the same managed candidate is unavailable.",
+  "La relance directe est bloquée. Le reçu d’origine est conservé.": "Direct retry is blocked. The original receipt is retained.",
   "La lecture du reçu de la dernière revue est indisponible.": "The latest review receipt could not be read.",
   "La dernière revue s’est arrêtée avant l’appel : le processus propriétaire a quitté.": "The last review stopped before calling the provider because the owning process exited.",
   "La dernière revue s’est arrêtée avant l’appel : le processus auxiliaire s’est terminé.": "The last review stopped before calling the provider because the helper process exited.",

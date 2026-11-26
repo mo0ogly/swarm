@@ -234,7 +234,7 @@ async function verify(){
     /5\/5 review calls used\. The review budget is exhausted\. The latest review failed without an applicable opinion\./);
    await observe(page.waitForFunction(()=>document.querySelector('.workbench-review')?.textContent.includes('Unix channel creation refusal (EPERM)')));
    await page.click(dialog+' .task-detail-diagnostic summary');
-   assert.match(await page.$eval(dialog+' .workbench-review',node=>node.textContent),/Exit code 101\. Recovery from this failure/);
+   assert.match(await page.$eval(dialog+' .workbench-review',node=>node.textContent),/Exit code 101\. Direct retry is blocked/);
 
    assert.equal(await page.$eval(button,node=>node.disabled),true);
    assert.deepEqual(writes,[]);
