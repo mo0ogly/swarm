@@ -12,6 +12,10 @@ Les preuves natives décrites ici ciblent Linux ; aucune équivalence entre
 plateformes n’est établie.
 
 
+Le processus privé de revue fixe `TMPDIR` à son espace I0 vérifié. Le dossier
+temporaire hôte configuré ne devient pas un espace d’écriture du fournisseur.
+Les chemins du compte et la politique réseau gardent leurs contrôles existants.
+
 ## Contrôle géré en lecture seule à entrées déclarées
 
 L’opérateur peut employer `schema_version: 2` avec `task validation-preview`

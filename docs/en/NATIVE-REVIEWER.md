@@ -10,6 +10,11 @@ review states are outside this projection.
 The native evidence below targets Linux; cross-platform equivalence is not established.
 
 
+The native reviewer helper sets `TMPDIR` to its own verified I0 workspace.
+The configured host temporary directory cannot become a writable area for the
+provider. Account configuration and network policy retain their existing paths
+and checks.
+
 ## Read-only managed control with declared inputs
 
 An operator can use `schema_version: 2` with `task validation-preview` and

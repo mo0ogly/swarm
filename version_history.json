@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le vérificateur natif crée ses temporaires dans son espace I0 vérifié.",
+        "en": "The native reviewer creates temporary files in its verified I0 workspace."
+      },
+      {
         "fr": "Le contrôle géré en lecture seule peut se limiter aux fichiers déclarés du candidat et en vérifier les octets.",
         "en": "Read-only managed controls can use only the declared candidate files and verify their bytes."
       },

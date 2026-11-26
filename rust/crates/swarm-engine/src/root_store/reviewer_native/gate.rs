@@ -214,7 +214,8 @@ pub(super) fn execute(
         &material.host.workspace,
         material.inputs.prompt.as_bytes(),
     )?.with_workspace_identity(material.host.directory_identity)
-      .with_internet_denied(internet_denied);
+      .with_internet_denied(internet_denied)
+      .with_workspace_tmpdir()?;
     let fresh = material
         .fresh(root)
         .map_err(|error| E::Launch(Box::new(error)))
