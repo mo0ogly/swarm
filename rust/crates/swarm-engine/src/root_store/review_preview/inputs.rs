@@ -380,11 +380,22 @@ pub(super) fn assemble_managed_using(
     }
     let protocol=super::managed_context::build(&prepared,candidate,reports,&materials.sources)?;
     let protocol=serde_json::to_value(&protocol).map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-protocol-encode",e))))?;
+    // Focused review already carries the exact text and hashes in the canonical
+    // protocol. A second copy here grows the prompt without adding evidence.
+    // Public materials still return the original bytes for read-only inspection.
+    let prompt_materials = if focused.is_some() {
+        serde_json::Value::Array(materials.sources.iter().map(|source| serde_json::json!({
+            "name":source.name,"kind":source.kind,"quote_kind":source.quote_kind,"sha256":source.sha256
+        })).collect())
+    } else {
+        serde_json::to_value(&materials.sources)
+            .map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-materials-encode",e))))?
+    };
     let mut body=serde_json::json!({"schema_version":1,"inspection_only":true,"managed_protocol":protocol,
         "native_invocation_supported":invocation,"native_verdict_supported":invocation,
         "accepted_baseline_verdicts_verified":false,
         "candidate":candidate.metadata(),"tracked_sources":inventory,"tasks":tasks,
-        "materials":materials.sources});
+        "materials":prompt_materials});
     if let Some(scope) = focused {
         body["candidate_review_scope"] = serde_json::json!({
             "tracked_count": scope.tracked_count,

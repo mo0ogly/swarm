@@ -1067,7 +1067,8 @@ et un `detail`. La pièce est attribuée à l’opérateur. Le vérificateur dé
 si elle démontre le critère. Un fichier absent préserve le comportement existant.
 Une liaison invalide, un type de fichier dangereux, un indice répété ou une limite
 dépassée refuse. Les octets d’origine entrent dans le catalogue et le contrôle
-de fraîcheur des artefacts. `review-inputs` les restitue même lorsque le quota
+de fraîcheur des artefacts. Le prompt ciblé donne l’index des pièces et réutilise
+le texte porté par le protocole. `review-inputs` les restitue même lorsque le quota
 est exactement consommé. L’exécution reste soumise à son admission et à son quota.
 
 Après un échec de protocole géré attesté à exit zéro, `review-archive-failure`

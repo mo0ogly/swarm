@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La revue ciblée réutilise le texte du catalogue au lieu de le dupliquer dans le prompt.",
+        "en": "Focused review uses the catalogue text without duplicating it in the prompt."
+      },
+      {
         "fr": "La revue gérée peut citer les observations opérateur liées au candidat et reprendre après un échec de protocole conservé.",
         "en": "Managed review can cite candidate-bound operator observations and resume after a retained protocol failure."
       },

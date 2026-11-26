@@ -1017,7 +1017,8 @@ Each observation declares a unique 1-based `criterion`, a `source` and a
 decides whether it proves the criterion. Missing optional files leave existing
 reviews compatible. Invalid bindings, unsafe file types, duplicate observation
 indices and limits refuse. The retained bytes enter the normal catalogue and
-artifact freshness checks. They can be inspected with `review-inputs` even
+artifact freshness checks. The focused prompt gives the material index without
+a second copy of the text already carried by the protocol. They can be inspected with `review-inputs` even
 when the saved reviewer counter exactly equals its cap. Execution still needs
 an available call and authorized native admission.
 
