@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite indique la phase et le code de sortie de la dernière revue échouée, à partir du reçu vérifié et sans exposer la sortie brute.",
+        "en": "Conduite shows the phase and exit code of the latest failed review from a verified receipt without exposing the raw output."
+      },
+      {
         "fr": "La console des logs sépare le journal et la rotation en onglets. Les termes recherchés sont surlignés dans le tableau.",
         "en": "The log console has separate Log and Rotation tabs and highlights search terms in the table."
       },

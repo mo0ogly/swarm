@@ -360,7 +360,85 @@ pub(super) fn expected_certificate(
 fn caused(code: &'static str, error: impl std::error::Error + Send + Sync + 'static) -> E {
     E::Launch(Box::new(A::caused(code, error)))
 }
+/// Read-only projection for a recorded reviewer failure. The retained provider
+/// message contributes only an allowlisted hint, never original text or authority.
+#[derive(serde::Deserialize)]
+struct DiagnosticCapture {
+    failed: bool,
+    stderr: DiagnosticStream,
+}
+
+#[derive(serde::Deserialize)]
+struct DiagnosticStream {
+    retained: Vec<u8>,
+}
+
+/// Recognize the specific reported runtime initialization failure. The raw
+/// stream remains private. Matching its text cannot prove a kernel decision.
+fn reviewer_startup_hint(stderr: &[u8]) -> Option<&'static str> {
+    stderr.split(|byte| *byte == b'\n').any(|line| {
+        let contains = |needle: &[u8]| line.windows(needle.len()).any(|part| part == needle);
+        contains(b"failed to create UnixStream") && contains(b"Operation not permitted")
+    }).then_some("provider-reported-unix-stream-permission-denied")
+}
+
 impl RootStore {
+    /// Read the exact current attempt and verify its native result event,
+    /// certificate and receipt. Returns only redacted facts, or null when
+    /// there is no current native error. Refuses stale revisions and changed
+    /// originals, without authorizing a retry or running the provider.
+    pub fn task_review_incident(&self, work_id: &str, task_id: &str, revision: i64) -> Result<serde_json::Value, E> {
+        crate::root_store::material_path::with_material_read(self, || {
+            let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
+            let result = (|| {
+                let work = crate::read_recorded_work(&tx, work_id).map_err(E::Work)?;
+                if work.revision != revision {
+                    return Err(E::Refused("task-review-revision-changed"));
+                }
+                let task = work.tasks.iter().flatten().find(|task| task.id == task_id)
+                    .ok_or(E::Refused("task-actions-task-missing"))?;
+                let Some(expected) = task.independent_review.as_deref().filter(|review| {
+                    review.state == "error" && crate::review_evidence::native_receipt_reference(&review.receipt)
+                }) else {
+                    return Ok(serde_json::Value::Null);
+                };
+                let original = self.recorded_native_review(&tx, work_id, &expected.id)?;
+                if original.task != task.id || original.review != *expected ||
+                   original.verdict_applicable || original.revision > revision {
+                    return Err(E::Refused("task-review-incident-original-changed"));
+                }
+                let suffix = crate::provider_configuration::configuration_digest(expected.id.as_bytes());
+                let raw = self.directory.read_native_receipt(&format!("native-review-{suffix}.receipt"))
+                    .map_err(E::Storage)?;
+                if crate::provider_configuration::configuration_digest(&raw) != original.original_receipt_sha256 {
+                    return Err(E::Refused("task-review-incident-original-changed"));
+                }
+                #[derive(serde::Deserialize)]
+                struct Details {
+                    exit_code: Option<i32>,
+                    signal: Option<i32>,
+                    output_complete: bool,
+                    gate: Option<crate::agent_execution_gate::GateFailure>,
+                    raw_capture: DiagnosticCapture,
+                }
+                let details: Details = serde_json::from_slice(&raw)
+                    .map_err(|err| caused("task-review-incident-receipt", err))?;
+                Ok(serde_json::json!({
+                    "review_id": expected.id, "attempt_id": expected.attempt,
+                    "started_at": expected.started, "finished_at": expected.finished,
+                    "stage": if details.gate.is_some() { "private-admission-refused" } else { "after-private-admission" },
+                    "exit_code": details.exit_code, "signal": details.signal,
+                    "output_complete": details.output_complete,
+                    "provider_hint": if details.gate.is_none() && !details.raw_capture.failed && details.exit_code.is_some_and(|code| code != 0) {
+                        reviewer_startup_hint(&details.raw_capture.stderr.retained)
+                    } else { None },
+                    "managed_repository": work.planning.as_deref().is_some_and(|plan| plan.repository.is_some())
+                }))
+            })();
+            super::finished(result, tx.rollback().map_err(E::Sql))
+        })
+    }
+
     /// Recheck the archived native correction authority at each execution gate.
     /// Actual current Root row/task must match the caller; the immediately prior
     /// attempt/review, canonical retry decision, private/public reviewer+control
@@ -837,5 +915,27 @@ mod tests {
             format!(".swarm/{}", expected.file_name),
             original["review"]["receipt"].as_str().unwrap()
         );
+    }
+}
+
+
+#[cfg(test)]
+mod incident_projection_tests {
+    use super::reviewer_startup_hint;
+
+    #[test]
+    fn reviewer_incident_hint_requires_both_reported_signals() {
+        assert_eq!(
+            reviewer_startup_hint(b"private fixture\nfailed to create UnixStream: Operation not permitted"),
+            Some("provider-reported-unix-stream-permission-denied")
+        );
+        for partial in [
+            &b"failed to create UnixStream: other error"[..],
+            &b"other service: Operation not permitted"[..],
+            &b"failed to create UnixStream\nother service: Operation not permitted"[..],
+            &b""[..],
+        ] {
+            assert_eq!(reviewer_startup_hint(partial), None);
+        }
     }
 }

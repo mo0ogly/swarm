@@ -55,6 +55,18 @@ Un refus de lecture reste visible dans la console avec son code quand celui-ci
 est fourni. Pour reprendre une lecture de projet en échec, refermez et rouvrez
 sa branche. Consultez la [version anglaise](../en/ADMIN-DEBUG.md).
 
+### Échec d’une revue dans Conduite
+
+La fiche d’une tâche soumise peut relire l’incident de sa revue courante avec
+les droits des journaux et la révision affichée. Le moteur rapproche le reçu
+avec la ligne d’exécution, l’événement et le certificat d’origine. La fiche
+affiche la frontière atteinte, le code de sortie quand il est connu et la limite
+de reprise sur un dépôt géré. Un échec de lecture garde son propre message.
+
+Le message Unix est une catégorie issue du texte rapporté par le fournisseur.
+Swarm renvoie un code fixe, sans recopier les captures, les chemins, ni les
+prompts. Cette lecture ne donne aucun droit de relance ni de validation.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

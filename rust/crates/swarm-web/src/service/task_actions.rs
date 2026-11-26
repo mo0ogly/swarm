@@ -5,7 +5,8 @@ use swarm_engine::RootStore;
 
 impl NativeHttpService {
     /// Read a task action file under the opened Root and views policy.
-    /// GET/HEAD require one Work and task key. Invalid queries, missing rows
+    /// GET/HEAD require one Work and task key. A review_revision query reads
+    /// only the current verified review incident for that revision. Invalid queries, missing rows
     /// and storage/serialization failures are distinct refusals. No visit,
     /// process, review, or file publication is performed.
     pub(super) fn task_actions(&self, request: &Request<Vec<u8>>) -> Result<RouteBody, E> {
@@ -14,10 +15,12 @@ impl NativeHttpService {
         }
         let mut work = None;
         let mut task = None;
+        let mut review_revision = None;
         for (key, value) in form_urlencoded::parse(request.uri().query().unwrap_or("").as_bytes()) {
             let slot = match key.as_ref() {
                 "work" => &mut work,
                 "task" => &mut task,
+                "review_revision" => &mut review_revision,
                 _ => return Err(E::Refused("task-actions-query-invalid")),
             };
             if slot.replace(value.into_owned()).is_some() {
@@ -36,6 +39,20 @@ impl NativeHttpService {
         let store = RootStore::open(&self.root, false).map_err(|cause| root("open", cause))?;
         let result = (|| {
             self.check_binding(&store)?;
+            #[cfg(target_os = "linux")]
+            if let Some(revision) = review_revision {
+                let revision = revision.parse::<i64>().ok().filter(|value| *value > 0)
+                    .ok_or(E::Refused("task-actions-query-invalid"))?;
+                let incident = store.task_review_incident(&work, &task, revision)
+                    .map_err(|cause| root("task-actions-read", cause))?;
+                return serde_json::to_vec(&serde_json::json!({
+                    "work": work, "task": task, "revision": revision, "incident": incident
+                })).map(RouteBody::plain).map_err(E::ResponseJson);
+            }
+            #[cfg(not(target_os = "linux"))]
+            if review_revision.is_some() {
+                return Err(E::Refused("task-actions-query-invalid"));
+            }
             let data = store
                 .task_actions(&work, &task)
                 .map_err(|cause| root("task-actions-read", cause))?;

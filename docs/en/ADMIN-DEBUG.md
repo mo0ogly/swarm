@@ -50,6 +50,18 @@ If Monaco cannot load, the log remains readable as text. A read refusal remains
 visible, with its code when available. Close and reopen a project branch to
 retry a failed read. See the [French version](../architecture/ADMIN-DEBUG.md).
 
+### Review failure in Conduite
+
+A submitted task can read its current review incident under the Logs permission
+and the revision shown. The engine cross-checks the original receipt, execution
+row, result event and certificate. Task details report the last boundary reached,
+the exit code when known and the recovery limit for a managed repository.
+A read failure has its own message.
+
+The Unix message is a category derived from provider-reported text. Swarm returns
+a fixed code without copying captured streams, paths or prompts. Reading this
+projection grants neither retry nor approval permission.
+
 ## Application logs for the relay
 
 Open the dedicated console in **Administration → Accounts and access →
