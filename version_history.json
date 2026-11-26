@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Conduite et la CLI Rust peuvent prévisualiser et enregistrer le modèle du vérificateur indépendant avec le catalogue existant. Les appels consommés et les avis précédents sont conservés.",
+        "en": "Conduite and the Rust CLI can preview and save the independent reviewer model from the existing catalogue. Consumed calls and previous opinions are preserved."
+      },
+      {
         "fr": "Une revue gérée arrêtée par un échec terminal du processus peut être archivée pour reprendre le même candidat, avec le reçu et le débit conservés.",
         "en": "A managed review stopped by a terminal process failure can be archived to resume the same candidate while preserving the receipt and charged call."
       },

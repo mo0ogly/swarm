@@ -81,6 +81,16 @@ pausing. Stale forms are rejected. Active planner sessions, running reviews and
 unfinished batch reviews prevent editing. No missing role is created; usage,
 quotas, failures and previous verdicts remain unchanged.
 
+### Native independent reviewer selection (Linux)
+
+The Rust flow configures the independent reviewer. Pause planning and wait for
+active reviews to close. Preview a provider and level from the catalogue, then
+confirm. In the CLI, use the preview's revision and `provider_digest` for
+`role-model apply`. The `model_policy_hash` must match the current choice.
+Original results preserve their provider routes and evidence. The change launches
+no review and grants no calls. Read the current state if the revision, policy,
+or provider has changed. Native orchestrator model configuration is separate.
+
 ## Reusable profiles in the Rust candidate — lot188
 
 Admission retains the requested level in the task profile and, for a manual

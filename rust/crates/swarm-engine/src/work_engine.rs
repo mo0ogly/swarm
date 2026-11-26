@@ -351,6 +351,13 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
         } else {
             None
         };
+        let reviewer_model = if kind == "reviewer.model" {
+            let request = crate::decode_reviewer_model_request(raw).map_err(WorkEngineError::TaskModel)?;
+            crate::require_reviewer_model_preview(&request).map_err(WorkEngineError::TaskModel)?;
+            Some(request)
+        } else {
+            None
+        };
         let task_model = if kind == "task.model" {
             Some(crate::decode_task_model_request(raw).map_err(WorkEngineError::TaskModel)?)
         } else {
@@ -418,6 +425,13 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
                 ..Default::default()
             }, crate::encode_model(change).map_err(|e| WorkEngineError::Quota(
                 crate::AgentLaunchError::caused("quota-request-encoding", e)))?)
+        } else if let Some(change) = &reviewer_model {
+            (
+                Request { schema_version: change.schema_version, event_id: change.event_id.clone(),
+                    expected_revision: change.expected_revision, ..Default::default() },
+                crate::encode_model(change).map_err(|e| WorkEngineError::TaskModel(
+                    crate::AgentLaunchError::caused("reviewer-model-request-encoding", e)))?,
+            )
         } else if let Some(change) = &task_model {
             (
                 Request {
@@ -507,6 +521,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
                     intent: &intent,
                     mission: mission.as_ref().map(|(r,a)|(r,*a)),
                     quota: quota.as_ref(),
+                    reviewer_model: reviewer_model.as_ref(),
                     task_model: task_model.as_ref(),
                     task_report: task_report.as_ref(),
                     memory: memory.as_ref().map(|(r, a)| (r, a.as_str())),
@@ -614,6 +629,7 @@ struct Invocation<'a> {
     intent: &'a [u8],
     mission: Option<(&'a crate::MissionControlRequest, crate::MissionControlAction)>,
     quota: Option<&'a crate::QuotaChange>,
+    reviewer_model: Option<&'a crate::ReviewerModelRequest>,
     task_model: Option<&'a crate::TaskModelRequest>,
     task_report: Option<&'a crate::TaskReportRequest>,
     memory: Option<(&'a crate::ProjectMemoryRequest, &'a str)>,
@@ -652,6 +668,7 @@ fn apply<E: WorkEnvironment>(
         graph,
         mission,
         quota,
+        reviewer_model,
         task_model,
         task_report,
         memory,
@@ -669,6 +686,7 @@ fn apply<E: WorkEnvironment>(
         && planning.is_none()
         && budget.is_none()
         && quota.is_none()
+        && reviewer_model.is_none()
         && task_model.is_none()
         && task_report.is_none()
         && memory.is_none()
@@ -766,6 +784,19 @@ fn apply<E: WorkEnvironment>(
             ))?;
             crate::task_report::apply(tx, root, &mut candidate, request, settings, environment)
                 .map_err(WorkEngineError::TaskReport)?;
+        }
+        "reviewer.model" => {
+            #[cfg(target_os = "linux")]
+            {
+                let request = reviewer_model.ok_or(WorkEngineError::UnportedStatus)?;
+                let settings = planning_settings.ok_or(WorkEngineError::TaskModel(
+                    crate::AgentLaunchError::Refused("reviewer-model-settings-required"),
+                ))?;
+                crate::reviewer_model::apply(tx, root, &mut candidate, request, settings, environment)
+                    .map_err(WorkEngineError::TaskModel)?;
+            }
+            #[cfg(not(target_os = "linux"))]
+            return Err(WorkEngineError::UnportedStatus);
         }
         "task.model" => {
             let request = task_model.ok_or(WorkEngineError::UnportedStatus)?;

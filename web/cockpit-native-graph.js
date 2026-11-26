@@ -45,6 +45,111 @@
     return {dialog, body};
   }
 
+  /** Preview and save only the configured independent reviewer. The mission
+   * revision and exact provider from the preview bind the subsequent write.
+   * Display safe public error codes and never resume planning or start a review.
+   */
+  function editReviewerModel(work, opener) {
+    const {dialog, body} = actionsDialog('native-reviewer-model-title', t('Modèle du vérificateur'), opener);
+    const note = document.createElement('p');
+    note.textContent = t('La mission doit être en pause. Le choix change les prochains appels de ce rôle uniquement. Consommations, échecs et avis précédents restent conservés.');
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    body.append(note, status);
+    if (!work.planning.paused) return;
+
+    const provider = document.createElement('select');
+    const level = document.createElement('select');
+    const confirm = document.createElement('button');
+    confirm.type = 'button';
+    confirm.disabled = true;
+    confirm.textContent = t('Prévisualiser le modèle');
+    for (const [select, label] of [[provider,'Fournisseur'],[level,'Niveau']]) {
+      const field = document.createElement('label');
+      field.append(t(label), select);
+      body.append(field);
+    }
+    body.append(confirm);
+    for (const [value, label] of Object.entries({auto:'Automatique',simple:'Simple',standard:'Standard',exigeant:'Exigeant'})) {
+      level.add(new Option(t(label), value));
+    }
+    level.value = work.planning.reviewer.model_route?.level || 'auto';
+    let selection;
+    let busy = false;
+    const unset = () => {
+      selection = undefined;
+      confirm.textContent = t('Prévisualiser le modèle');
+      status.textContent = '';
+    };
+    provider.addEventListener('change', unset);
+    level.addEventListener('change', unset);
+    dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
+
+    /** Consume only protected local JSON. Unknown responses become an explicit failure. */
+    async function read(path, options) {
+      const response = await fetch(path, {credentials:'same-origin', ...options});
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data) {
+        const code = data?.failure?.reason || data?.failure?.code;
+        throw Error(typeof code === 'string' && /^[a-z][a-z0-9_.-]*$/.test(code) ? code : 'web-native-reviewer-response-invalid');
+      }
+      return data;
+    }
+
+    /** Populate routes from the saved CLI inventory without probing a provider. */
+    async function load() {
+      const {providers} = await read('/api/v1/providers/admin');
+      if (!dialog.open) return;
+      for (const [name, route] of Object.entries(providers)) {
+        if (route.policy && !route.assistant_unavailable) provider.add(new Option(name, name));
+      }
+      const current = work.planning.reviewer.provider;
+      if ([...provider.options].some(option => option.value === current)) provider.value = current;
+      confirm.disabled = provider.options.length === 0;
+    }
+
+    const message = error => globalThis.SwarmI18n?.engine?.(error.message) ?? error.message;
+    confirm.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+      provider.disabled = level.disabled = confirm.disabled = true;
+      try {
+        const session = await read('/api/v1/native-session');
+        if (!/^[a-f0-9]{64}$/.test(session.csrf_token)) throw Error('web-native-session-invalid');
+        const post = (operation, request) => read('/api/v1/planning/reviewer-model/' + operation + '?' +
+          new URLSearchParams({work:work.id}), {method:'POST',
+            headers:{'Content-Type':'application/json','X-Swarm-CSRF':session.csrf_token},
+            body:JSON.stringify(request)});
+        if (selection) {
+          const observed = await post('apply', selection);
+          if (observed.planning.reviewer.provider !== selection.provider || observed.revision <= work.revision) {
+            throw Error('web-native-reviewer-response-invalid');
+          }
+          if (!refreshWork) throw Error('web-native-graph-refresh-unavailable');
+          await refreshWork(work.id, observed.revision);
+          dialog.close();
+          return;
+        }
+        const route = (await read('/api/v1/providers/resolve?' +
+          new URLSearchParams({provider:provider.value,level:level.value,purpose:'planning'}))).route;
+        if (!route?.policy_hash) throw Error('reviewer-model-route-required');
+        const request = {schema_version:1,event_id:crypto.randomUUID(),expected_revision:work.revision,
+          reviewer:true,provider:provider.value,level:level.value,model_policy_hash:route.policy_hash};
+        const observed = (await post('preview', request)).planning.reviewer;
+        if (!dialog.open) return;
+        selection = {...request,provider_digest:observed.provider_digest};
+        status.textContent = observed.provider + ' · ' + observed.model_route.model;
+        confirm.textContent = t('Enregistrer le modèle');
+      } catch (error) {
+        if (dialog.open) status.textContent = message(error);
+      } finally {
+        busy = false;
+        if (dialog.open) provider.disabled = level.disabled = confirm.disabled = false;
+      }
+    });
+    load().catch(error => { if (dialog.open) status.textContent = message(error); });
+  }
+
   /** Append one labeled observation as text. Missing values keep their label
    * out of the view. Captured content never enters markup or an executable URL.
    */
@@ -1747,6 +1852,12 @@
         : t('Non configuré'))));
     if (reviewer?.provider) {
       configuredReviewer.append(' ', activityBadge(...reviewActivity));
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.textContent = t('Modèle du vérificateur');
+      edit.setAttribute('aria-haspopup', 'dialog');
+      edit.addEventListener('click', () => editReviewerModel(work, edit));
+      configuredReviewer.append(' ', edit);
     }
     panel.append(configuredReviewer);
     const architecture = workflowArchitecture(work);

@@ -33,6 +33,18 @@ mod store;
 use crate::root_store::native_transaction as transaction;
 
 impl crate::RootStore {
+    /// Refuse mission-wide reviewer configuration while an unresolved or live
+    /// job exists. Checks the normalized ledger in the caller's snapshot.
+    pub(crate) fn require_idle_mission_reviews(db: &rusqlite::Connection, work: &str) -> Result<(), crate::AgentLaunchError> {
+        if db.is_autocommit() {
+            return Err(crate::AgentLaunchError::Refused("reviewer-model-transaction-required"));
+        }
+        if store::mission_has_owner(db, work)? {
+            return Err(crate::AgentLaunchError::Refused("reviewer-model-active-owner"));
+        }
+        Ok(())
+    }
+
     /// Exclude registered live/unresolved review work during scoped closure.
     /// Reads the authoritative normalized ledger in the caller transaction;
     /// neither an expired lease nor missing process observations releases it.

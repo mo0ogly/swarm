@@ -314,6 +314,16 @@ pub(super) fn active(db: &Connection, work: &str, task: &str) -> Result<Option<J
     id.map(|id| job(db, &id)?.ok_or(E::Refused("review-ledger-owner-missing")))
         .transpose()
 }
+/// Check the normalized reviewer ledger for any live or unresolved mission
+/// owner. Terminal and genuinely absent historical ledgers do not hold a slot.
+pub(super) fn mission_has_owner(db: &Connection, work: &str) -> Result<bool, E> {
+    if !schema(db, false)? {
+        return Ok(false);
+    }
+    query(db, "SELECT 1 FROM native_review_jobs WHERE work_id=? AND phase IN ('claimed','registered','permitted','unresolved') LIMIT 1",
+        [work], |rows| Ok(rows.next()?.is_some()))
+}
+
 /// Stage one fresh job in the caller's atomic Work/call/budget transaction.
 /// No exec, replacement, quota reset or implicit retry follows from this row.
 pub(super) fn claim(db: &Connection, job: &Job) -> Result<(), E> {

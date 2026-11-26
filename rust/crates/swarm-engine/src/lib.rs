@@ -18,6 +18,8 @@ mod agent_launch;
 #[cfg(target_os = "linux")]
 pub use agent_launch::AgentLaunchOutcome;
 mod agent_launch_error;
+mod reviewer_model;
+pub use reviewer_model::{decode_reviewer_model_request, require_reviewer_model_preview, ReviewerModelRequest, ReviewerModelView};
 mod task_model;
 mod graph_batch;
 pub use graph_batch::{decode_graph_batch, GraphBatchRequest, GraphBatchPreview, GraphTaskChange, GraphTaskDefinition};

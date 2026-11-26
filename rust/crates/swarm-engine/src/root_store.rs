@@ -1982,6 +1982,39 @@ impl RootStore {
         })();
         settings_finished(result, reservation.close().map_err(RootStoreError::Storage))
     }
+    /// Read the saved independent reviewer in a minimal public projection.
+    pub fn reviewer_model(&self, work: &str) -> Result<crate::ReviewerModelView, RootStoreError> {
+        let work = self.read_work(work)?;
+        crate::ReviewerModelView::from_work(&work).map_err(|e| RootStoreError::Launch(Box::new(e)))
+    }
+
+    /// Preview the same revision, owner and provider checks as apply in one
+    /// read-only SQL snapshot, without a provider call or Work write.
+    #[cfg(target_os = "linux")]
+    pub fn preview_reviewer_model(
+        &self, work: &str, raw: &[u8], environment: &mut impl WorkEnvironment,
+    ) -> Result<crate::ReviewerModelView, RootStoreError> {
+        use RootStoreError as E;
+        crate::check_command_input_size(raw).map_err(E::Input)?;
+        let request = crate::decode_reviewer_model_request(raw).map_err(|e| E::Launch(Box::new(e)))?;
+        let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
+            let result = (|| {
+                let mut current = crate::read_recorded_work(&tx, work).map_err(E::Work)?;
+                if current.revision != request.expected_revision {
+                    return Err(E::Refused("revision_conflict"));
+                }
+                crate::reviewer_model::apply(&tx, &self.root, &mut current, &request, &settings, environment)
+                    .map_err(|e| E::Launch(Box::new(e)))?;
+                crate::ReviewerModelView::from_work(&current).map_err(|e| E::Launch(Box::new(e)))
+            })();
+            finished(result, tx.rollback().map_err(E::Sql))
+        })();
+        finished(result, reservation.close().map_err(E::Storage))
+    }
+
     /// Preview the current task choice under saved settings without SQL writes.
     /// Strict request/revision, idle guards and provider resolution apply. Local
     /// actor/time are unverified observations, not identity or launch permission;

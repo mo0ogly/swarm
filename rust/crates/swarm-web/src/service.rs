@@ -64,6 +64,8 @@ pub use api_connection_probe::ProviderProbeReceipt;
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
+mod reviewer_model;
+#[cfg(target_os = "linux")]
 mod quotas;
 use http::{
     header::{ALLOW, CACHE_CONTROL, CONTENT_TYPE},
@@ -1458,6 +1460,10 @@ impl NativeHttpService {
             "/api/v1/admin-advice-budget/preview"=>self.admin_budget(admin_budget::Operation::Preview,request),
             #[cfg(target_os = "linux")]
             "/api/v1/admin-advice-budget/apply"=>self.admin_budget(admin_budget::Operation::Apply,request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/planning/reviewer-model/preview" => self.reviewer_model(false, request),
+            #[cfg(target_os = "linux")]
+            "/api/v1/planning/reviewer-model/apply" => self.reviewer_model(true, request),
             #[cfg(target_os = "linux")]
             "/api/v1/quotas" => self.quotas(quotas::Operation::Show,request),
             #[cfg(target_os = "linux")]
