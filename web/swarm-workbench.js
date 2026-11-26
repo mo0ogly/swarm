@@ -103,7 +103,8 @@
   const codeLabel=el('code');
   diagnostic.append(el('summary',t('Diagnostic')),codeLabel);diagnostic.hidden=true;
   const incident=el('p',undefined,'hint');incident.hidden=true;
-  panel.append(button,status,reviewContext,incident,diagnostic);taskDialogHeader.append(panel);
+  diagnostic.append(incident);
+  panel.append(button,status,reviewContext,diagnostic);taskDialogHeader.append(panel);
   const live=()=>taskDialog===dialog&&dialog.open&&panel.isConnected&&model?.work.id===work.id
    &&model.work.revision===work.revision&&selected===task.id;
   /** Complete the visible rejection with verified facts for this same revision. */
@@ -121,7 +122,7 @@
      ?t('L’auxiliaire a refusé l’admission avant exécution.')
      :t('Le canal privé a été ouvert. La revue s’est arrêtée sans avis applicable.')];
     if(value.provider_hint==='provider-reported-unix-stream-permission-denied')
-     parts.push(t('Le fournisseur signale un refus de création de canal Unix (EPERM).'));
+     status.textContent=t('Le fournisseur signale un refus de création de canal Unix (EPERM).');
     if(Number.isInteger(value.exit_code))parts.push(t('Code de sortie {code}.').replace('{code}',value.exit_code));
     if(value.managed_repository)parts.push(t('La reprise de cet échec sur le même candidat géré est indisponible.'));
     incident.textContent=parts.join(' ');incident.hidden=false;
