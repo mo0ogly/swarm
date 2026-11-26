@@ -65,7 +65,8 @@ impl RootStore {
             }
         };
         if claimed.is_some()
-            && self.archived_unstarted_review(tx, &work.id, task_id, &previous.id)?
+            && (self.archived_unstarted_review(tx, &work.id, task_id, &previous.id)?
+                || self.archived_failed_task_review(tx, work, task_id, previous)?)
         {
             return Ok(None);
         }

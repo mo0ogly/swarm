@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Une revue gérée arrêtée par un échec terminal du processus peut être archivée pour reprendre le même candidat, avec le reçu et le débit conservés.",
+        "en": "A managed review stopped by a terminal process failure can be archived to resume the same candidate while preserving the receipt and charged call."
+      },
+      {
         "fr": "Conduite indique la phase et le code de sortie de la dernière revue échouée, à partir du reçu vérifié et sans exposer la sortie brute.",
         "en": "Conduite shows the phase and exit code of the latest failed review from a verified receipt without exposing the raw output."
       },

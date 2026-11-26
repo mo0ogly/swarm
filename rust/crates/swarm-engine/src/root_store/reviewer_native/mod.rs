@@ -3,6 +3,7 @@
 //! test-only and grant no provider/model/human authenticity or task acceptance.
 #[cfg(test)]
 mod budget_sdk;
+mod archive;
 mod capture;
 #[cfg(test)]
 mod certificate_sdk;

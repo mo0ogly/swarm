@@ -30,7 +30,7 @@ def provider_program(config):
 
  Purpose: build the standalone `#!/usr/bin/python3` program the engine launches
  as the managed native reviewer. Inputs: `config` — the small dict of fixture
- options (`case` in pass/partial/publish-refusal/source, `source` absolute path
+ options (`case` in pass/partial/publish-refusal/source/startup, `source` absolute path
  used only by the source variant, `marker_event` = the request event_id naming
  the I0 reviewer leaf). Output: bytes, with the config serialized JSON embedded
  quoting-safe (the json.dumps string literal is repr-escaped) so the provider
@@ -59,6 +59,7 @@ for task in context['tasks']:
  refs={span['reference'] for original in protocol['catalog']['originals'] if original['name']==task['binding']['report'] and original['kind']=='source' for span in original['spans']}
  ref=next(q['id'] for q in protocol['catalog']['quotes'] if q['id'] in refs and len(q['text'].encode())>=8)
  entries.append(dict(task=task['task'],reason='Current candidate inspected through actual native fixture',criteria=[dict(index=i+1,verdict='pass',evidence_ref=ref) for i,_ in enumerate(task.get('criteria') or [])]))
+if config['case']=='startup':raise SystemExit(101)
 if config['case']=='partial':entries=[]
 if config['case']=='publish-refusal':pass
 if config['case']=='source':
@@ -219,6 +220,38 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   assert snapshot['protocol']['context_sha256']==protocol['context_sha256'] and (original['failed'] or original['original_reply'])
   fixture.publish(out/'retained-original.frame',frame)
   checks.append('framed-original-retains-full-cohort-protocol-frozen-policy-and-actual-wait')
+  if case=='startup':
+   assert original['failed'] and original['exit_code']==101 and not original['original_reply']
+   assert review['state']=='error'
+   ready=dict(request,event_id=request['event_id']+'-next',expected_revision=after['revision'])
+   call('before-archive-refusal',['task','review-inputs',work],ready,success=False)
+   archive=call('archive-failure',['task','review-archive-failure',review['id']])
+   assert archive['review_recorded'] and not archive['replayed'] and not archive['verdict_applicable'] and not archive['task_accepted']
+   archived=shown('after-archive')
+   archived_task=next(t for t in archived['tasks'] if t['id']=='task')
+   assert archived['revision']==after['revision']+1 and archived_task['status']=='submitted'
+   assert not archived_task.get('independent_review') and archived_task['previous_reviews'][-1]==review
+   assert archived_task['attempts']==task['attempts'] and archived_task['automatic_validation']==task['automatic_validation']
+   assert archived['planning']['reviewer']==after['planning']['reviewer'] and finance(root,work)==rows
+   ready['expected_revision']=archived['revision']
+   preview=call('same-candidate-next-preview',['task','review-inputs',work],ready)
+   assert preview['managed_protocol']['context']['candidate_commit']==protocol['context']['candidate_commit']
+   fixture.publish(root/'codex',provider_program(dict(case='pass',source=str(source),marker_event=ready['event_id'])))
+   (root/'codex').chmod(0o700)
+   next_result=call('same-candidate-next-review',['task','review',work],ready)
+   assert next_result['verdict_applicable'] and next_result['review_recorded'] and not next_result['task_accepted']
+   replay=call('archive-exact-replay',['task','review-archive-failure',review['id']])
+   assert replay['replayed'] and not replay['verdict_applicable']
+   assert replay['work']==next_result['work'] and private.read_bytes()==frame
+   final_rows=finance(root,work)
+   assert len(final_rows)==len(rows)+1 and all(row in final_rows for row in rows)
+   assert next_result['work']['planning']['reviewer']['calls']==archived['planning']['reviewer']['calls']+1
+   call('archive-passed-refusal',['task','review-archive-failure',next_result['review_id']],success=False)
+   assert shown('final-archive-work')==next_result['work']
+   checks+=['same-candidate-archive-preserves-failure-and-budget','separate-review-after-archive','archive-replay-and-passed-refusal']
+   fixture.publish(out/'result.json',dict(status='PASS',checks=checks,paid_provider=False,accepted=False))
+   print('MANAGED_REVIEW_FAILURE_ARCHIVE_PASS',flush=True)
+   return
   if extra_tracked:
    assert case=='pass' and result['verdict_applicable'] and result['review_recorded']
    assert review['state']=='passed' and review['id']==result['review_id']
@@ -310,7 +343,7 @@ def main():
  parser=argparse.ArgumentParser(description=__doc__)
  for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
  parser.add_argument('--extra-tracked',type=int,default=0)
- parser.add_argument('--case',choices=['pass','partial','publish-refusal','source'],default='pass');parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before-binary',type=Path);parser.add_argument('--recover-from',type=Path)
+ parser.add_argument('--case',choices=['pass','partial','publish-refusal','source','startup'],default='pass');parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before-binary',type=Path);parser.add_argument('--recover-from',type=Path)
  a=parser.parse_args();out=a.output.resolve();fixture=inspection.native.fixture
  inputs=dict(binary=str(a.binary.resolve()),binary_sha256=fixture.digest(a.binary.read_bytes()),profile_sha256=fixture.digest(a.profile.read_bytes()),helpers=inspection.native.helper_inputs(Path(__file__)),global_watchdog=None)
  try:

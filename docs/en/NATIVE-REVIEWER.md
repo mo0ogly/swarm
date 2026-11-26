@@ -440,6 +440,18 @@ two results/public contexts09, five normal start guards07, four stale10, eight
 publications11 and Clippy/Rustdoc12 passed on05. Normal06 SHA cc2e88 compiles255
 effective sources identical in05 (08), without fixture features or installation.
 
+
+## Archive a reviewer failure on a managed candidate
+
+`swarm task review-archive-failure REVIEW_ID --root ROOT --json` archives the
+current error of a submitted task when the original proves a waited process
+after grant, a nonzero exit and no complete response. An existing opinion, a
+private admission refusal, unknown wait status or failed capture refuses. The
+archive event binds the original to the same Work and retains the receipt,
+producer attempt, controls, report and charged call. Replay verifies the event
+without mutation. A later call is a separate command subject to current quota,
+preflight and evidence. Archival grants no acceptance.
+
 ## Run and recover through the normal CLI
 
 `task review WORK --input FILE --root ROOT --json` accepts the four preview fields.

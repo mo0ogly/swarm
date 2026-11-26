@@ -18,7 +18,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let run = action == "review";
     if !matches!(
         action,
-        "review" | "review-reconcile" | "review-retire-stale" | "review-retire-unstarted"
+        "review" | "review-reconcile" | "review-retire-stale" | "review-retire-unstarted" | "review-archive-failure"
     ) || run == a.input.is_empty()
     {
         return Err(CliError::Usage);
@@ -44,6 +44,8 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             store.run_task_review(&a.pos[2], &raw)
         } else if action == "review-retire-stale" {
             store.retire_stale_task_review(&a.pos[2])
+        } else if action == "review-archive-failure" {
+            store.archive_failed_task_review(&a.pos[2])
         } else if action == "review-retire-unstarted" {
             store.retire_unstarted_task_review(&a.pos[2])
         } else {

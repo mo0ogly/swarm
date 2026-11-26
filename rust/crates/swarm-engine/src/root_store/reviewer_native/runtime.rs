@@ -1,5 +1,5 @@
 //! Normal reviewer orchestration: one private gated process, original, result.
-use super::{capture, claim, gate, guard, journal, process, publication, store};
+use super::{archive, capture, claim, gate, guard, journal, process, publication, store};
 use crate::{
     root_store::{finished, task_validation, RootStore, RootStoreError as E},
     AgentLaunchError as A,
@@ -352,6 +352,20 @@ impl RootStore {
             self, id, publication::Mode::Unstarted, publication::OwnerBoundary::ConfirmedDeparted,
             crate::root_store::native_review_context::CertificateFormat::ContentV2,
         ).map(Into::into)
+    }
+
+    /// Archive a recorded terminal managed process failure without clearing its
+    /// financial reservation, replacing its candidate or creating a verdict.
+    pub fn archive_failed_task_review(&self, id: &str) -> Result<TaskReviewOutcome, E> {
+        archive::record(self, id).map(Into::into)
+    }
+
+    /// Verify an explicit managed failure archive before a new claim uses
+    /// existing producer evidence. Ordinary non-archived errors retain their
+    /// recovery rules. Verification does not authorize any execution.
+    pub(in crate::root_store) fn archived_failed_task_review(&self, tx: &rusqlite::Transaction<'_>,
+        work: &crate::Work, task: &str, review: &crate::IndependentReview) -> Result<bool, E> {
+        archive::verified(self, tx, work, task, review)
     }
 
     /// Recognize the verified archived no-grant review in a current snapshot.

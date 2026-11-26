@@ -470,6 +470,18 @@ quatre stale10, huit publications11 et Clippy/Rustdoc12 PASS sur05. Normal06
 SHA cc2e88 compile255sources effectives, inchangées dans05 (08), sans fixture
 et sans installation.
 
+
+## Archiver un échec du reviewer sur candidat géré
+
+`swarm task review-archive-failure REVIEW_ID --root ROOT --json` archive l’erreur
+courante d’une tâche soumise si le reçu prouve une fin de processus après octroi,
+un code de sortie non nul et l’absence de réponse complète. Un avis existant, un
+refus d’admission, un arrêt sans preuve de fin ou une capture en erreur refuse.
+L’événement d’archive lie l’original au même travail et conserve le reçu,
+l’exécution productrice, les contrôles, le rapport et le débit. Le rejeu vérifie
+l’événement sans muter. Le prochain appel reste une commande distincte, soumise
+au quota, au prévol et aux preuves courantes. L’archivage n’accepte aucune tâche.
+
 ## Exécuter et reprendre depuis le CLI normal
 
 `task review WORK --input FILE --root ROOT --json` prend les quatre champs des
