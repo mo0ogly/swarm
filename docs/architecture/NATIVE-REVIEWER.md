@@ -1073,6 +1073,13 @@ invalides, un outil déclaré ou un flux sans fin explicite refusent. Les limite
 Admin de réponse, d’événement et de texte sont réellement consommées ; un refus
 conserve sa cause et ne produit aucun résultat partiel sur la sortie CLI.
 
+Le décodeur géré accepte le JSON brut ou un bloc Markdown complet étiqueté
+`json`, avec chaque délimiteur sur sa propre ligne et sans texte autour. Les
+limites persistées couvrent la réponse complète, dont les octets et l’empreinte
+d’origine sont conservés. L’objet interne est soumis aux mêmes contrôles de
+champs, cohorte, citations et verdict que le JSON brut. Un critère `unknown`
+empêche toujours un avis favorable.
+
 Le résultat contient l’opinion parsée et les empreintes du contexte, du catalogue
 et de la réponse. `supplied_output_checked=true` décrit seulement les octets
 fournis. `provider_started`, `review_recorded`, `native_execution_proven`,

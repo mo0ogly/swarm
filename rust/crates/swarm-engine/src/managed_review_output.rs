@@ -68,6 +68,18 @@ pub(crate) fn decode_retained_managed_review(raw: &[u8], values: &EngineSettings
     decode(raw,protocol,limits,cap)
 }
 
+/// Borrow the JSON payload of one full ```json fence, or keep the original
+/// input for strict validation. The delimiters must occupy their own lines.
+/// Does not search for JSON, repair it, modify custody bytes or waive limits.
+fn managed_json_payload(raw: &[u8]) -> &[u8] {
+    let trimmed = raw.trim_ascii();
+    trimmed
+        .strip_prefix(b"```json\n")
+        .or_else(|| trimmed.strip_prefix(b"```json\r\n"))
+        .and_then(|body| body.strip_suffix(b"\n```"))
+        .unwrap_or(raw)
+}
+
 /// Shared exact domain validation after the caller freezes saved policy. Typed
 /// errors propagate; no stream state or externally observed effect is inferred.
 pub(crate) fn decode(raw:&[u8], protocol:&ManagedReviewProtocol, limits:crate::ReviewReplyLimits,
@@ -76,8 +88,9 @@ pub(crate) fn decode(raw:&[u8], protocol:&ManagedReviewProtocol, limits:crate::R
     if cap.is_some_and(|cap| raw.len()>cap) {
         return Err(E::Refused("review-publication-reply-cap"));
     }
-    canonical_reply(raw)?;
-    parse_managed_review_reply(raw,&protocol.context,Some(&protocol.catalog),limits,cap)
+    let payload = managed_json_payload(raw);
+    canonical_reply(payload)?;
+    parse_managed_review_reply(payload,&protocol.context,Some(&protocol.catalog),limits,cap)
         .map_err(|e| E::caused(e.code(), e))
 }
 
@@ -185,6 +198,50 @@ mod tests {
     fn complete_two_task_literal_citations_and_retained_revalidation() {
         let (values,protocol,reply)=fixture();healthy(&values,&protocol,&serde_json::to_vec(&reply).unwrap());
     }
+    /// One complete JSON fence keeps the original response and uses the same
+    /// checks as bare JSON, including for immutable originals and unknowns.
+    #[test]
+    fn single_json_fence_preserves_original_and_domain_rules() {
+        let (values, protocol, mut reply) = fixture();
+        let bare = serde_json::to_vec(&reply).unwrap();
+        healthy(&values, &protocol, &bare);
+        reply["tasks"][0]["criteria"][0] = serde_json::json!({
+            "index": 1, "verdict": "unknown", "evidence": "Runtime evidence was not supplied"
+        });
+        let fenced = |json: &str| format!("```json\n{json}\n```\n");
+        let complete = fenced(&reply.to_string());
+        let mut stream = ManagedReviewOutputStream::from_saved_settings(&values, &protocol).unwrap();
+        stream.feed(&events(complete.as_bytes(), true)).unwrap();
+        let result = stream.finish().unwrap();
+        assert_eq!(result.review.state, ReviewReplyState::ChangesRequested);
+        assert_eq!(result.transport.response, complete.as_bytes());
+        let decoded = decode_retained_managed_review(complete.as_bytes(), &values, &protocol).unwrap();
+        assert_eq!(decoded.state, result.review.state);
+        let crlf = complete.replace("\n", "\r\n");
+        let decoded = decode_retained_managed_review(crlf.as_bytes(), &values, &protocol).unwrap();
+        assert_eq!(decoded.state, result.review.state);
+
+        let nested = fenced(&complete);
+        let before = format!("Explanation\n{complete}");
+        let after = format!("{complete}\nExplanation");
+        let multiple = format!("{complete}\n{complete}");
+        let duplicate = fenced(&format!("{{\"tasks\":[],{}", &reply.to_string()[1..]));
+        let wrong_candidate = fenced(&serde_json::json!({
+            "candidate_commit": "b".repeat(40),
+            "catalog_sha256": protocol.catalog_sha256,
+            "tasks": reply["tasks"],
+        }).to_string());
+        for malformed in [nested, before, after, multiple, duplicate, wrong_candidate,
+                          complete.replace("```json", "```js"), complete.replace("\n```", "\n````")] {
+            let mut stream = ManagedReviewOutputStream::from_saved_settings(&values, &protocol).unwrap();
+            stream.feed(&events(malformed.as_bytes(), true)).unwrap();
+            assert!(stream.finish().is_err());
+            assert_eq!(stream.retained_reply(), Some(malformed.as_bytes()));
+        }
+        assert!(decode(complete.as_bytes(), &protocol, values.review_reply_limits().unwrap(),
+            Some(complete.len() - 1)).is_err());
+    }
+
     #[test]
     fn domain_failure_keeps_original_and_cannot_finish_again() {
         let (values,protocol,mut reply)=fixture();let raw=serde_json::to_vec(&reply).unwrap();healthy(&values,&protocol,&raw);

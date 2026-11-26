@@ -1020,6 +1020,13 @@ indices, invalid citations, declared tool or missing terminal event refuses.
 Actual saved Admin reply/event/text limits apply; refusal preserves its cause
 and emits no partial CLI result.
 
+The managed decoder accepts bare JSON or one complete Markdown fence labeled
+`json`, with the opening and closing delimiters on their own lines and no
+surrounding prose. The full response still counts against saved limits and
+retains its original bytes and digest. The enclosed object undergoes the same
+canonical field, cohort, citation and verdict checks as bare JSON. An
+`unknown` criterion still prevents a favorable verdict.
+
 The result contains parsed opinion data and context/catalogue/response digests.
 `supplied_output_checked=true` describes supplied bytes only. `provider_started`,
 `review_recorded`, `native_execution_proven`, `reviewer_authenticated`,

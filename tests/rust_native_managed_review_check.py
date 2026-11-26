@@ -50,6 +50,17 @@ def run(binary,profile,out,reuse=None):
     assert result['context_sha256']==protocol['context_sha256'] and result['catalog_sha256']==protocol['catalog_sha256']
     for key in ['provider_started','review_recorded','native_execution_proven','reviewer_authenticated','verdict_applicable','task_accepted']:assert result[key] is False,key
     checks.append('valid-complete-opinion-is-data-without-work-mutation-or-authority')
+    fenced = "```json\n" + json.dumps(reply) + "\n```"
+    wrapped = check('fenced-unknown', events(fenced))
+    assert wrapped['opinion_state'] == result['opinion_state']
+    assert wrapped['tasks'] == result['tasks']
+    assert wrapped['response_sha256'] == protocol_fixture.inspection.native.fixture.digest(fenced.encode())
+    assert not wrapped['verdict_applicable'] and not wrapped['task_accepted']
+    for label, bad in [('fenced-prefix', 'Explanation\n'+fenced),
+                       ('fenced-suffix', fenced+'\nExplanation'),
+                       ('fenced-multiple', fenced+'\n'+fenced)]:
+        check(label, events(bad), False)
+    checks.append('one-json-fence-retains-original-and-unknown-without-authority')
     settings=call('check-settings',['engine-settings','show'])
     values=settings['values'];minimum=int(values['review_reply_min_text_bytes']);maximum=values['review_reply_max_text_bytes']
     source_names={source['path'] for source in context['sources']}
