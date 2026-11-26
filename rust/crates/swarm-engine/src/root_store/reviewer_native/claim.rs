@@ -40,12 +40,12 @@ pub(super) fn stage(
     work: &str,
     request: &task_validation::Request,
 ) -> Result<Staged, E> {
-    stage_using(root_store,tx,settings,work,request,None,None)
+    stage_using(root_store,tx,settings,work,request,None,None,&mut Default::default())
 }
 /// Engine-owned mission variant. An actual borrowed lease and current mission
 /// consent are checked inside this writer before host preparation. Binding, Job,
 /// call debit and reserve are staged atomically; no request field grants rights.
-fn stage_using(root_store:&RootStore,tx:&mut Transaction<'_>,settings:crate::EngineSettingsDocument,work:&str,request:&task_validation::Request,lease:Option<&crate::MissionLease>,source:Option<&task_validation::ReviewCandidate>)->Result<Staged,E>{
+fn stage_using(root_store:&RootStore,tx:&mut Transaction<'_>,settings:crate::EngineSettingsDocument,work:&str,request:&task_validation::Request,lease:Option<&crate::MissionLease>,source:Option<&task_validation::ReviewCandidate>,diagnostics:&mut super::diagnostics::Preflight)->Result<Staged,E>{
     if let Some(lease)=lease {
         use crate::work_engine::MutationFence;
         lease.check(tx,work,&crate::system_timestamp().map_err(|e|caused("review-mission-clock",e))?)
@@ -72,7 +72,10 @@ fn stage_using(root_store:&RootStore,tx:&mut Transaction<'_>,settings:crate::Eng
     {
         return Err(E::Refused("review-job-active"));
     }
-    let material = material::prepare_for_job_using(root_store,tx,settings,work,request,None,source)?;
+    let started = std::time::Instant::now();
+    let material = material::prepare_for_job_using(root_store,tx,settings,work,request,None,source,diagnostics);
+    diagnostics.finish(started, &material);
+    let material = material?;
     let preview = &material.inputs.preview;
     let mut candidate = material.work.clone();
     let task = candidate
@@ -226,6 +229,7 @@ fn commit(
     request: &task_validation::Request,
     lease: Option<&crate::MissionLease>,
     source:Option<&task_validation::ReviewCandidate>,
+    diagnostics: &mut super::diagnostics::Preflight,
 ) -> Result<Recorded, E> {
     super::transaction::apply(root, |tx| {
         let intent = crate::encode_model(request).map_err(E::Encode)?;
@@ -241,7 +245,7 @@ fn commit(
                 Box::new(old),
             )));
         }
-        let staged=stage_using(root,tx,settings,work,request,lease,source);
+        let staged=stage_using(root,tx,settings,work,request,lease,source,diagnostics);
         staged.map(|new| super::transaction::Change::Mutate(Recorded::New(Box::new(new))))
     })
 }
@@ -265,12 +269,12 @@ pub(super) fn record(
 /// provider invocation; original budget and known Work errors remain intact.
 #[cfg(test)]
 pub(super) fn record_using(root:&RootStore,work:&str,request:&task_validation::Request,lease:Option<&crate::MissionLease>)->Result<Recorded,E>{
-    record_using_candidate(root,work,request,lease,None)
+    record_using_candidate(root,work,request,lease,None,&mut Default::default())
 }
 /// Claim from borrowed externally held managed sources. The caller owns their
 /// lifetime through execution, and explicit close after all recorded outcomes.
 /// Same CAS, event replay, mission consent, call debit and reserve contracts.
-pub(super) fn record_using_candidate(root:&RootStore,work:&str,request:&task_validation::Request,lease:Option<&crate::MissionLease>,source:Option<&task_validation::ReviewCandidate>)->Result<Recorded,E>{
+pub(super) fn record_using_candidate(root:&RootStore,work:&str,request:&task_validation::Request,lease:Option<&crate::MissionLease>,source:Option<&task_validation::ReviewCandidate>,diagnostics:&mut super::diagnostics::Preflight)->Result<Recorded,E>{
     if !root.writable {
         return Err(E::Refused("root-read-only"));
     }
@@ -280,7 +284,8 @@ pub(super) fn record_using_candidate(root:&RootStore,work:&str,request:&task_val
         &root.directory,
         false,
         |_, settings| {
-            let result = commit(root, settings.clone(), work, request, lease, source)?;
+            *diagnostics = Default::default();
+            let result = commit(root, settings.clone(), work, request, lease, source, diagnostics)?;
             match &result {
                 Recorded::New(new) => known = Some((new.work.id.clone(), new.work.revision)),
                 Recorded::Replay(job) => {

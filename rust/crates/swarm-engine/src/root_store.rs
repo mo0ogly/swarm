@@ -287,6 +287,9 @@ pub enum RootStoreError {
     /// Unpublished mission status observation invalidated by concurrent change.
     /// Retains the typed recheck and ancillary causes without authorizing retry.
     MissionStatusChanged { primary: Box<Self> },
+    /// Original review refusal plus independent safe sink codes. The logging
+    /// failure grants no retry and leaves the original exit/recorded state intact.
+    ReviewDiagnostics { primary: Box<Self>, failures: Vec<&'static str> },
     Cleanup {
         primary: Option<Box<Self>>,
         cleanup: Box<Self>,
@@ -320,6 +323,7 @@ impl RootStoreError {
     #[cfg(target_os="linux")]
     pub fn recorded_execution_interruption(&self)->Option<(&'static str,&str,i64)>{
         match self{
+            Self::ReviewDiagnostics { primary, .. } => primary.recorded_execution_interruption(),
             Self::WorkRecorded{primary,work,revision}=>match primary.as_ref(){
                 Self::Refused("planning-execution-interrupted")=>Some(("planner",work,*revision)),
                 Self::Runtime(runtime)=>std::error::Error::source(runtime).and_then(|e|e.downcast_ref::<crate::execution_interrupt::CompletedRoleInterrupt>()).map(|m|(m.role(),work.as_str(),*revision)),
@@ -503,6 +507,7 @@ impl RootStoreError {
             Self::SqlTransaction(_) => "root-sql-transaction-failed",
             Self::Refused(s) => s,
             Self::MissionStatusChanged { .. } => "mission-status-observation-changed",
+            Self::ReviewDiagnostics { primary, .. } => primary.code(),
             Self::Cleanup { .. } => "root-cleanup",
             Self::Busy { .. } => "root-storage-busy",
         }
@@ -537,6 +542,10 @@ impl fmt::Display for RootStoreError {
             Self::AuxiliaryRecorded { .. } => f.write_str("auxiliary-state-preserved; read back before retrying"),
             Self::Published { .. } => {
                 f.write_str("root-state-preserved; re-read recorded configuration before retrying")
+            }
+            Self::ReviewDiagnostics { primary, failures } => {
+                fmt::Display::fmt(primary, f)?;
+                write!(f, " (review diagnostic sink: {})", failures.join(", "))
             }
             Self::Context(e) => fmt::Display::fmt(e, f),
             Self::Workflow(e) => fmt::Display::fmt(e, f),
@@ -622,7 +631,7 @@ impl Error for RootStoreError {
             #[cfg(target_os = "linux")]
             Self::View(e) => Some(e),
             Self::SchemaCommit { cause, .. } => Some(cause),
-            Self::MissionStatusChanged { primary } => Some(primary.as_ref()),
+            Self::MissionStatusChanged { primary } | Self::ReviewDiagnostics { primary, .. } => Some(primary.as_ref()),
             Self::Cleanup {
                 primary: Some(e), ..
             } => Some(e.as_ref()),

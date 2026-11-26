@@ -8,6 +8,7 @@ mod capture;
 #[cfg(test)]
 mod certificate_sdk;
 mod claim;
+pub(super) mod diagnostics;
 mod failure;
 #[cfg(test)]
 mod failure_sdk;

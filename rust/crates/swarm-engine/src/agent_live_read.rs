@@ -48,6 +48,7 @@ pub struct CursorPage<T> {
 /// ascending order. A negative cursor is refused (`live-cursor-invalid`).
 /// SQL, type and finalization failures stay explicit; an unknown agent yields
 /// an empty page, so callers must check agent existence separately.
+/// Protected review phases are available from the mission Logs view only.
 pub fn read_agent_logs_after(
     db: &Connection,
     agent: &str,
@@ -56,7 +57,7 @@ pub fn read_agent_logs_after(
 ) -> Result<CursorPage<AgentLogEntry>, AgentStoreError> {
     page(
         db,
-        "SELECT seq,at,kind,message FROM main.agent_logs WHERE agent_id=? AND seq>? ORDER BY seq LIMIT ?",
+        "SELECT seq,at,kind,message FROM main.agent_logs WHERE agent_id=? AND seq>? AND kind NOT IN ('review-info','review-warn','review-error') ORDER BY seq LIMIT ?",
         agent,
         after,
         page_rows,

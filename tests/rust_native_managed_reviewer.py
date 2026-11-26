@@ -17,6 +17,8 @@ incompatible schema (historical evidence) — never silently consumed.
 """
 import argparse,json,os,subprocess,sys,traceback,uuid
 from pathlib import Path
+from urllib.parse import urlencode
+from rust_native_http_cli import Server, finish as finish_server
 import rust_native_managed_review_inputs as inspection
 from rust_native_task_validation import invoke
 from rust_native_reviewer import finance
@@ -136,6 +138,39 @@ def read_reviewer_marker(root,event_id,expected_owner=None):
   raise
 
 
+def diagnostic_rows(call, work, producer, label, query='', kind=''):
+ """Read the retained producer journal through the real filtered CLI.
+
+ The result is a cursor page ordered by the saved policy. This isolated run
+ expects one page for its explicitly selected fields and asserts its boundary.
+ """
+ page=call(label,['logs','query',work,producer],dict(schema_version=1,query=query,kind=kind))
+ assert not page['more'],page
+ return page['entries']
+
+
+def read_diagnostics_over_http(binary,root,out,environment,work,producer,attempt,wanted):
+ """Round-trip the real wired journal with and without an owned web session.
+
+ Requests carry their cookie only in memory. The native local guard and the
+ separate Authority policy test cover different permission boundaries.
+ """
+ server=Server(binary,root,out,'review-diagnostics',environment=environment)
+ primary=None
+ try:
+  path='/api/v1/logs?'+urlencode(dict(work=work,agent=producer,q=attempt,kind='review-info'))
+  page=server.request(path)
+  assert page['entries']==wanted and not page['more']
+  server.request(path,authorized=False,status=403,observe=False)
+  server.request('/api/v1/logs?'+urlencode(dict(work='missing-work',agent=producer,q=attempt)),status=404)
+  assert server.key not in json.dumps(page)
+  server.stop()
+ except BaseException as error:
+  primary=error
+ finally:
+  finish_server(server,primary)
+
+
 def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dependent=False,cumulative_fixture=False,extra_tracked=0):
  """Run one owned native lifecycle; preserve original refusal before recovery.
 
@@ -179,6 +214,75 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   assert inputs['preview']['work_revision']==request['expected_revision']
  else:
   inputs=call('valid-inputs',['task','review-inputs',work],request)
+ producer=inputs['preview']['producer_agent_id']
+ if case=='pass':
+  # Successful inspection is the witness before applying a fixture-only cap.
+  prompt_bytes=len(inputs['prompt'].encode())
+  low_cap=prompt_bytes//2
+  previous=inspection.ordinary.quotas(
+   binary,root,out,'review-diag-lower-'+uuid.uuid4().hex,work,review_context_bytes=low_cap)
+  refusal_state=shown('diagnostic-refusal-before')
+  refused_request=dict(request,event_id='diagnostic-private-marker-'+uuid.uuid4().hex,
+                       expected_revision=refusal_state['revision'])
+  reservation=finance(root,work)
+  for label in ('preflight-refused','preflight-refused-repeated'):
+   rejected=call(label,['task','review',work],refused_request,False)
+   assert 'review-context-bytes-exceeded' in json.dumps(rejected),rejected
+  assert shown('diagnostic-refusal-after')==refusal_state and finance(root,work)==reservation
+  assert not (root/'.swarm/biba-i0/reviewer'/refused_request['event_id']).exists()
+  warning_rows=diagnostic_rows(call,work,producer,'diagnostic-warning-query',kind='review-warn')
+  warning=[(row,json.loads(row['message'])) for row in warning_rows
+           if 'review-context-bytes-exceeded' in row['message']
+           and json.loads(row['message'])['work_revision']==refusal_state['revision']]
+  assert len(warning)==1,warning
+  warning_row,refusal=warning[0]
+  assert refusal['phase']=='preflight' and refusal['level']=='warn' and refusal['outcome']=='refused'
+  assert refusal['facts']['limits']['prompt_bytes']==low_cap
+  assert refusal['facts']['prompt_bytes']>low_cap and refusal['facts']['source_bytes']==inputs['source_bytes']
+  assert refusal['resume']=='resolve-effective-review-limit'
+  assert diagnostic_rows(call,work,producer,'diagnostic-refusal-correlation',refusal['review_attempt'])==[warning_row]
+  assert refused_request['event_id'] not in warning_row['message']
+  # Use the actual saved message cap to make just the diagnostic too large.
+  # The authorized Root schema and review prompt cap remain the same.
+  def log_cap(label, cap):
+   """Apply a supported message cap to this Root only, preserving all other settings."""
+   doc=call(label+'-show',['engine-settings','show'])
+   values=dict(doc['values'],agent_log_message_max_bytes=cap)
+   intent=dict(schema_version=doc['schema_version'],event_id=label+'-'+uuid.uuid4().hex,
+               expected_revision=doc['revision'],values=values,reason='Owned diagnostic cap fixture',preview_token='')
+   preview=call(label+'-preview',['engine-settings','preview'],intent)
+   intent['preview_token']=preview['preview_token']
+   call(label+'-apply',['engine-settings','apply'],intent)
+   return doc['values']['agent_log_message_max_bytes']
+
+  fault_request=dict(refused_request,event_id='diagnostic-sink-fault-'+uuid.uuid4().hex)
+  previous_cap=log_cap('diagnostic-cap-lower','1')
+  try:
+   baseline=os.environ.get('SWARM_REVIEW_DIAG_BASELINE')
+   if baseline:
+    try:
+     call('preflight-refused-with-log-fault-baseline',['task','review',work],fault_request,False,exe=Path(baseline))
+    except json.JSONDecodeError:
+     lines=(out/'preflight-refused-with-log-fault-baseline.stderr').read_text().splitlines()
+     assert lines[0]=='review-diagnostic-sink: review-diagnostic-log-cap'
+     assert json.loads('\n'.join(lines[1:]))['failure']['code']==rejected['failure']['code']
+     checks.append('baseline-sink-fault-reproduced-multi-frame-json')
+    else:
+     raise AssertionError('Diagnostic baseline accepted the expected fault regression')
+   fault=call('preflight-refused-with-log-fault',['task','review',work],fault_request,False)
+   assert fault['failure']['code']==rejected['failure']['code'],fault
+   assert 'review-context-bytes-exceeded' in json.dumps(fault),fault
+   assert 'review-diagnostic-sink:review-diagnostic-log-cap' in fault['failure']['causes'],fault
+  finally:
+   log_cap('diagnostic-cap-restore',previous_cap)
+  assert shown('diagnostic-sink-fault-work-unchanged')==refusal_state and finance(root,work)==reservation
+  checks.append('review-diagnostic-sink-failure-preserves-business-json')
+  inspection.ordinary.quotas(binary,root,out,'review-diag-restore-'+uuid.uuid4().hex,work,
+                             review_context_bytes=previous['review_context_bytes'])
+  before=shown('before-review-after-diagnostic-refusal')
+  request['expected_revision']=before['revision']
+  inputs=call('valid-inputs-after-diagnostic-refusal',['task','review-inputs',work],request)
+  checks.append('review-diagnostics-size-refusal-no-job-no-provider-no-duplicate')
  protocol=inputs['managed_protocol']
  source=Path(setup['workspace'])/'tracked.txt';source_before=source.read_bytes()
  # The only executable changed belongs to this isolated fixture; provider
@@ -319,9 +423,33 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
    finally:fixture.publish(context_file,context_bytes)
    call('context-restored',['task','review-reconcile',review['id']])
    checks.append('published-context-corruption-refuses-and-restores-without-state-change')
+  if case=='pass':
+   candidates=diagnostic_rows(call,work,producer,'diagnostic-info-query','review_attempt','review-info')
+   phases=[json.loads(row['message']) for row in candidates]
+   expected=['preflight','reservation','grant','process','reply','publication']
+   assert [event['phase'] for event in phases]==expected,phases
+   ids={event['review_attempt'] for event in phases}
+   assert len(ids)==1 and refusal['review_attempt'] not in ids
+   diagnostic_attempt=ids.pop()
+   preflight,reserve,grant,process,reply,publish=phases
+   assert all(event['elapsed_ms']>=0 and event['producer_attempt']==inputs['preview']['attempt_id'] for event in phases)
+   assert reserve['facts']['review_id']==review['id'] and reserve['facts']['calls']==after['planning']['reviewer']['calls']
+   assert grant['facts']['grant_written'] and process['facts']['helper_registered']
+   assert reply['facts']['opinion']=='passed' and reply['facts']['exit_code']==0
+   assert publish['facts']['review_recorded'] and publish['facts']['verdict_applicable'] and not publish['facts']['task_accepted']
+   retained='\n'.join(row['message'] for row in candidates+warning_rows)
+   for private in (str(root),request['event_id'],'Current candidate inspected through actual native fixture',
+                   'UNTRACKED-PRIVATE-SOURCE-NOT-IN-CANDIDATE','Return only JSON','stdin_sha256','context_sha256'):
+    assert private not in retained,private
+   checks.append('review-diagnostics-six-correlated-phases-no-private-data')
   replay=call('event-replay',['task','review',work],request);assert replay['replayed'] and replay['review_id']==review['id'] and not replay['task_accepted']
   assert shown('after-replay')==after and finance(root,work)==rows and read_reviewer_marker(root,request['event_id'])==marker
   checks.append('exact-event-and-explicit-original-replay-never-rerun-provider-or-debit')
+  if case=='pass':
+   assert diagnostic_rows(call,work,producer,'diagnostic-replay-correlation',diagnostic_attempt)==candidates
+   assert diagnostic_rows(call,work,producer,'diagnostic-exact-kind-no-match',diagnostic_attempt,'review-warn')==[]
+   read_diagnostics_over_http(binary,root,out,environment,work,producer,diagnostic_attempt,candidates)
+   checks.append('review-diagnostics-replay-filter-and-protected-http')
   fixture.publish(out/'result.json',dict(status='PASS',case=case,checks=checks,root=str(root),work=work,review_id=review['id'],paid_provider=False,accepted=False,model_authenticated=False,os_sandbox=False,global_watchdog=None))
   print('MANAGED_NATIVE_REVIEWER_PASS '+case+' '+str(len(checks))+' assertions',flush=True)
  finally:

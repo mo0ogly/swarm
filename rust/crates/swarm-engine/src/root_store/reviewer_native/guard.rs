@@ -363,7 +363,7 @@ pub(super) fn fresh_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSet
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let material =
-        material::prepare_for_job_using(root, tx, settings, &job.work_id, &request, Some(review),source)?;
+        material::prepare_for_job_using(root, tx, settings, &job.work_id, &request, Some(review),source,&mut Default::default())?;
     if !bound_inputs_match(tx,&material.inputs, job)? {
         return Err(E::Refused("review-guard-preparation-changed"));
     }

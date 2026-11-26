@@ -153,6 +153,7 @@ fn views_match_menu() {
 #[test]
 fn exclusive_route_requires_view_permission() {
     assert_eq!(view_permission("/api/v1/agent-logs"), Some("view.logs"));
+    assert_eq!(view_permission("/api/v1/logs"), Some("view.logs"));
     assert_eq!(view_permission("/api/v1/live/annotations"), Some("view.live"));
     assert_eq!(view_permission("/api/v1/works"), None, "shared routes stay family-gated");
     // Family held (cockpit.read covers both GET routes), views missing.
@@ -170,6 +171,8 @@ fn exclusive_route_requires_view_permission() {
     ))
     .unwrap();
     assert!(decide(&with_view, &subject(&viewer, 1, &none), "GET", "/api/v1/agent-logs").allowed);
+    assert!(!decide(&p, &subject(&viewer, 1, &none), "GET", "/api/v1/logs").allowed);
+    assert!(decide(&with_view, &subject(&viewer, 1, &none), "GET", "/api/v1/logs").allowed);
     // But the route's own write permission stays required for mutations
     // (I3 subject: past the floor, so the refusal is the missing grant).
     let d = decide(&with_view, &subject(&viewer, 3, &none), "POST", "/api/v1/agent-logs/clear");

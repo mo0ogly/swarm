@@ -62,6 +62,48 @@ The Unix message is a category derived from provider-reported text. Swarm return
 a fixed code without copying captured streams, paths or prompts. Reading this
 projection grants neither retry nor approval permission.
 
+### Native Rust review phases
+
+In **Monitoring → Logs**, select the producer of the submitted task. Search for
+`review_attempt`, then paste its full digest into the text filter to follow one
+attempt. The type filter accepts `review-info`, `review-warn` and `review-error`.
+The native filtered `GET /api/v1/logs` applies the saved log page policy. With
+the Authority relay, this route and `GET /api/v1/agent-logs` require read access
+and the Logs view permission. Live Agents omits these rows. The relay application
+journal continues to use its own permissions and rotation.
+
+The engine emits these events when executing `task review`, including the
+shared mission entry point. It binds a verified producer attempt before context
+assembly. Read-only `review-preview` and `review-inputs` calls and replay of
+a retained outcome emit no new lines. A refusal before the producer is
+identified creates no mission journal entry. The writer uses the existing
+journal, timestamp and message cap. An event that cannot fit the cap is dropped
+as a whole. The result carries safe sink failures separately. For a refusal, its JSON
+diagnostic retains them with the original causes. The original operation
+supplies the business outcome.
+
+| Phase | Observable facts |
+| --- | --- |
+| `preflight` | Effective source, file and prompt limits, with sizes already observed. A size refusal can precede reservation. |
+| `reservation` | Created review ID, committed revision and call counts and limit, or the refusal code. |
+| `grant` and `process` | Helper registration, gate permission, grant delivery, channel state and safe refusals, including known identity and Biba codes. Grant delivery leaves provider execution undetermined. |
+| `reply` and `receipt` | Decode result, aggregate opinion, observed exit code, byte counts and truncation. Receipt retention failure has its own phase. |
+| `publication` | Recorded opinion, applicability and task state where known. |
+
+The correlation digest identifies the structured request intent in the
+producer’s scope. An attempt can have distinct results for a phase. The writer
+keeps one line per phase and outcome code for that digest. Elapsed times are
+monotonic, unmeasured counters stay unknown, and only recognized stable causes
+carry a recovery condition. The projection omits source text, prompts, replies,
+private error messages, paths, tokens and provider identifiers. These review
+boundaries execute no additional Bell–LaPadula control. Relay refusals use the
+existing relay diagnostics.
+
+The [managed native reviewer recipe](../../tools/verification/recipes/native-managed-reviewer.json)
+covers a successful review, size refusal, replay and CLI/HTTP filtering in an
+isolated root. The Authority policy test `exclusive_route_requires_view_permission`
+covers the missing-view refusal and the authorized counterpart.
+
 ## Application logs for the relay
 
 Open the dedicated console in **Administration → Accounts and access →

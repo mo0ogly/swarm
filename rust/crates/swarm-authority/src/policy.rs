@@ -127,7 +127,7 @@ pub const VIEWS: [View; 16] = [
     View { id: "tasks", key: "view.tasks", section: "Conduite", label: "Tâches", routes: &[] },
     View { id: "agents", key: "view.agents", section: "Conduite", label: "Agents et hiérarchie", routes: &[] },
     View { id: "decisions", key: "view.decisions", section: "Conduite", label: "Décisions", routes: &[] },
-    View { id: "logs", key: "view.logs", section: "Suivi", label: "Journaux", routes: &["/api/v1/agent-logs", "/api/v1/agent-transcript"] },
+    View { id: "logs", key: "view.logs", section: "Suivi", label: "Journaux", routes: &["/api/v1/agent-logs", "/api/v1/agent-transcript", "/api/v1/logs"] },
     View { id: "budget", key: "view.budget", section: "Suivi", label: "Budgets et coûts IA", routes: &["/api/v1/work-budget"] },
     View { id: "resume", key: "view.resume", section: "Suivi", label: "Reprise et OODA", routes: &["/api/v1/work-resume", "/api/v1/work-recorded-resume"] },
     View { id: "automation", key: "view.automation", section: "Configuration", label: "Programmes", routes: &["/api/v1/automation"] },

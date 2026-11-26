@@ -67,7 +67,7 @@ pub(super) fn prepare_for_job(
     request: &task_validation::Request,
     review: Option<&crate::IndependentReview>,
 ) -> Result<Material, E> {
-    prepare_for_job_using(store,tx,settings,work,request,review,None)
+    prepare_for_job_using(store,tx,settings,work,request,review,None,&mut Default::default())
 }
 /// Borrow externally held candidate custody inside this snapshot. All ordinary
 /// provider/host/budget/settings guards remain; no descriptor ownership transfers.
@@ -76,9 +76,11 @@ pub(super) fn prepare_for_job_using(
     store:&RootStore, tx:&Transaction<'_>,settings:EngineSettingsDocument,
     work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
     candidate:Option<&task_validation::ReviewCandidate>,
+    diagnostics: &mut super::diagnostics::Preflight,
 )->Result<Material,E>{
     require_native_wait(store, &settings)?;
     let prepared = store.prepare_review_snapshot_using(tx,settings,work,request,review,candidate,false)?;
+    diagnostics.bind(&prepared.preview, &prepared.settings);
     let config = prepared
         .work
         .planning
@@ -95,7 +97,7 @@ pub(super) fn prepare_for_job_using(
     let submitted =
         task_validation::submission(tx, &current, &prepared.preview.task_id).map_err(launch)?;
     let recovery = prepared.recovery.clone();
-    let inputs = store.assemble_review_inputs_using(tx,prepared,candidate,true)?;
+    let inputs = store.assemble_review_inputs_observed(tx,prepared,candidate,true,&mut diagnostics.sizes)?;
     if inputs.response_limit_bytes == Some(0) {
         return Err(E::Refused("review-call-response-disabled"));
     }
@@ -278,7 +280,7 @@ mod tests {
                 &tx, &store.root, &store.directory, &settings, "missing-work", &planner, false,
             ).err().unwrap();
             let review = prepare_for_job_using(
-                &store, &tx, settings.clone(), "missing-work", &reviewer, None, None,
+                &store, &tx, settings.clone(), "missing-work", &reviewer, None, None, &mut Default::default(),
             ).err().unwrap();
             tx.rollback().unwrap();
             let review_code = match &review {

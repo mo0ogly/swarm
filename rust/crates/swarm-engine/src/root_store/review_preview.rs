@@ -120,6 +120,16 @@ impl RootStore {
         &self, tx:&rusqlite::Transaction<'_>,prepared:PreparedReview,
         candidate:Option<&task_validation::ReviewCandidate>,invocation:bool,
     )->Result<TaskReviewInputs,E>{
+        self.assemble_review_inputs_observed(tx, prepared, candidate, invocation, &mut Default::default())
+    }
+
+    /// Assemble from the same snapshot while collecting only numeric limits and
+    /// observations. The caller decides whether the attempt is authorized to log.
+    fn assemble_review_inputs_observed(
+        &self, tx: &rusqlite::Transaction<'_>, prepared: PreparedReview,
+        candidate: Option<&task_validation::ReviewCandidate>, invocation: bool,
+        sizes: &mut reviewer_candidate::diagnostics::Sizes,
+    ) -> Result<TaskReviewInputs, E> {
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
             match candidate {
@@ -127,9 +137,9 @@ impl RootStore {
                     let plan=candidate.candidate().control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
                     let reports=plan.policies.iter().map(|policy|task_validation::submission(tx,&prepared.work,&policy.task_id)
                         .map_err(|e|E::Launch(Box::new(e)))).collect::<Result<Vec<_>,E>>()?;
-                    inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation)
+                    inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation,sizes)
                 }
-                None => inputs::assemble(&self.root, prepared, &submitted),
+                None => inputs::assemble(&self.root, prepared, &submitted, sizes),
             }
     }
 
