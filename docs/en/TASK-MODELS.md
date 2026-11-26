@@ -91,6 +91,11 @@ Original results preserve their provider routes and evidence. The change launche
 no review and grants no calls. Read the current state if the revision, policy,
 or provider has changed. Native orchestrator model configuration is separate.
 
+Following a control failure before execution, resubmitting an existing managed
+report checks the copy for the recorded attempt. Resubmission reuses the
+verified producer and report and creates no worker attempt. Controls and review
+remain separate operations.
+
 ## Reusable profiles in the Rust candidate — lot188
 
 Admission retains the requested level in the task profile and, for a manual

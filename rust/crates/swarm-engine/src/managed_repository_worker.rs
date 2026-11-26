@@ -199,10 +199,15 @@ fn contract_digest(raw: &[u8]) -> Result<String, E> {
         crate::encode_model(&r).map_err(|e| E::caused("managed-worker-request-encode", e))?;
     Ok(hash(&bytes))
 }
-/// Bind the stored task/source/first copy/original intent without filesystem IO.
-/// No retry, parent delegation or legacy proof adoption exists. Native automatic
-/// origin is bound to the canonical request; its authority is checked separately.
+/// Bind a new first-attempt copy before its recorded attempt is available.
+/// Preparing a later attempt is outside this entry point.
 fn binding(work: &Work, r: &Launch, raw: &[u8], p: &Proof) -> Result<(), E> {
+    binding_at(work, r, raw, p, 1)
+}
+
+/// Bind the exact task, copy ordinal and original intent without filesystem IO.
+/// Native automatic origin still requires its separate persisted authority.
+fn binding_at(work: &Work, r: &Launch, raw: &[u8], p: &Proof, ordinal: usize) -> Result<(), E> {
     let repo = work
         .planning
         .as_deref()
@@ -210,7 +215,7 @@ fn binding(work: &Work, r: &Launch, raw: &[u8], p: &Proof) -> Result<(), E> {
         .ok_or(E::Refused("managed-repository-required"))?;
     let expected = Path::new(&repo.storage)
         .join("copies")
-        .join(format!("{}-1", r.task_id));
+        .join(format!("{}-{ordinal}", r.task_id));
     if !swarm_identity_contract::name(r.event_id.as_bytes())
         || !swarm_identity_contract::name(r.task_id.as_bytes())
         || !matches!(r.origin.as_str(), "" | "operateur" | "conducteur")
@@ -579,10 +584,28 @@ pub(crate) enum WorkerCheck {
     Record,
     BeforeExecution,
     AfterExecution,
-    /// Read retained request/proof/SQL attribution only; never insert or inspect the mutable copy.
+    /// Read retained request/proof/SQL attribution at its recorded attempt ordinal.
+    /// Never insert a row or inspect the mutable copy.
     Observe,
     Cancel,
 }
+/// Read the attempt ordinal from the exact stored Work/task and agent attempt.
+/// Missing or ambiguous attribution refuses; never infer a number from a path.
+fn retained_attempt_ordinal(work: &Work, agent: &Agent) -> Result<usize, E> {
+    let mut tasks = work.tasks.iter().flatten().filter(|task| task.id == agent.task_id);
+    let task = tasks.next().ok_or(E::Refused("managed-worker-attempt-task-required"))?;
+    if tasks.next().is_some() || agent.work_id != work.id || agent.attempt_id.is_empty() {
+        return Err(E::Refused("managed-worker-attempt-binding-mismatch"));
+    }
+    let mut matches = task.attempts.iter().flatten().enumerate()
+        .filter(|(_, attempt)| attempt.id == agent.attempt_id);
+    let (index, _) = matches.next().ok_or(E::Refused("managed-worker-attempt-required"))?;
+    if matches.next().is_some() {
+        return Err(E::Refused("managed-worker-attempt-binding-mismatch"));
+    }
+    index.checked_add(1).ok_or(E::Refused("managed-worker-attempt-overflow"))
+}
+
 /// Apply exactly the physical/SQL checks for the caller's lifecycle boundary.
 /// Record inserts attribution inside admission; Record/BeforeExecution check the
 /// physical copy before permission. Cancel/AfterExecution require original proof
@@ -641,7 +664,11 @@ pub(crate) fn verify_worker(
     }
     with_storage(root, work, false, |dir| {
         let p = proof(dir, &format!("native-worker-{}.json", agent.id))?;
-        binding(work, &r, &raw, &p)?;
+        if matches!(mode, WorkerCheck::Observe) {
+            binding_at(work, &r, &raw, &p, retained_attempt_ordinal(work, agent)?)?;
+        } else {
+            binding(work, &r, &raw, &p)?;
+        }
         let repo = work
             .planning
             .as_deref()
@@ -753,6 +780,43 @@ mod tests {
         p.path = "/root/other".into();
         assert!(binding(&w, &r, &raw, &p).is_err());
     }
+    /// A completed later attempt observes only its own retained copy. The
+    /// first-attempt preparation contract and original request digest still hold.
+    #[test]
+    fn retained_later_attempt_requires_exact_historical_copy() {
+        let (mut work, request, raw, mut proof) = fixture();
+        let mut task = crate::Task {
+            id: "task".into(),
+            attempts: Some(vec![
+                crate::Attempt { id: "first".into(), ..Default::default() },
+                crate::Attempt { id: "second".into(), ..Default::default() },
+            ]),
+            ..Default::default()
+        };
+        work.tasks = Some(vec![task.clone()]);
+        let mut agent = crate::Agent {
+            work_id: "w".into(), task_id: "task".into(), attempt_id: "first".into(),
+            ..Default::default()
+        };
+        assert_eq!(retained_attempt_ordinal(&work, &agent).unwrap(), 1);
+        assert!(binding(&work, &request, &raw, &proof).is_ok());
+
+        agent.attempt_id = "second".into();
+        let ordinal = retained_attempt_ordinal(&work, &agent).unwrap();
+        assert_eq!(ordinal, 2);
+        assert!(binding_at(&work, &request, &raw, &proof, ordinal).is_err());
+        proof.path = "/root/.swarm/managed/w/copies/task-2".into();
+        assert!(binding_at(&work, &request, &raw, &proof, ordinal).is_ok());
+        assert!(binding(&work, &request, &raw, &proof).is_err());
+
+        agent.attempt_id = "missing".into();
+        assert!(retained_attempt_ordinal(&work, &agent).is_err());
+        agent.attempt_id = "second".into();
+        task.attempts.as_mut().unwrap().push(crate::Attempt { id: "second".into(), ..Default::default() });
+        work.tasks = Some(vec![task]);
+        assert!(retained_attempt_ordinal(&work, &agent).is_err());
+    }
+
     /// Unknown proof fields and duplicate coordinates refuse, never disappear.
     #[test]
     fn proof_rejects_unknown_and_duplicate_fields() {

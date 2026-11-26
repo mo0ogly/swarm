@@ -115,6 +115,11 @@ dans les résultats d’origine. Le changement ne lance aucune revue et n’ajou
 aucun appel. Relire l’état si la révision, la politique ou le fournisseur a changé.
 Le parcours natif des modèles d’orchestrateur reste distinct.
 
+Après un refus de contrôle avant exécution, la resoumission du rapport géré
+existant vérifie la copie de la tentative enregistrée. La resoumission
+réutilise le producteur et le rapport vérifiés. Elle n’ouvre aucune nouvelle
+tentative de worker. Le contrôle et la revue restent des opérations séparées.
+
 ## Profils réutilisables dans le candidat Rust — lot188
 
 L’admission conserve le niveau demandé dans le profil de la tâche et, pour un
