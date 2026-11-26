@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La console des logs sépare le journal et la rotation en onglets. Les termes recherchés sont surlignés dans le tableau.",
+        "en": "The log console has separate Log and Rotation tabs and highlights search terms in the table."
+      },
+      {
         "fr": "La console des logs affiche les filtres amovibles, distingue l’absence d’archives et reprend la première page si l’instantané expire. Le démon Rust journalise son démarrage et les refus de lecture.",
         "en": "The log console shows removable filters, reports when no archives are retained and resumes at the first page on snapshot expiry. The Rust daemon logs listener startup and rejected reads."
       },
