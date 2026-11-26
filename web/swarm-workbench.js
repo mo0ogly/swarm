@@ -108,8 +108,10 @@
   const live=()=>taskDialog===dialog&&dialog.open&&panel.isConnected&&model?.work.id===work.id
    &&model.work.revision===work.revision&&selected===task.id;
   /** Complete the visible rejection with verified facts for this same revision. */
-  async function readIncident(){
-   if(task.independent_review?.state!=='error')return;
+  async function readIncident(blocker){
+   const reviewBlockers=['native-scoped-submitted-review-required','publication-preview-original-required',
+    'publication-preview-current-opinion-required','managed-passed-opinion-required'];
+   if(task.independent_review?.state!=='error'||!reviewBlockers.includes(blocker))return;
    const query=new URLSearchParams({work:work.id,task:task.id,review_revision:String(work.revision)});
    try {
     const data=await taskReview.read('/api/v1/agent-logs/task-actions?'+query,true);
@@ -142,7 +144,7 @@
    reviewContext.textContent=independentReviewContext(code,work,task);
    reviewContext.hidden=!reviewContext.textContent;
    codeLabel.textContent=code;diagnostic.hidden=false;
-   void readIncident();
+   void readIncident(code);
    if(document.activeElement===button)status.focus();
   };
   if(!Number.isSafeInteger(work.revision)||work.revision<1){
