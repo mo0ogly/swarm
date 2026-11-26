@@ -43,7 +43,10 @@
     "tests/rust_mission_watch_public.py",
     "tests/rust_planning_failure_recovery.py",
     "tests/rust_native_http_mission.py",
-    "tests/rust_managed_planning.py"
+    "tests/rust_managed_planning.py",
+    "rust/crates/swarm-biba-linux/src/*.rs",
+    "tests/rust_native_managed_focused_control.py",
+    "tests/rust_native_managed_validation.py"
   ],
   "environment": {},
   "steps": [
@@ -91,6 +94,22 @@
       "required_stdout": [
         "NATIVE_MANAGED_CANDIDATE_PASS",
         "public-settings-mutation-during-git-succeeds-and-stale-preparation-refuses"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-read-only-declared-inputs",
+      "command": [
+        "python3",
+        "-c",
+        "import os, subprocess, sys, tempfile\nfrom pathlib import Path\nsys.path.insert(0, 'tests')\nfrom fixture_area import fixture_area\nroot=Path.cwd()\nout=Path(tempfile.mkdtemp(prefix='managed-focused-',dir=fixture_area()))/'flow'\nsubprocess.run([sys.executable,'tests/rust_native_managed_focused_control.py',str(root),os.environ['SWARM_STATUS_CONTRACT_BINARY'],os.environ['SWARM_STATUS_CONTRACT_PROFILE'],str(out)],check=True)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS scoped-manifest-two-inputs-and-retained-report",
+        "PASS changed-declared-input-refused-without-work-mutation",
+        "PASS focused-engine-executed-read-only-control",
+        "PASS focused-receipt-reopens-for-independent-review"
       ],
       "required_stderr": []
     }

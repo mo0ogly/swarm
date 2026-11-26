@@ -3,7 +3,7 @@
 #[path = "native_provider_biba.rs"]
 mod biba;
 pub(crate) use biba::{deny_internet, output_workspace, OutputRole};
-pub(crate) use biba::{prepare as prepare_boundary, enforce as enforce_boundary, close as close_boundary};
+pub(crate) use biba::{prepare as prepare_boundary, prepare_readonly_inputs as prepare_boundary_inputs, enforce as enforce_boundary, close as close_boundary};
 use crate::{root_store::finished as finish, AgentLaunchError, Provider, RootStoreError as E};
 use std::{
     collections::BTreeSet,

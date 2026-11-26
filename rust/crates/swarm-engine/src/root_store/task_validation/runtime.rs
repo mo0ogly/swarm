@@ -255,6 +255,9 @@ pub(super) fn run_using(store:&mut RootStore,work:&str,raw:&[u8],lease:Option<&c
     // Preserve exact-event readback before any candidate Git or frame creation.
     let exists = store::event(&store.db, &r.event_id).map_err(|e| E::Launch(Box::new(e)))?.is_some();
     let managed = if exists { None } else { super::managed_execution::acquire_fresh(store, work, &r, true)? };
+    if !exists && r.schema_version == 2 && managed.is_none() {
+        return Err(E::Refused("task-validation-focused-managed-required"));
+    }
     let result = (|| {
         let id = match managed.as_ref() {
             Some(session) => {

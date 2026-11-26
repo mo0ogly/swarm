@@ -52,6 +52,33 @@ print('OWNED_PROVIDER_OUTPUT',flush=True)
     observed=invoke('confined',[str(driver),str(root),str(workspace),str(script)])
     assert not any(observed.values()),observed
     assert not any(p.exists() for p in [private/'canary',private/'child-canary',root/'official-canary'])
+    focused = private/'focused-control'
+    focused.mkdir()
+    for name in ('report.md', 'dat.docx', 'unrelated'):
+        (focused/name).write_text(name)
+    focused_script = root/'focused-control.py'
+    proof.publish(focused_script, b"""from pathlib import Path
+assert Path('report.md').read_text() == 'report.md'
+assert Path('dat.docx').read_text() == 'dat.docx'
+for operation in (lambda: Path('unrelated').read_bytes(),
+                  lambda: Path('report.md').write_text('changed'),
+                  lambda: list(Path('.').iterdir()),
+                  lambda: Path('new-report').write_text('new')):
+    try:
+        operation()
+    except PermissionError:
+        continue
+    raise AssertionError('unexpected candidate access')
+print('DECLARED_INPUTS_ONLY')
+""")
+    argv = [str(driver), str(root), str(focused), str(focused_script), 'report.md', 'dat.docx']
+    r = subprocess.run(argv, cwd=focused, capture_output=True)
+    proof.publish(out/'focused-argv.json', argv)
+    proof.publish(out/'focused.stdout', r.stdout)
+    proof.publish(out/'focused.stderr', r.stderr)
+    assert r.returncode == 0 and r.stdout == b'DECLARED_INPUTS_ONLY\n', r.stderr
+    assert (focused/'report.md').read_text() == 'report.md'
+    assert not (focused/'new-report').exists()
     alias=root/'alias';alias.mkdir();os.link(private/'state.synthetic',alias/'hardlink')
     r=subprocess.run([str(driver),str(root),str(alias),str(script)],capture_output=True)
     proof.publish(out/'hardlink.stdout',r.stdout);proof.publish(out/'hardlink.stderr',r.stderr)

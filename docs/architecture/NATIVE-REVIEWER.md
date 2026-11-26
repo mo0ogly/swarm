@@ -11,6 +11,25 @@ intermédiaires de revue restent hors de cette projection.
 Les preuves natives décrites ici ciblent Linux ; aucune équivalence entre
 plateformes n’est établie.
 
+
+## Contrôle géré en lecture seule à entrées déclarées
+
+L’opérateur peut employer `schema_version: 2` avec `task validation-preview`
+et `task validate` pour un candidat géré qui a déjà un point de contrôle et
+un seul contrôle enregistré à entrées explicites. L’aperçu expose
+`declared_candidate_inputs`. Le moteur compare ces fichiers réguliers au
+point de contrôle Git et vérifie séparément le rapport conservé. Ce parcours
+ne recrée pas le candidat et ne parcourt pas la copie complète.
+
+Le processus privé Linux donne accès en lecture aux inodes vérifiés du
+candidat. Le listage, les autres fichiers du candidat et les écritures sont
+refusés. Les sorties et le runtime hôte en lecture seule restent disponibles
+comme auparavant. Une entrée absente, modifiée, redirigée ou non déclarée fait
+échouer le contrôle. La version 1 couvre les dépendances implicites et les
+copies modifiables. La demande et l’empreinte de source lient le mode au job.
+La revue réutilise les entrées du job. La publication conserve sa vérification
+d’intégrité du candidat complet et ses contrôles d’approbation.
+
 ## Périmètre réellement disponible
 
 Les aperçus, le contrôleur reviewer, le lecteur de contexte, la publication et

@@ -6,7 +6,8 @@ pub(crate) fn abi() -> io::Result<i32> {
     let v=unsafe {libc::syscall(libc::SYS_landlock_create_ruleset,std::ptr::null::<u8>(),0,1)};
     if v<0 {Err(io::Error::last_os_error())} else {Ok(v as i32)}
 }
-pub(crate) const READ:u64=(1<<0)|(1<<2)|(1<<3);
+pub(crate) const READ_FILE:u64=1<<2;
+pub(crate) const READ:u64=(1<<0)|READ_FILE|(1<<3);
 pub(crate) const ALL:u64=(1<<16)-1;
 #[repr(C)] struct Ruleset {fs:u64,net:u64,scoped:u64}
 #[repr(C,packed)] struct Beneath {access:u64,fd:i32}

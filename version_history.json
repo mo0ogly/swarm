@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le contrôle géré en lecture seule peut se limiter aux fichiers déclarés du candidat et en vérifier les octets.",
+        "en": "Read-only managed controls can use only the declared candidate files and verify their bytes."
+      },
+      {
         "fr": "La resoumission d’un rapport géré vérifie la copie correspondant à la tentative d’origine, y compris après la première tentative.",
         "en": "Resubmitting a managed report verifies the copy for the originating attempt, including attempts after the first."
       },

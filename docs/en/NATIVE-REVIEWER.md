@@ -9,6 +9,25 @@ review states are outside this projection.
 
 The native evidence below targets Linux; cross-platform equivalence is not established.
 
+
+## Read-only managed control with declared inputs
+
+An operator can use `schema_version: 2` with `task validation-preview` and
+`task validate` for a managed candidate with an existing checkpoint and one
+saved control with explicit inputs. Preview reports `declared_candidate_inputs`.
+The engine compares those regular files with the committed checkpoint and
+observes the retained report separately. It does not build a new candidate or
+walk the full worktree for this control.
+
+The private Linux helper grants read access to the exact verified input inodes
+inside the candidate. Directory listing, other candidate files and writes are
+denied. Stdout/stderr and the usual host read-only runtime are available as
+before. A missing, changed, redirected or undeclared dependency fails. Use
+request version 1 for controls with implicit inputs or mutable workspaces.
+A job binds its original mode in both its replay request and source digest.
+Review reuses the declared inputs from that job. Managed publication still
+performs its separate whole-candidate integrity and approval checks.
+
 ## Actual availability
 
 Previews, reviewer controller, context reader, publication and reconciliation

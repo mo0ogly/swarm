@@ -23,6 +23,7 @@ pub(super) struct Captured {
     root_instance: crate::root_store::RootInstanceIdentity,
     artifacts: BTreeMap<String, String>,
     directories: BTreeMap<String, (String, String, String)>,
+    focused: bool,
 }
 /// The controller/helper owns custody separately from plain Prepared/SQL results.
 /// Must be explicitly closed; never return this through a cleanup wrapper that
@@ -49,6 +50,34 @@ impl Session {
     pub fn observed_artifact(&self, name: &str) -> Option<&str> {
         self.data.artifacts.get(name).map(String::as_str)
     }
+    /// Reopen the selected committed files on anchored descriptors and compare
+    /// exact bytes to the observed private source before adding read-only rules.
+    /// Full-scope historical controls use their original workspace profile.
+    pub fn focused_files(&self, root: &Path) -> Result<Option<Vec<std::fs::File>>, E> {
+        use std::io;
+        use sha2::{Digest, Sha256};
+        if !self.data.focused {
+            return Ok(None);
+        }
+        let root = crate::canonical_project_root(root).map_err(E::Path)?;
+        let mut files = Vec::new();
+        for (name, expected) in &self.data.artifacts {
+            let (_, file) = crate::anchored_artifact::with(
+                &root, name, crate::anchored_artifact::Access::Contents, |_| {},
+                |file| {
+                    let mut bytes = &mut *file;
+                    let mut hash = Sha256::new();
+                    io::copy(&mut bytes, &mut hash)?;
+                    if format!("{:x}", hash.finalize()) != *expected {
+                        return Err(io::Error::new(io::ErrorKind::InvalidData, "focused input changed"));
+                    }
+                    file.try_clone()
+                },
+            ).map_err(|e| launch(A::caused("task-validation-focused-input-open", e)))?;
+            files.push(file);
+        }
+        Ok(Some(files))
+    }
     /// Check current selected bytes under the held candidate. This does not
     /// upgrade the control journal's historical inventory to current evidence.
     pub fn verify_review_source(&self, name: &str) -> Result<(), E> {
@@ -73,6 +102,7 @@ impl Session {
             &self.witness,
             &self.data.repository_sha256,
             &self.data.root_instance,
+            self.data.focused,
             Some(&self.data.artifacts),
             false,
             false,
@@ -227,6 +257,7 @@ fn capture(
     witness: &CandidateWitness,
     repository_sha256: &str,
     root_instance: &crate::root_store::RootInstanceIdentity,
+    focused: bool,
     initial: Option<&BTreeMap<String,String>>,
     reuse_verified_tree: bool,
     opinion_only: bool,
@@ -247,9 +278,12 @@ fn capture(
     // Entry names include the repository project prefix. Resolve against the
     // actual retained repository, not a reconstructed caller path.
     let repository=crate::local_directory(&witness.repository_path(),"").map_err(E::Path)?;
-    let links=candidate.review_entries().filter(|(_,mode,_)| *mode=="120000")
-        .map(|(name,_,_)|repository.join(name)).collect();
+
+    if focused && (plan.slots.len() != 1 || plan.slots[0].control.inputs.as_ref().is_none_or(Vec::is_empty)) {
+        return Err(E::Refused("task-validation-focused-single-declared-control-required"));
+    }
     let mut artifacts = match initial {
+        _ if focused => BTreeMap::new(),
         Some(expected) if opinion_only => expected.clone(),
         Some(expected) if reuse_verified_tree => {
             super::input_inventory::observe_with(&base, &workspace, expected, |path| {
@@ -259,7 +293,11 @@ fn capture(
             })?
         }
         Some(expected)=>super::input_inventory::observe(&base,&workspace,expected)?,
-        None=>super::input_inventory::collect(&base,&workspace,&links)?,
+        None => {
+            let links = candidate.review_entries().filter(|(_, mode, _)| *mode == "120000")
+                .map(|(name, _, _)| repository.join(name)).collect();
+            super::input_inventory::collect(&base, &workspace, &links)?
+        },
     };
     let mut directories = BTreeMap::new();
     for slot in &plan.slots {
@@ -284,6 +322,15 @@ fn capture(
                 crate::gate_evaluation::artifact_hash(&witness.workspace_path(), input).map_err(
                     |e| E::Launch(Box::new(A::caused("task-validation-managed-input", e))),
                 )?;
+            if focused {
+                let entry = workspace.join(input);
+                let relative_name = relative(&repository, &entry)?;
+                if path != entry || !candidate.review_entry(&relative_name).is_some_and(|(mode, digest)|
+                    matches!(mode, "100644" | "100755") && digest == hash)
+                {
+                    return Err(E::Refused("task-validation-focused-input-not-committed"));
+                }
+            }
             let name = relative(&base, &path)?;
             if artifacts.get(&name).is_some_and(|old| old != &hash) {
                 return Err(E::Refused("task-validation-managed-inputs-changed"));
@@ -291,7 +338,11 @@ fn capture(
             artifacts.insert(name, hash);
         }
     }
+    if focused && initial.is_some_and(|expected| expected != &artifacts) {
+        return Err(E::Refused("task-validation-managed-inputs-changed"));
+    }
     Ok(Captured {
+        focused,
         candidate: candidate.clone(),
         repository_sha256: repository_sha256.into(),
         root_instance: root_instance.clone(),
@@ -308,6 +359,7 @@ fn acquire(
     input: Inputs,
     create: bool,
     expected: Option<&ManagedCandidate>,
+    focused: bool,
     initial: Option<&BTreeMap<String,String>>,
     reuse_verified_tree: bool,
     opinion_only: bool,
@@ -334,7 +386,7 @@ fn acquire(
     {
         return Err(E::Refused("task-validation-managed-report-changed"));
     }
-    if create {
+    if create && !focused {
         crate::managed_repository::prepare_candidate(
             &store.root,
             &observation.work,
@@ -343,7 +395,7 @@ fn acquire(
         )
         .map_err(launch)?;
     }
-    let pin = if opinion_only {
+    let pin = if opinion_only || focused {
         crate::managed_repository::pin_for_opinion
     } else {
         crate::managed_repository::pin_candidate
@@ -364,6 +416,7 @@ fn acquire(
             &witness,
             &repository_sha256,
             &input.root_instance,
+            focused,
             initial,
             reuse_verified_tree,
             opinion_only,
@@ -384,8 +437,18 @@ pub(super) fn acquire_fresh(
     create: bool,
 ) -> Result<Option<Session>, E> {
     inputs(store, work, request, None)?
-        .map(|i| acquire(store, i, create, None, None, false, false))
+        .map(|i| acquire(store, i, create, None, request.schema_version == 2, None, false, false))
         .transpose()
+}
+/// Recover the explicit scope from the immutable normalized request hash.
+/// The claim uses the pre-claim Work revision. The source digest below also
+/// binds this mode, so a changed scope cannot reuse a job or its receipts.
+fn focused_job(job: &store::Job) -> Result<bool, E> {
+    let request = Request { schema_version: 2, event_id: job.event_id.clone(),
+        expected_revision: job.work_revision, task_id: job.task_id.clone() };
+    let bytes = serde_json::to_vec(&request)
+        .map_err(|e| launch(A::caused("task-validation-request-encode", e)))?;
+    Ok(job.request_sha256 == crate::provider_configuration::configuration_digest(&bytes))
 }
 /// Inspect only the exact existing candidate of a real registered job. No stage
 /// creation or fallback to a new original is permitted; missing source refuses.
@@ -403,7 +466,7 @@ pub(super) fn acquire_job(
     let input = inputs(store, &job.work_id, &request, Some(job))?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     let initial=initial_artifacts(store,job,candidate)?;
-    acquire(store, input, false, Some(candidate),Some(&initial), false, false)
+    acquire(store, input, false, Some(candidate), focused_job(job)?, Some(&initial), false, false)
 }
 /// Pin an existing completed control job for an internally selected current
 /// running reviewer or readonly completed opinion. Full submission equality and immutable checkpoint guards
@@ -413,7 +476,7 @@ pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&Man
     let input=inputs_using(store,&job.work_id,&request,Some(job),review)?
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     let initial=initial_artifacts(store,job,candidate)?;
-    acquire(store,input,false,Some(candidate),Some(&initial), true, opinion_only)
+    acquire(store,input,false,Some(candidate), focused_job(job)?, Some(&initial), true, opinion_only)
 }
 /// Persist one candidate preimage before SQL claim. A later failed claim can
 /// leave this immutable orphan; it grants nothing and never replaces an original.
@@ -542,7 +605,7 @@ pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root
     }
     let policy_epoch = super::source_policy::binding(settings)?;
     let source = super::digest(&(
-        "native-managed-task-validation-source/1",
+        if data.focused { "native-managed-task-validation-source/2" } else { "native-managed-task-validation-source/1" },
         &observed.work.id,
         &observed.task.id,
         &observed.task.scope_id,
@@ -577,6 +640,7 @@ pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root
             .map(|v| crate::SettingCount(v.revision)),
         policy_mode: observed.policy.mode.clone(),
         control_count: plan.slots.len(),
+        declared_candidate_inputs: data.focused.then_some(data.artifacts.len()),
         source_sha256: source,
         artifacts,
         execution_authorized: false,

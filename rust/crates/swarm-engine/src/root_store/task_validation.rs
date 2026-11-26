@@ -37,7 +37,8 @@ pub use runtime::TaskValidationOutcome;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, os::unix::fs::MetadataExt, path::Path};
 
-/// Native request names an existing task and optimistic revision only. It cannot
+/// Native request names an existing task and optimistic revision. Version 2
+/// selects a read-only control over declared candidate inputs. It cannot
 /// supply commands, a producer, an actor or an automatic mission origin.
 #[derive(Clone, Default, Deserialize, Serialize)]
 #[serde(default)]
@@ -58,7 +59,7 @@ pub(super) fn decode(raw: &[u8]) -> Result<Request, E> {
     ];
     let r: Request = crate::work::decode_mode(raw, FIELDS, true)
         .map_err(|e| E::caused("task-validation-request-invalid", e))?;
-    if r.schema_version != 1
+    if !matches!(r.schema_version, 1 | 2)
         || r.expected_revision < 1
         || [&r.event_id, &r.task_id]
             .iter()
@@ -89,6 +90,8 @@ pub struct TaskValidationPreview {
     pub authority_revision: Option<crate::SettingCount>,
     pub policy_mode: String,
     pub control_count: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub declared_candidate_inputs: Option<usize>,
     pub source_sha256: String,
     pub artifacts: BTreeMap<String, String>,
     pub execution_authorized: bool,
@@ -411,6 +414,7 @@ fn prepare_source(
         authority_revision: authority.as_ref().map(|v| crate::SettingCount(v.revision)),
         policy_mode: policy.mode.clone(),
         control_count: controls.len(),
+        declared_candidate_inputs: None,
         source_sha256: source,
         artifacts,
         execution_authorized: false,
@@ -498,6 +502,9 @@ impl RootStore {
                 Err(error) => Err(error),
             };
             return finished(result, session.close());
+        }
+        if r.schema_version == 2 {
+            return Err(RootStoreError::Refused("task-validation-focused-managed-required"));
         }
 
         let reservation = self
