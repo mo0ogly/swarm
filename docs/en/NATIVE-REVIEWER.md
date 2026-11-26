@@ -469,8 +469,10 @@ effective sources identical in05 (08), without fixture features or installation.
 
 `swarm task review-archive-failure REVIEW_ID --root ROOT --json` archives the
 current error of a submitted task when the original proves a waited process
-after grant, a nonzero exit and no complete response. An existing opinion, a
-private admission refusal, unknown wait status or failed capture refuses. The
+after grant. It accepts a nonzero exit without a reply or a known protocol
+failure at exit zero with a retained reply. An already recorded opinion, a
+retained reply currently decoded as favorable, a private admission refusal,
+unknown wait status or failed capture refuses. The
 archive event binds the original to the same Work and retains the receipt,
 producer attempt, controls, report and charged call. Replay verifies the event
 without mutation. A later call is a separate command subject to current quota,
@@ -1003,6 +1005,21 @@ sequenceDiagram
     R-->>U: Refuse until final protocol is wired
 ```
 
+
+## Supplement managed review with operator observations
+
+A project operator can place a UTF-8 JSON document at
+`docs/swarm-review-evidence/{work_id}/{task_id}.json` in the project Root, outside
+the candidate checkout. Version 1 requires `work_id`, `task_id`, `attempt_id`,
+`candidate_commit`, `report_sha256` and `observations` alongside `schema_version`.
+Each observation declares a unique 1-based `criterion`, a `source` and a
+`detail`. The source is attributed operator material. The reviewer still
+decides whether it proves the criterion. Missing optional files leave existing
+reviews compatible. Invalid bindings, unsafe file types, duplicate observation
+indices and limits refuse. The retained bytes enter the normal catalogue and
+artifact freshness checks. They can be inspected with `review-inputs` even
+when the saved reviewer counter exactly equals its cap. Execution still needs
+an available call and authorized native admission.
 
 ## Check supplied cohort output
 

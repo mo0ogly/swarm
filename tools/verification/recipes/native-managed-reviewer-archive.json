@@ -61,6 +61,7 @@
     "tests/rust_native_managed_review_check.py",
     "rust/crates/swarm-engine/src/managed_review_record.rs",
     "rust/crates/swarm-engine/src/root_store/native_review_context.rs",
+    "rust/crates/swarm-engine/src/agent_reviewer_preflight.rs",
     "rust/crates/swarm-engine/src/root_store/reviewer_native/*.rs",
     "tests/rust_native_managed_reviewer.py"
   ],
@@ -71,7 +72,7 @@
       "command": [
         "python3",
         "-c",
-        "import os, subprocess, tempfile\nfrom pathlib import Path\ntarget=Path(tempfile.mkdtemp(prefix='review-archive-'))/'scenario'\nsubprocess.run(['python3','tests/rust_native_managed_reviewer.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--case','startup','--output',str(target)],check=True)\nprint('REVIEW_ARCHIVE_EVIDENCE '+str(target))\n"
+        "import os, subprocess, tempfile\nfrom pathlib import Path\ntarget=Path(tempfile.mkdtemp(prefix='review-archive-'))/'scenario'\nsubprocess.run(['python3','tests/rust_native_managed_reviewer.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--case','protocol','--output',str(target)],check=True)\nprint('REVIEW_ARCHIVE_EVIDENCE '+str(target))\n"
       ],
       "expected_exit": 0,
       "required_stdout": [

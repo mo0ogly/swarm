@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La revue gérée peut citer les observations opérateur liées au candidat et reprendre après un échec de protocole conservé.",
+        "en": "Managed review can cite candidate-bound operator observations and resume after a retained protocol failure."
+      },
+      {
         "fr": "La revue gérée valide aussi un objet JSON entouré d’un seul bloc Markdown json et conserve la réponse originale.",
         "en": "Managed review also validates a JSON object enclosed in a single Markdown json fence and retains the original response."
       },

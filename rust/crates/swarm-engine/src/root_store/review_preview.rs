@@ -2,6 +2,7 @@
 //! Complete text inputs are observations; no invocation grant or publication.
 pub(super) mod inputs;
 mod managed_context;
+mod evidence;
 mod file_reader;
 pub use file_reader::TaskReviewFileReader;
 pub(super) mod inventory;
@@ -154,7 +155,7 @@ impl RootStore {
             let result=(||{
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
-            let result = self.prepare_review_snapshot_using(&tx, settings, work, &request,None,candidate.as_ref())
+            let result = self.prepare_review_snapshot_using(&tx, settings, work, &request,None,candidate.as_ref(),true)
                 .and_then(|prepared| consume(&tx, prepared,candidate.as_ref()));
             finished(result, tx.rollback().map_err(E::Sql))
             })();
@@ -200,7 +201,7 @@ impl RootStore {
         request: &task_validation::Request,
         review: Option<&crate::IndependentReview>,
     ) -> Result<PreparedReview, E> {
-        self.prepare_review_snapshot_using(tx,settings,work,request,review,None)
+        self.prepare_review_snapshot_using(tx,settings,work,request,review,None,false)
     }
     /// Build observations for a readonly managed inspector with actual external
     /// candidate custody. Native invocation supplies the same borrowed holder;
@@ -210,7 +211,7 @@ impl RootStore {
     fn prepare_review_snapshot_using(
         &self, tx:&rusqlite::Transaction<'_>,settings:crate::EngineSettingsDocument,
         work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
-        candidate:Option<&task_validation::ReviewCandidate>,
+        candidate:Option<&task_validation::ReviewCandidate>, inspect: bool,
     )->Result<PreparedReview,E>{
         let launch = |e| E::Launch(Box::new(e));
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
@@ -246,6 +247,8 @@ impl RootStore {
         let launch_policy = settings.values.agent_launch_policy().map_err(E::Settings)?;
         match review {
             Some(_) => crate::agent_reviewer_preflight::check_reserved(
+                &self.root, &self.directory, planning, &launch_policy),
+            None if inspect && candidate.is_some() => crate::agent_reviewer_preflight::observe(
                 &self.root, &self.directory, planning, &launch_policy),
             None => crate::agent_reviewer_preflight::check(
                 &self.root, &self.directory, Some(planning), &launch_policy),

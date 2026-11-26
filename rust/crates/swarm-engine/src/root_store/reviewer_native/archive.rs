@@ -5,9 +5,10 @@ use rusqlite::{OptionalExtension, Transaction};
 
 const EVENT_KIND: &str = "review.archive-failure";
 
-/// Return the exact terminal managed error and its receipt binding. A refusal
-/// with a reply, ambiguous wait, revoked source or uncertain capture cannot
-/// release the current error through this operation.
+/// Return the exact terminal managed non-verdict and its receipt binding.
+/// An unambiguous failed process or a known protocol failure may be archived.
+/// Never discard a recorded opinion or a favorable reply recognized by the
+/// current parser. Revoked source, uncertain wait/capture and gate failures refuse.
 fn original(
     root: &RootStore, tx: &Transaction<'_>, job: &store::Job,
 ) -> Result<(IndependentReview, String), E> {
@@ -15,11 +16,9 @@ fn original(
         return Err(E::Refused("review-archive-terminal-failure-required"));
     }
     let (receipt, hash) = journal::read(root, &job.id)?;
-    if receipt.original_reply.is_some() || receipt.output_complete
-        || receipt.managed_review.is_none() || !receipt.failed
+    if receipt.output_complete || receipt.managed_review.is_none() || !receipt.failed
         || receipt.gate.is_some() || receipt.source_interrupted
         || receipt.duration_expired || receipt.drain_expired
-        || !receipt.exit_code.is_some_and(|code| code != 0)
         || receipt.raw_capture.as_ref().is_none_or(|capture| capture.failed)
     {
         return Err(E::Refused("review-archive-managed-process-failure-required"));
@@ -28,6 +27,16 @@ fn original(
     if checked.task != job.task_id || checked.verdict_applicable
         || checked.review.state != "error" || checked.original_receipt_sha256 != hash {
         return Err(E::Refused("review-archive-original-changed"));
+    }
+    match (receipt.exit_code, receipt.original_reply.as_deref()) {
+        (Some(code), None) if code != 0 => {}
+        (Some(0), Some(raw)) if matches!(checked.retry_failure, Some(crate::review_evidence::NativeReviewFailure::Protocol)) => {
+            let snapshot = receipt.managed_review.as_ref().ok_or(E::Refused("review-archive-managed-original-required"))?;
+            if snapshot.decode(raw).is_ok_and(|opinion| opinion.state == crate::ReviewReplyState::Passed) {
+                return Err(E::Refused("review-archive-favorable-original"));
+            }
+        }
+        _ => return Err(E::Refused("review-archive-managed-process-failure-required")),
     }
     Ok((checked.review, hash))
 }

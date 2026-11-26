@@ -78,7 +78,7 @@ pub(super) fn prepare_for_job_using(
     candidate:Option<&task_validation::ReviewCandidate>,
 )->Result<Material,E>{
     require_native_wait(store, &settings)?;
-    let prepared = store.prepare_review_snapshot_using(tx,settings,work,request,review,candidate)?;
+    let prepared = store.prepare_review_snapshot_using(tx,settings,work,request,review,candidate,false)?;
     let config = prepared
         .work
         .planning
@@ -109,7 +109,7 @@ pub(super) fn prepare_for_job_using(
     for source in inputs
         .materials
         .iter()
-        .filter(|s| matches!(s.kind.as_str(), "report" | "document"))
+        .filter(|s| matches!(s.kind.as_str(), "report" | "document" | "operator_evidence"))
     {
         if artifacts
             .get(&source.name)

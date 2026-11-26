@@ -30,7 +30,7 @@ def provider_program(config):
 
  Purpose: build the standalone `#!/usr/bin/python3` program the engine launches
  as the managed native reviewer. Inputs: `config` — the small dict of fixture
- options (`case` in pass/partial/publish-refusal/source/startup, `source` absolute path
+ options (`case` in pass/partial/publish-refusal/source/startup/protocol, `source` absolute path
  used only by the source variant, `marker_event` = the request event_id naming
  the I0 reviewer leaf). Output: bytes, with the config serialized JSON embedded
  quoting-safe (the json.dumps string literal is repr-escaped) so the provider
@@ -66,7 +66,7 @@ if config['case']=='source':
  fd=os.open(config['source'],os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o700)
  with os.fdopen(fd,'w') as f:f.write('Changed native reviewer candidate source\\n')
 reply=dict(catalog_sha256=protocol['catalog_sha256'],candidate_commit=context['candidate_commit'],tasks=entries)
-print(json.dumps(dict(type='item.completed',item=dict(type='agent_message',id='review',text=json.dumps(reply)))),flush=True)
+print(json.dumps(dict(type='item.completed',item=dict(type='agent_message',id='review',text='not a JSON object' if config['case']=='protocol' else json.dumps(reply)))),flush=True)
 print(json.dumps(dict(type='turn.completed',usage=dict(input_tokens=7,output_tokens=8))),flush=True)
 '''%(embedded,)
  return text.encode()
@@ -220,8 +220,12 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   assert snapshot['protocol']['context_sha256']==protocol['context_sha256'] and (original['failed'] or original['original_reply'])
   fixture.publish(out/'retained-original.frame',frame)
   checks.append('framed-original-retains-full-cohort-protocol-frozen-policy-and-actual-wait')
-  if case=='startup':
-   assert original['failed'] and original['exit_code']==101 and not original['original_reply']
+  if case in ('startup','protocol'):
+   assert original['failed']
+   if case=='startup':
+    assert original['exit_code']==101 and not original['original_reply']
+   else:
+    assert original['exit_code']==0 and bytes(original['original_reply'])==b'not a JSON object'
    assert review['state']=='error'
    ready=dict(request,event_id=request['event_id']+'-next',expected_revision=after['revision'])
    call('before-archive-refusal',['task','review-inputs',work],ready,success=False)
@@ -234,7 +238,24 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
    assert archived_task['attempts']==task['attempts'] and archived_task['automatic_validation']==task['automatic_validation']
    assert archived['planning']['reviewer']==after['planning']['reviewer'] and finance(root,work)==rows
    ready['expected_revision']=archived['revision']
+   if case=='protocol':
+    binding=protocol['context']['tasks'][0]['binding']
+    path=root/'docs'/'swarm-review-evidence'/work/'task.json'
+    path.parent.mkdir(parents=True,exist_ok=False)
+    evidence=dict(schema_version=1,work_id=work,task_id='task',attempt_id=binding['attempt'],
+                  candidate_commit=protocol['context']['candidate_commit'],report_sha256=binding['report_sha256'],
+                  observations=[dict(criterion=1,source='fixture desktop observation',detail='Exact observed fixture behavior and result')])
+    fixture.publish(path,dict(evidence,report_sha256='0'*64))
+    call('mismatched-operator-evidence',['task','review-inputs',work],ready,success=False)
+    fixture.publish(path,evidence)
+    checks.append('operator-evidence-refuses-report-drift')
    preview=call('same-candidate-next-preview',['task','review-inputs',work],ready)
+   if case=='protocol':
+    evidence_name=path.relative_to(root).as_posix()
+    sources=preview['managed_protocol']['catalog']['originals']
+    assert any(item['name']==evidence_name and item['kind']=='source' and item['sha256']==fixture.digest(path.read_bytes()) for item in sources)
+    assert not preview['preview']['provider_started'] and shown('preflight-unchanged')==archived
+    checks.append('operator-evidence-is-attributed-citable-and-readonly')
    assert preview['managed_protocol']['context']['candidate_commit']==protocol['context']['candidate_commit']
    fixture.publish(root/'codex',provider_program(dict(case='pass',source=str(source),marker_event=ready['event_id'])))
    (root/'codex').chmod(0o700)
@@ -343,7 +364,7 @@ def main():
  parser=argparse.ArgumentParser(description=__doc__)
  for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
  parser.add_argument('--extra-tracked',type=int,default=0)
- parser.add_argument('--case',choices=['pass','partial','publish-refusal','source','startup'],default='pass');parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before-binary',type=Path);parser.add_argument('--recover-from',type=Path)
+ parser.add_argument('--case',choices=['pass','partial','publish-refusal','source','startup','protocol'],default='pass');parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before-binary',type=Path);parser.add_argument('--recover-from',type=Path)
  a=parser.parse_args();out=a.output.resolve();fixture=inspection.native.fixture
  inputs=dict(binary=str(a.binary.resolve()),binary_sha256=fixture.digest(a.binary.read_bytes()),profile_sha256=fixture.digest(a.profile.read_bytes()),helpers=inspection.native.helper_inputs(Path(__file__)),global_watchdog=None)
  try:

@@ -327,7 +327,7 @@ fn dependencies(
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let prepared =
-        root.prepare_review_snapshot_using(tx, settings, &job.work_id, &request, Some(review),source)?;
+        root.prepare_review_snapshot_using(tx, settings, &job.work_id, &request, Some(review),source,false)?;
     let inputs=root.assemble_review_inputs_using(tx,prepared,source,true)?;
     Ok((work, inputs))
 }

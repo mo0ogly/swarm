@@ -1056,6 +1056,25 @@ sequenceDiagram
 ```
 
 
+## Ajouter des observations opérateur à la revue gérée
+
+L’opérateur du projet peut déposer un JSON UTF-8 dans
+`docs/swarm-review-evidence/{work_id}/{task_id}.json` sous la racine du projet,
+hors de la copie du candidat. La version 1 porte `schema_version`, `work_id`,
+`task_id`, `attempt_id`, `candidate_commit`, `report_sha256` et `observations`.
+Chaque observation donne un `criterion` unique compté à partir de 1, une `source`
+et un `detail`. La pièce est attribuée à l’opérateur. Le vérificateur décide
+si elle démontre le critère. Un fichier absent préserve le comportement existant.
+Une liaison invalide, un type de fichier dangereux, un indice répété ou une limite
+dépassée refuse. Les octets d’origine entrent dans le catalogue et le contrôle
+de fraîcheur des artefacts. `review-inputs` les restitue même lorsque le quota
+est exactement consommé. L’exécution reste soumise à son admission et à son quota.
+
+Après un échec de protocole géré attesté à exit zéro, `review-archive-failure`
+peut conserver la réponse en historique sans la transformer en avis. Un avis
+enregistré ou une réponse que le décodeur courant reconnaît comme favorable
+reste exclu de cet archivage.
+
 ## Vérifier une sortie de cohorte fournie
 
 `task review-check ID --root ROOT --input FILE --json` reprend les quatre champs
