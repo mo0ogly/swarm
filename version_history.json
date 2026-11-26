@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La console des logs sépare le journal et la rotation en onglets. Les termes recherchés sont surlignés dans le tableau.",
+        "en": "The log console has separate Log and Rotation tabs and highlights search terms in the table."
+      },
+      {
         "fr": "Le prévol reviewer réserve au processus enfant la vérification du dossier avant exécution. Les dossiers volumineux ciblent les preuves pertinentes et les échecs avant autorisation sont clôturés.",
         "en": "Reviewer preflight leaves the dossier check before execution to the helper. Large dossiers focus on relevant evidence and failures before authorization are closed."
       },

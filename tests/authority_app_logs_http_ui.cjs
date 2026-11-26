@@ -110,9 +110,15 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.waitForSelector('[data-authority-log-jump]',{visible:true});
  await page.click('[data-authority-log-jump]');
  const query='[data-authority-log-search]';
+ const journalTab='[data-authority-log-journal-tab]', rotationTab='[data-authority-log-rotation-tab]';
  await page.waitForSelector(query,{visible:true});
+ check('Journal opens by default with rotation in a separate tab',
+  await page.$eval(journalTab,tab=>tab.getAttribute('aria-selected')==='true')&&
+  !await page.$eval('[data-authority-log-rotation]',metrics=>metrics.checkVisibility()));
+ await page.click(rotationTab);
  await page.waitForSelector('[data-authority-log-rotation] progress',{visible:true});
  check('rotation metrics appear in the authenticated console',await page.$eval('[data-authority-log-rotation] progress',bar=>bar.value>0&&bar.max>=bar.value));
+ await page.click(journalTab);
  const logged = await page.evaluate(async () => {
   const response=await fetch('/api/v1/authority/log?level=warn&q=identity');
   return {status:response.status, rows:(await response.json()).lines.map(raw=>JSON.parse(raw))};
@@ -123,6 +129,8 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.focus(query);await page.keyboard.press('Enter');
  await page.waitForFunction(()=>[...document.querySelectorAll('[data-authority-log-results] tbody tr')].some(row=>row.cells[1].textContent==='warn'&&row.cells[3].textContent==='identity'&&row.cells[5].textContent==='401'));
  check('refusal visible through real authenticated UI',true);
+ check('search terms are highlighted in rendered Rust rows',await page.$eval('[data-authority-log-results] tbody tr',row=>
+  [...row.querySelectorAll('mark')].map(mark=>mark.textContent).join(',')==='identity,identity'));
  await page.$eval('[data-authority-log-options]',options=>{options.open=true});
  await page.select('[data-authority-log-position]','all');
  await page.$eval('[data-authority-log-rows]',field=>{field.value='1';field.form.requestSubmit()});
@@ -145,9 +153,10 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.waitForFunction(()=>document.querySelector('[data-authority-log-results] tbody tr'));
  check('active log origin is visible',await page.$eval('[data-authority-log-results] tbody tr',row=>row.cells[7].textContent==='Journal actif'));
  const threshold='[data-authority-log-setting="max_bytes"]';
- await page.$eval(threshold,control=>{control.closest('details').open=true;control.value='256'});
+ await page.click(rotationTab);
+ await page.$eval(threshold,control=>{control.value='256'});
  await page.$eval('[data-authority-log-save]',button=>button.click());
- await page.waitForFunction(()=>document.querySelector('[data-authority-log-dialog] details [role="status"]').textContent.includes('enregistrés'));
+ await page.waitForFunction(()=>document.querySelector('[data-authority-log-save]').parentElement.nextElementSibling.textContent.includes('enregistrés'));
  const saved=await page.evaluate(async()=>(await fetch('/api/v1/authority/config')).json());
  check('rotation policy saved through the UI',saved.config.diagnostics.max_bytes===256);
  // Six synthetic, fixed-size relay events cross the fixture's 256-byte trigger.
@@ -158,6 +167,7 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  const archive=await getLog('?position=all&source=archives&limit=1&minimum_level=warn');
  check('rotation retains archived bytes',archive.status===200&&archive.body.archives>0&&
   archive.body.rotation.archived_bytes>0&&archive.body.rotation.last_rotation_at>0);
+ await page.click(journalTab);
  await page.select('[data-authority-log-source]','archives');
  await page.$eval(query,field=>field.form.requestSubmit());
  await page.waitForFunction(()=>document.querySelector('[data-authority-log-results] tbody tr')?.cells[7].textContent.startsWith('Archive du'));
