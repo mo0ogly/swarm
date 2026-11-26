@@ -1068,7 +1068,9 @@ si elle démontre le critère. Un fichier absent préserve le comportement exist
 Une liaison invalide, un type de fichier dangereux, un indice répété ou une limite
 dépassée refuse. Les octets d’origine entrent dans le catalogue et le contrôle
 de fraîcheur des artefacts. Le prompt ciblé donne l’index des pièces et réutilise
-le texte porté par le protocole. `review-inputs` les restitue même lorsque le quota
+le texte porté par le protocole. Les observations opérateur se lisent dans les
+segments du catalogue du prompt. Le protocole conservé et les entrées publiques
+gardent les originaux exacts. `review-inputs` les restitue même lorsque le quota
 est exactement consommé. L’exécution reste soumise à son admission et à son quota.
 
 Après un échec de protocole géré attesté à exit zéro, `review-archive-failure`
