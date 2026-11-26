@@ -592,8 +592,10 @@
    });
    modal.showModal();title.tabIndex=-1;title.focus();
    const active=()=>modal.open&&modal.isConnected;
+   let journalVisible=true;
    const report=(text,error=false)=>{
     state.className='authority-log-meta'+(error?' notice alert':'');
+    state.hidden=!journalVisible&&!error;
     state.textContent=text
    };
    try{
@@ -928,7 +930,7 @@
     const journal=node('section',undefined,'authority-log-panel');
     if(policy)journal.append(filters);
     else journal.append(node('p','La recherche dans les archives exige une mise à jour du démon.','notice info'),toolbar(refresh));
-    journal.append(state,reading,activeFilters,matches,retry,display);
+    journal.append(reading,activeFilters,matches,retry,display);
     if(history)journal.append(pages);
     journal.append(exports);
     settings.prepend(rotation);
@@ -941,6 +943,8 @@
     /** Switch panels in place to preserve the search, read position and
      * unsaved settings. Only the selected tab is in the tab order. */
     const selectTab=selected=>{
+     journalVisible=selected===journalTab;
+     state.hidden=!journalVisible&&!state.classList.contains('alert');
      for(const [tab,panel] of panels){
       const current=tab===selected;
       tab.setAttribute('aria-selected',String(current));tab.tabIndex=current?0:-1;
@@ -961,7 +965,7 @@
      tabs.append(tab)
     }
     selectTab(journalTab);
-    view.append(tabs,journal,settings);
+    view.append(tabs,state,journal,settings);
     if(history)await read();else render(first)
    }catch(error){
     if(!active())return;

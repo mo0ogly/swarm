@@ -227,7 +227,11 @@ if (requestedOutput) fs.mkdirSync(output, {mode: 0o700});
     assert.deepEqual(await values(), ['archived']);
 
     await page.click(rotationTab);
+    await page.evaluate(() => { window.refuseLog = true; });
     await page.click(control('save'));
+    assert.equal(await page.$eval(control('status'), e => e.checkVisibility()), true);
+    assert.match(await page.$eval(control('status'), e => e.textContent), /authority-diag-io/);
+    await page.evaluate(() => { window.refuseLog = false; });
     assert.deepEqual(await criteria(), {q: 'archived', level: 'warn'});
     await page.click(control('save'));
     assert.equal(await page.evaluate(() => window.configRequest.revision), 'fixture-revision-saved');
