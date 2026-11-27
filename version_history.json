@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Les journaux de mission corrèlent les phases des tentatives de revue Rust et indiquent les refus de taille et les pannes de journalisation.",
+        "en": "Mission logs correlate the phases of Rust review attempts and show size refusals and logging failures."
+      },
+      {
         "fr": "La revue ciblée porte le texte complet des preuves opérateur dans le catalogue de citations, sans le répéter dans son contexte de prompt.",
         "en": "Focused review carries complete operator evidence in the citation catalogue without repeating it inside the prompt context."
       },
