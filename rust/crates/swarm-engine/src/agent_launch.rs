@@ -1488,7 +1488,7 @@ pub(crate) fn prepare<E: WorkEnvironment>(
             let checked = check_fence(fence,&tx,work,settings,environment);
             finish(checked,tx.rollback().map_err(|e| AgentLaunchError::caused("managed-worker-fence-rollback",e)))?;
         }
-        r.workspace=crate::managed_repository::prepare_worker(root,&chosen_work,&r,&raw,settings,fence.and_then(|f|f.mission_conductor()))?;
+        r.workspace=crate::managed_repository::prepare_worker(root,&chosen_work,&r,&raw,settings,db,fence.and_then(|f|f.mission_conductor()))?;
     }
     let host = agent_launch_preflight::observe(root, &r.provider, &model, &r, &policy)?;
     let workflow = crate::read_agent_workflow(

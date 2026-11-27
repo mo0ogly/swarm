@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "managed-worker-retry",
+  "inputs": [
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
+    "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/root_store/native_worker_retry.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_fixture_ownership.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_managed_worker_retry.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_planning_bootstrap.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "failed-managed-worker-retry-public-cli",
+      "command": [
+        "python3",
+        "-c",
+        "import hashlib,json,os,subprocess,sys,tempfile\nfrom pathlib import Path\nprofile=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_bytes())\nbinary=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']).resolve()\nwith binary.open('rb') as artifact:\n assert hashlib.file_digest(artifact,'sha256').hexdigest()==profile['sha256']\nassert profile['no_fixture_feature'] and profile['all_core_test_false']\nout=Path(tempfile.mkdtemp(prefix='managed-worker-retry-',dir='.cache')).resolve()\nsubprocess.run([sys.executable,'tests/rust_managed_worker_retry.py','--binary',str(binary),'--output',str(out/'journey')],check=True)\nprint('REPLAY_EVIDENCE '+str(out))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS managed retry from original native failure through a distinct copy",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -231,6 +231,22 @@ pub(crate) fn managed_submission_controls_only(r: &Request) -> bool {
         ..Request::default()
     }
 }
+/// Identify the operator's explicit, cap-only initialization for a managed retry.
+/// The Work writer checks the failed native original, idle task, and exact
+/// remaining attempt count before updating the task. A reason is retained in the
+/// event. Mixed contract, status or validation edits follow the ordinary guards.
+pub(crate) fn managed_retry_capacity_only(r: &Request) -> bool {
+    r.confirm_contract_revision && r.max_attempts > 0 && *r == Request {
+        schema_version: r.schema_version,
+        event_id: r.event_id.clone(),
+        expected_revision: r.expected_revision,
+        id: r.id.clone(),
+        max_attempts: r.max_attempts,
+        confirm_contract_revision: true,
+        contract_revision_reason: r.contract_revision_reason.clone(),
+        ..Request::default()
+    }
+}
 fn paused(db: &Connection, work: &str) -> Result<bool, MutationGuardError> {
     statement(
         db,
@@ -356,7 +372,7 @@ pub fn inspect_recorded_mutation(
         let definition = edits_definition(&r);
         let managed_controls = kind == "task.update"
             && w.planning.as_ref().is_some_and(|p| p.repository.is_some())
-            && managed_submission_controls_only(&r);
+            && (managed_submission_controls_only(&r) || managed_retry_capacity_only(&r));
         if w.planning.is_some() && definition && !managed_controls {
             if kind != "task.update" {
                 return Err(MutationGuardError::ContractRevision(

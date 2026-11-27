@@ -145,6 +145,8 @@ jobs:
       - run: TMPDIR="$SWARM_RUNNER_TMPDIR" cargo test --manifest-path rust/Cargo.toml --locked -p swarm-cli --test version_no_repository
       - run: npm test
       - run: make smoke
+      - name: Check manual retry of a failed managed worker
+        run: TMPDIR="$SWARM_RUNNER_TMPDIR" python3 tests/rust_managed_worker_retry.py --binary "$PWD/bin/swarm" --output .cache/ci-managed-worker-retry
       - run: SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/existing-cockpit-rust.json --output .cache/ci-cockpit
         env:
           CHROME_BIN: /usr/bin/google-chrome

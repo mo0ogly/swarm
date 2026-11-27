@@ -1233,6 +1233,29 @@ fn apply<E: WorkEnvironment>(
         }
         "task.update" => {
             if candidate.planning.as_ref().is_some_and(|p| p.repository.is_some())
+                && crate::mutation_guard::managed_retry_capacity_only(r)
+            {
+                #[cfg(target_os = "linux")]
+                {
+                    require_native_task_idle(tx, &candidate.id, &r.id, "managed-worker-retry-active")?;
+                    let settings = planning_settings.ok_or(WorkEngineError::UnportedStatus)?;
+                    let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
+                    let refused = |code| WorkEngineError::PlanningActivation(Box::new(crate::AgentLaunchError::Refused(code)));
+                    if actor.trim().is_empty() || r.contract_revision_reason.trim().len() < 16
+                        || r.contract_revision_reason.len() > 2000
+                    {
+                        return Err(refused("managed-worker-retry-capacity-authorization-required"));
+                    }
+                    crate::root_store::require_planning_mission_active(tx, &candidate.id)
+                        .map_err(|e| WorkEngineError::Mission(Box::new(e)))?;
+                    crate::RootStore::initialize_managed_worker_retry_capacity(
+                        root, &mut candidate, r, settings, limits.task.max_attempts,
+                    ).map_err(|e| WorkEngineError::PlanningActivation(Box::new(
+                        crate::AgentLaunchError::caused("managed-worker-retry-capacity", e))))?;
+                }
+                #[cfg(not(target_os = "linux"))]
+                return Err(WorkEngineError::UnportedStatus);
+            } else if candidate.planning.as_ref().is_some_and(|p| p.repository.is_some())
                 && crate::mutation_guard::managed_submission_controls_only(r)
             {
                 #[cfg(target_os = "linux")]
