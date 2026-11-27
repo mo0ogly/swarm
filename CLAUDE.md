@@ -3,6 +3,8 @@
 Read `AGENTS.md` and `tools/agent-workflows/CONTRACT.md` at the repository root.
 They are the common project rules for Claude, Codex and Swarm preparation.
 
+For cockpit access and browser checks, follow the [Swarm sign-in rule](.claude/rules/browser-sign-in.md).
+
 ## Same quality requirements as Codex
 
 Apply the complete **Common quality standard — Codex and Claude** in `AGENTS.md`.
