@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "La planification remet les annulations avant démarrage dont le moteur a conservé la preuve. Le reçu natif reste requis pour les workers démarrés.",
+        "en": "Planning can deliver recorded pre-start cancellations. Started workers still require their native completion receipts."
+      },
+      {
         "fr": "Une tentative native en échec peut reprendre dans une mission gérée avec un plafond explicite, une décision sous bail et une nouvelle copie de travail attribuée.",
         "en": "A failed native attempt can be retried in a managed mission with an explicit attempt ceiling, a leased decision and a new attributed working copy."
       },

@@ -3,8 +3,9 @@ use super::{finished, RootStore, RootStoreError as E};
 use crate::{PlanningEvent, Work};
 use sha2::{Digest, Sha256};
 
-/// Safe owned-scope input built from original controller evidence, not a DTO
-/// assertion or permission. No raw capture/prompt, host or process stamp leaks.
+/// Safe owned-scope input built from original controller evidence. A recorded
+/// cancellation before start has no native receipt and is context-only.
+/// No raw capture, prompt, host or process stamp leaks.
 #[derive(serde::Serialize)]
 pub(crate) struct WorkerCompletionInput {
     pub event: String,
@@ -12,7 +13,10 @@ pub(crate) struct WorkerCompletionInput {
     pub attempt: String,
     pub agent: String,
     pub outcome: String,
-    pub receipt_sha256: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receipt_sha256: Option<String>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub cancelled_before_start: bool,
     pub output_complete: bool,
     pub provider_may_have_started: bool,
 }
@@ -21,8 +25,9 @@ pub(crate) struct WorkerCompletionInput {
 enum Purpose { Context, Retry, Execution }
 
 /// Verify one actual current/prior native terminal attempt and its exact logical
-/// end signal in a readonly Root/SQL snapshot. Kernel original, full terminal
-/// Agent and reservation must agree. Failed/interrupted retry requires a new
+/// end signal in a readonly Root/SQL snapshot. Running workers require the
+/// original kernel receipt. Context alone can show a proven pre-start cancellation
+/// without a journal. A failed or interrupted retry requires a new
 /// canonical decision at admission/execution; no PID/lease/message grants it.
 /// All IO/codec/rollback/close causes survive; reads create no new call or state.
 fn observe(root: &std::path::Path, supplied: &Work, task_id: &str, purpose: Purpose) -> Result<WorkerCompletionInput, E> {
@@ -53,8 +58,7 @@ fn observe(root: &std::path::Path, supplied: &Work, task_id: &str, purpose: Purp
             let mut matched = agents.iter().filter(|a| a.task_id == task.id && a.attempt_id == attempt.id);
             let agent = matched.next().ok_or(E::Refused("native-worker-agent-required"))?;
             if matched.next().is_some() { return Err(E::Refused("native-worker-agent-ambiguous")); }
-            let original = crate::agent_completion_journal::observe_terminal(&tx, &store.directory, &agent.id)?;
-            if original.agent != *agent || agent.work_id != current.id || agent.role != "worker" || agent.status != attempt.status {
+            if agent.work_id != current.id || agent.role != "worker" || agent.status != attempt.status {
                 return Err(E::Refused("native-worker-completion-changed"));
             }
             let bytes = crate::encode_model(&["attempt-ended", attempt.id.as_str()]).map_err(E::Encode)?;
@@ -65,11 +69,30 @@ fn observe(root: &std::path::Path, supplied: &Work, task_id: &str, purpose: Purp
             let expected = PlanningEvent { id: event_id.clone(), task: task.id.clone(), scope: task.scope_id.clone(), attempt: attempt.id.clone(),
                 kind: "attempt_ended".into(), message: format!("{} : processus récolté ; validation requise", agent.status), at: agent.ended.clone(), decision: event.decision.clone(), ..Default::default() };
             if event != &expected { return Err(E::Refused("native-worker-end-event-changed")); }
+            let original = match crate::agent_completion_journal::observe_terminal(&tx, &store.directory, &agent.id) {
+                Ok(original) => original,
+                Err(error) if purpose == Purpose::Context && crate::agent_completion_journal::missing_original(&error) => {
+                    match crate::agent_store::observed_manual_prestart_cancellation(&tx, agent) {
+                        Ok(true) => return Ok(WorkerCompletionInput {
+                            event: event_id, task: task.id.clone(), attempt: attempt.id.clone(),
+                            agent: agent.id.clone(), outcome: agent.status.clone(),
+                            receipt_sha256: None, cancelled_before_start: true,
+                            output_complete: false, provider_may_have_started: false,
+                        }),
+                        Ok(false) => return Err(error),
+                        Err(cause) => return finished(Err(error), Err(E::Agent(cause))),
+                    }
+                }
+                Err(error) => return Err(error),
+            };
+            if original.agent != *agent {
+                return Err(E::Refused("native-worker-completion-changed"));
+            }
             if purpose == Purpose::Execution || purpose == Purpose::Retry && task.planning_retry {
                 super::native_review_context::verify_production_retry_decision_for_input(&tx, &current, task, &event_id)?;
             }
             Ok(WorkerCompletionInput { event: event_id, task: task.id.clone(), attempt: attempt.id.clone(), agent: agent.id.clone(), outcome: agent.status.clone(),
-                receipt_sha256: original.receipt_sha256, output_complete: original.output_complete, provider_may_have_started: original.provider_may_have_started })
+                receipt_sha256: Some(original.receipt_sha256), cancelled_before_start: false, output_complete: original.output_complete, provider_may_have_started: original.provider_may_have_started })
         })();
         tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
         finished(read, tx.rollback().map_err(E::Sql))
@@ -120,9 +143,9 @@ impl RootStore {
         finished(result, directory.close().map_err(E::Storage))
     }
 
-    /// Verify a selected current end event before model input; historical events
-    /// are handled by their existing acknowledgement-only contract. Returns safe
-    /// metadata and exact original hash, with no process/source/permission change.
+    /// Verify a selected current end event before model input. Historical events
+    /// keep their acknowledgement-only contract. Return safe native receipt metadata
+    /// or a verified manual cancellation, with no process or permission change.
     pub(crate) fn worker_completion_for_context(root: &std::path::Path, work: &Work, event: &PlanningEvent) -> Result<WorkerCompletionInput, E> {
         let observed = observe(root, work, &event.task, Purpose::Context)?;
         if observed.event != event.id || observed.attempt != event.attempt || !work.planning.iter().flat_map(|p| p.inbox.iter().flatten()).any(|e| e == event) {
