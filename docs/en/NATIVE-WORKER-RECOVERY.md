@@ -79,7 +79,7 @@ Linux implementation verified on isolated native fixtures in migration lot169. T
 
 The readonly observer shares the existing recovery terminal Agent/reservation projection; it does not call recovery, write state or refund an attempt. It checks the original Root identity, full terminal row, normalized ownership, native snapshot/context, recorded kernel reap, workspace release and explicit gate/output disposition. Unknown wait/release or unresolved/draining execution refuses. Known logical output failure can be described for correction, never quality acceptance. A known helper refusal is distinguished from possible provider start; no provider execution is guessed.
 
-`attempt_ended` is matched exactly to the current/prior original attempt, agent outcome and owning scope. Safe `worker_completions` in the selected model context contain event/task/attempt/agent IDs, outcome, original SHA and observed output/start flags; they contain no raw prompt, capture or host/PID stamps. Their bytes participate in the existing context hash and result freshness fence. Older events retain the existing historical acknowledgement-only contract.
+`attempt_ended` is matched exactly to the current/prior original attempt, agent outcome and owning scope. Safe `worker_completions` in the selected model context contain event/task/attempt/agent IDs, outcome and observed output/start flags. Native completion includes the original SHA. A proven manual pre-start cancellation carries `cancelled_before_start: true`. The context contains no raw prompt, capture or host/PID stamps. Their bytes participate in the existing context hash and result freshness fence. Older events retain the existing historical acknowledgement-only contract.
 
 Only explicit supervisor retry with a new correction and saved task attempt capacity can set the persisted signal. Original completion and canonical decision/input acknowledgement are rechecked before admission and before native execution after the new attempt is recorded. Previous review recovery remains distinct; an unrelated older review cannot authorize retry after a later failed worker. No new task or counter reset bypass is permitted. Lot169 evidence separates the exit0 control, actual exit17, native supervisor decision, second exit0 worker and submitted report. Five pre-model faults (wait, gate, terminal projection, invalid JSON and missing original), then unknown wait at preflight refuse without mutation/call/reservation/execution; exact restoration runs the same queued agent. History and originals are preserved, and the new report stays submitted and unaccepted. Interruption, known pre-exec refusal and known logical output failure are represented by the contract, without claiming a positive native scenario for those variants here. No installed delivery or autonomous scheduling is claimed.
 
@@ -487,6 +487,13 @@ revision, `id`, `max_attempts`, `confirm_contract_revision: true`, and
 consumed plus one, within the engine policy. The engine requires the original
 native receipt, a pending end event, and an open scope with no lease. The update
 preserves the attempts, budgets, and any previously configured positive ceiling.
+
+When `planning claim` delivers an end event for a manual pre-start cancellation,
+the agent, attempt, lifecycle log and reservation state must agree. The claim
+records `cancelled_before_start: true` without a native receipt hash or a
+completed result. It preserves the event and attempt. A started worker still
+requires its original native receipt, including for retry and execution. An
+unreadable or invalid receipt blocks delivery.
 
 The current lease holder binds the `retry` operation in `planning decide` to
 the end event. `agent prepare` rechecks that decision and prepares a separate

@@ -83,7 +83,7 @@ Implémentation Linux vérifiée sur fixtures natives isolées dans le lot169. L
 
 L’observateur en lecture seule partage la projection terminale Agent/réservation de recovery ; il n’appelle aucune récupération, n’écrit aucun état et ne rembourse aucune tentative. Il vérifie identité du Root original, ligne terminale complète, ownership normalisé, snapshot/contexte natifs, collecte kernel enregistrée, libération de workspace et disposition gate/sortie explicite. Attente/libération inconnue ou exécution en quarantaine/drainage refuse. Une sortie logique invalide connue peut être décrite pour correction, jamais comme acceptation de qualité. Un refus connu du helper est distingué d’un possible démarrage provider ; aucune exécution n’est devinée.
 
-`attempt_ended` est relié exactement à l’originale courante/antérieure, au résultat de l’agent et à son périmètre. Le contexte sélectionné `worker_completions` contient IDs événement/tâche/tentative/agent, résultat, SHA original et observations sortie/démarrage ; aucun prompt/capture brut ou host/stamp PID. Ces octets entrent dans le hash de contexte et le fence de fraîcheur de remise existants. Les anciens événements gardent leur contrat d’acquittement historique seul.
+`attempt_ended` est relié exactement à l’originale courante/antérieure, au résultat de l’agent et à son périmètre. Le contexte sélectionné `worker_completions` contient IDs événement/tâche/tentative/agent, résultat et observations sortie/démarrage. Une fin native inclut le SHA original. Une annulation manuelle avant démarrage prouvée porte `cancelled_before_start: true`. Aucun prompt/capture brut ou host/stamp PID. Ces octets entrent dans le hash de contexte et le fence de fraîcheur de remise existants. Les anciens événements gardent leur contrat d’acquittement historique seul.
 
 Seule une décision explicite de reprise avec correction nouvelle et capacité sauvegardée d’essais peut poser le signal persistant. Originale et décision/input/acquittement canoniques sont relus avant admission et avant exécution native après création de la nouvelle tentative. La reprise de revue reste distincte ; une ancienne revue non liée n’autorise jamais la reprise après un worker plus récent en échec. Pas de nouvelle tâche ou reset des compteurs pour contourner les limites. Les preuves du lot169 distinguent fin0 témoin, fin17 réelle, décision native, deuxième worker0 et rapport soumis. Cinq altérations avant modèle (attente, gate, projection, JSON invalide et originale absente), puis attente inconnue au préflight refusent sans mutation/appel/réserve/exécution ; restauration exacte et même agent queued exécuté. Les historiques et originaux restent conservés, le rapport nouveau est soumis et non accepté. Une interruption, un refus pré-exec ou une sortie logique invalide sont reconnus par le contrat, sans parcours natif positif revendiqué ici. Aucun conducteur autonome ni installation annoncé.
 
@@ -516,6 +516,15 @@ nombre consommé, dans la limite de la politique moteur. Le moteur exige le reç
 natif original, un signal de fin en attente et un périmètre ouvert sans bail.
 Cette opération conserve les tentatives, les budgets et une éventuelle borne
 positive déjà enregistrée.
+
+Lors de `planning claim`, le moteur peut remettre l’événement de fin d’une
+annulation manuelle avant démarrage lorsque l’agent, la tentative, le journal
+de cycle de vie et l’état de la réservation concordent. La remise porte
+`cancelled_before_start: true` sans empreinte de reçu natif ni résultat complet.
+Elle conserve l’événement et la tentative. Une absence de reçu natif reste
+bloquante pour un worker démarré et les opérations de reprise et d’exécution
+continuent d’exiger le reçu natif original. Un reçu illisible ou invalide fait
+échouer la remise.
 
 Le détenteur du bail courant lie ensuite `planning decide` et son opération
 `retry` au signal de fin. `agent prepare` revalide cette décision et prépare

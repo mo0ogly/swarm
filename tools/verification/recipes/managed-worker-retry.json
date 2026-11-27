@@ -2,6 +2,8 @@
   "schema_version": 1,
   "id": "managed-worker-retry",
   "inputs": [
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "rust/crates/swarm-engine/src/agent_store.rs",
     "rust/crates/swarm-engine/src/agent_launch.rs",
     "rust/crates/swarm-engine/src/agent_execution_preflight.rs",
     "rust/crates/swarm-engine/src/managed_repository_worker.rs",
@@ -23,10 +25,12 @@
       "command": [
         "python3",
         "-c",
-        "import hashlib,json,os,subprocess,sys,tempfile\nfrom pathlib import Path\nprofile=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_bytes())\nbinary=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']).resolve()\nwith binary.open('rb') as artifact:\n assert hashlib.file_digest(artifact,'sha256').hexdigest()==profile['sha256']\nassert profile['no_fixture_feature'] and profile['all_core_test_false']\nout=Path(tempfile.mkdtemp(prefix='managed-worker-retry-',dir='.cache')).resolve()\nsubprocess.run([sys.executable,'tests/rust_managed_worker_retry.py','--binary',str(binary),'--output',str(out/'journey')],check=True)\nprint('REPLAY_EVIDENCE '+str(out))\n"
+        "import hashlib,json,os,subprocess,sys,tempfile\nfrom pathlib import Path\nprofile=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_bytes())\nbinary=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']).resolve()\nwith binary.open('rb') as artifact:\n assert hashlib.file_digest(artifact,'sha256').hexdigest()==profile['sha256']\nassert profile['no_fixture_feature'] and profile['all_core_test_false']\nout=Path(tempfile.mkdtemp(prefix='managed-worker-retry-',dir='.cache')).resolve()\nsubprocess.run([sys.executable,'tests/rust_managed_worker_retry.py','--binary',str(binary),'--output',str(out/'journey'),'--prestart-cancellation'],check=True)\nprint('REPLAY_EVIDENCE '+str(out))\n"
       ],
       "expected_exit": 0,
       "required_stdout": [
+        "PASS lease distinguishes pre-start cancellation from native completion",
+        "PASS missing native receipt refuses retry without mutation",
         "PASS managed retry from original native failure through a distinct copy",
         "REPLAY_EVIDENCE"
       ],

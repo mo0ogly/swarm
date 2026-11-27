@@ -3,6 +3,8 @@
 
 import argparse
 import json
+import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import rust_agent_model_route as fixture
@@ -11,7 +13,7 @@ from rust_planning_bootstrap import request
 from rust_mission_report_relay import rows
 
 
-def run(binary, output):
+def run(binary, output, *, prestart_cancellation=False):
     """Retain original processes, copies and public refusals on one owned Root."""
     assert not output.exists()
     f = fixture.Fixture(binary, output, 'managed-retry')
@@ -46,13 +48,55 @@ def run(binary, output):
                      expected_revision=show()['revision'], id='task',
                      validation_policy=dict(mode='human'))
     authorized = f.ok(['task', 'update', work], authorize)['work']
+    scopes = {'task': 'envelopes'}
+    if prestart_cancellation:
+        added = dict(schema_version=1, event_id='add-cancelled-worker',
+                     expected_revision=authorized['revision'], id='cancelled',
+                     title='Queued cancellation', deliverable='Evidence',
+                     criteria=['Preserve evidence'])
+        existing = f.ok(['task', 'add', work], added)['work']
+        authorized = f.ok(['task', 'update', work], {
+            **authorize, 'id': 'cancelled', 'event_id': 'authorize-cancelled-worker',
+            'expected_revision': existing['revision'],
+        })['work']
+        scopes['cancelled'] = 'envelopes'
     attach = request(event='retry-attach', expected_revision=authorized['revision'],
-                     task_scopes={'task': 'envelopes'}, repository=dict(
+                     task_scopes=scopes, repository=dict(
                          path='repository', committed_only=True),
                      checks={'req-1': [dict(
                          id='owned-input', command=['git', 'diff', '--check'],
                          criteria=[1], justification='Keep fixture repository input stable')]})
     attached = f.ok(['planning', 'attach', work], attach)
+    if prestart_cancellation:
+        pending = dict(schema_version=1, event_id='cancelled-before-start',
+                       expected_revision=attached['revision'], task_id='cancelled',
+                       provider='fixture', capture_output=True)
+        queued = f.ok(['agent', 'prepare', work], pending)['agent']
+        f.ok(['agent', 'stop', queued['id']])
+        cancelled = f.ok(['agent', 'reconcile', queued['id']])['agent']
+        attached = show()
+        assert cancelled['status'] == 'interrupted' and not cancelled.get('child_pid')
+        assert not (Path(queued['workspace']) / 'model-received.json').exists()
+        cancel_journal = f.root / '.swarm' / (
+            'native-completion-' + fixture.digest(queued['id'].encode()) + '.json')
+        assert not cancel_journal.exists()
+
+        # Remove only the retained lifecycle entry in the isolated fixture.
+        # The normal reconcile command must restore it without changing the end event.
+        cancellation_log = (cancelled['id'], cancelled['activity'])
+        read_log = ("SELECT at FROM agent_logs WHERE agent_id=? AND kind='lifecycle' "
+                    "AND message=?")
+        assert rows(f, read_log, cancellation_log) == [(cancelled['ended'],)]
+        with closing(sqlite3.connect(f.root / '.swarm/state.db', timeout=0)) as db, db:
+            change = db.execute("DELETE FROM agent_logs WHERE agent_id=? AND kind='lifecycle' "
+                                "AND message=?", cancellation_log)
+            assert change.rowcount == 1
+        assert rows(f, read_log, cancellation_log) == []
+        assert f.ok(['agent', 'reconcile', queued['id']])['agent'] == cancelled
+        repaired_log, = rows(f, read_log, cancellation_log)
+        assert repaired_log[0] != cancelled['ended']
+        assert show() == attached
+
     program = f.root / 'codex'
     fixture.publish(program, (fixture.PROGRAM + '\nsys.exit(17)\n').encode())
     program.chmod(0o700)
@@ -97,6 +141,19 @@ def run(binary, output):
                  scope=scope['id'], scope_revision=scope['revision'], holder='retry-fixture',
                  lease_seconds=int(settings['planning_default_lease_seconds']))
     claimed = f.ok(['planning', 'claim', work], claim)
+    if prestart_cancellation:
+        context, = rows(f, 'SELECT context_json FROM native_planning_claims WHERE claim_id=?',
+                        (claim['event_id'],))
+        inputs = json.loads(context[0])['worker_completions']
+        recorded = next(item for item in inputs if item['agent'] == cancelled['id'])
+        assert recorded['attempt'] == cancelled['attempt_id']
+        assert recorded['cancelled_before_start'] and not recorded.get('receipt_sha256')
+        assert not recorded['output_complete'] and not recorded['provider_may_have_started']
+        failed_input = next(item for item in inputs if item['agent'] == first_agent['id'])
+        assert failed_input['receipt_sha256'] == fixture.digest(original)
+        assert not failed_input.get('cancelled_before_start')
+        assert not cancel_journal.exists()
+        print('PASS lease distinguishes pre-start cancellation from native completion', flush=True)
     leased = next(s for s in claimed['planning']['scopes'] if s['id'] == claim['scope'])
     decision = dict(schema_version=1, event_id='retry-decision',
                     expected_revision=claimed['revision'], scope=leased['id'],
@@ -107,6 +164,18 @@ def run(binary, output):
                     reason='Bind the retry to the original failed worker event')
     refuse(['planning', 'decide'], {**decision, 'generation': leased['generation'] - 1},
            'stale_lease')
+    if prestart_cancellation:
+        # The successful claim above verified the native original. Keep owned
+        # bytes and restore after refusing a decision with that proof absent.
+        parked = receipt.with_suffix('.retained')
+        assert not parked.exists()
+        receipt.rename(parked)
+        try:
+            refuse(['planning', 'decide'], decision, 'agent-completion-journal-missing')
+        finally:
+            assert not receipt.exists() and parked.read_bytes() == original
+            parked.rename(receipt)
+        print('PASS missing native receipt refuses retry without mutation', flush=True)
     decided = f.ok(['planning', 'decide', work], decision)
     assert f.ok(['planning', 'decide', work], decision) == decided
     assert decided['tasks'][0]['planning_retry']
@@ -157,5 +226,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--prestart-cancellation', action='store_true')
     args = parser.parse_args()
-    run(args.binary.resolve(), args.output.resolve())
+    run(args.binary.resolve(), args.output.resolve(), prestart_cancellation=args.prestart_cancellation)

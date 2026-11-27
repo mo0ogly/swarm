@@ -367,6 +367,13 @@ pub(crate) fn recover(
     recover_original(db, root, directory, id, journal, None)
 }
 
+/// Recognize only the structured absence reported by the native journal
+/// reader. Invalid records, permissions and compound errors stay failures.
+pub(crate) fn missing_original(error: &RootStoreError) -> bool {
+    matches!(error, RootStoreError::Launch(cause)
+        if matches!(cause.as_ref(), AgentLaunchError::Cause { code: "agent-completion-journal-missing", .. }))
+}
+
 /// Observe an original completion for a registered automatic worker, then recover
 /// only after actual owner departure and a current transaction-local mission fence.
 /// Missing original or a still-live owner is explicit waiting with its typed cause,
@@ -378,8 +385,7 @@ pub(crate) fn recover_under_mission(
 ) -> Result<crate::MissionWorkerRecovery, RootStoreError> {
     let journal=match read_journal(directory,id) {
         Ok((journal,_))=>journal,
-        Err(error) if matches!(&error,RootStoreError::Launch(cause)
-            if matches!(cause.as_ref(),AgentLaunchError::Cause{code:"agent-completion-journal-missing",..})) => {
+        Err(error) if missing_original(&error) => {
                 return Ok(crate::MissionWorkerRecovery::Waiting { reason:"completion-original-pending",cause:error });
             }
         Err(error)=>return Err(error),

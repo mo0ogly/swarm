@@ -613,6 +613,46 @@ fn reservation_snapshot(
     )
 }
 
+// Persisted lifecycle value used by both the cancellation writer and its reader.
+const PRESTART_CANCELLATION_ACTIVITY: &str =
+    "Démarrage annulé avant prise en charge — reprise possible";
+
+/// Recognize a retained manual cancellation in the caller's read snapshot.
+/// Require ownership, the cancellation lifecycle record and a settled reservation.
+/// A repaired lifecycle log can have a later timestamp than the original end.
+/// Process or execution facts disqualify the record. This is evidence for the
+/// planner context only and grants no retry or execution permission.
+pub(crate) fn observed_manual_prestart_cancellation(
+    db: &Connection,
+    agent: &Agent,
+) -> Result<bool, AgentStoreError> {
+    if db.is_autocommit() {
+        return Err(AgentStoreError::Refused("agent-cancellation-observation-transaction-required"));
+    }
+    if agent.origin != "operateur" || agent.native_mission.is_some()
+        || agent.status != "interrupted" || agent.desired != "stop"
+        || agent.stop_kind != "operateur" || agent.ended.is_empty()
+        || agent.delivery_version != 0 || agent.activity != PRESTART_CANCELLATION_ACTIVITY
+        || agent.supervisor_pid != 0 || agent.child_pid != 0 || !agent.heartbeat.is_empty()
+        || !agent.supervisor_identity.is_empty() || !agent.child_identity.is_empty()
+        || agent.native_execution.is_some() || agent.native_execution_result.is_some()
+        || agent.exit_code.is_some() || agent.usage.is_some() || !agent.reply.is_empty()
+    {
+        return Ok(false);
+    }
+    verify_agent_ownership(db, agent)?;
+    if reservation_snapshot(db, &agent.id)?
+        .is_some_and(|r| r.work != agent.work_id || r.state != "released")
+    {
+        return Ok(false);
+    }
+    query(db,
+        "SELECT 1 FROM main.agent_logs WHERE agent_id=? AND kind='lifecycle' AND message=? LIMIT 1",
+        rusqlite::params![agent.id, PRESTART_CANCELLATION_ACTIVITY],
+        |rows| Ok(rows.next()?.is_some()),
+    )
+}
+
 /// Cancel a queued, unregistered launch and settle its matching manual attempt
 /// in one caller-policy transaction. The legacy starting/body-queued gap requires
 /// durable desired=stop. Registered agents, unattributed managed work and corrupt
@@ -837,7 +877,7 @@ pub(crate) fn cancel_queued_agent_with_settings<E: crate::WorkEnvironment>(
             agent.status = "interrupted".into();
             agent.stop_kind = "operateur".into();
             agent.desired = "stop".into();
-            agent.activity = "Démarrage annulé avant prise en charge — reprise possible".into();
+            agent.activity = PRESTART_CANCELLATION_ACTIVITY.into();
             agent.ended = at.clone();
             let encoded = crate::encode_model(&agent).map_err(AgentStoreError::Encode)?;
             let changed=tx.execute("UPDATE main.agents SET status='interrupted',body=?,desired='stop' WHERE id=? AND status=? AND desired=? AND CAST(body AS BLOB)=?",rusqlite::params![encoded,id,previous_status,desired,before])?;
