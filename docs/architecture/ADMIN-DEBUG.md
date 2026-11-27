@@ -69,6 +69,15 @@ prompts. Cette lecture ne donne aucun droit de relance ni de validation.
 
 ### Phases d’une revue native Rust
 
+Filtrez sur `"phase":"summary"` pour lire une synthèse de fin de tentative.
+Elle regroupe la durée totale, le dernier jalon observé, la cause stable,
+la révision connue, les tailles du prévol et la version compilée. Les champs
+d’issue absents ou nuls correspondent à des faits non établis. Les lignes
+d’étape restent disponibles pendant l’exécution et le rejeu exact ne crée pas
+de synthèse. La ligne `receipt` confirme la conservation du reçu ou en indique
+l’échec. `process` expose aussi les expirations, l’interruption et le nombre
+d’erreurs du transport observées.
+
 Dans **Suivi → Journaux**, ouvrez le journal de l’agent producteur de la tâche
 soumise. Cherchez `review_attempt`, puis copiez son empreinte complète dans le
 filtre de texte pour suivre une tentative. Le filtre de type reconnaît
@@ -93,6 +102,7 @@ L’issue métier reste celle de l’opération d’origine.
 | --- | --- |
 | `preflight` | Limites effectives de sources, de fichiers et du prompt, avec les tailles déjà observées. Le refus de taille peut précéder la réservation. |
 | `reservation` | Identifiant de revue créé, révision, consommation et plafond d’appels après l’engagement, ou code du refus. |
+| `execution` | Début de la préparation du processus après réservation, avec identifiant de revue et révision des réglages. |
 | `grant` et `process` | Enregistrement du helper, autorisation de porte, envoi du grant, état du canal et refus sûrs, dont les codes d’identité et Biba connus. L’envoi du grant laisse l’exécution du fournisseur indéterminée. |
 | `reply` et `receipt` | Issue du décodage, avis agrégé, code de sortie, compteurs et troncature observés. Un échec de conservation du reçu a sa propre phase. |
 | `publication` | Avis enregistré, applicabilité et état de la tâche lorsque le moteur les connaît. |

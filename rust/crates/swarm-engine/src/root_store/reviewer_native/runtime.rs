@@ -160,6 +160,12 @@ fn execute(
 /// authority. A terminal readback never enters this process path; known Work,
 /// monetary reserves and all original error trees remain intact.
 fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,lease:Option<&crate::MissionLease>,diag:Option<&diagnostics::Attempt<'_>>)->Result<TaskReviewOutcome,E>{
+    if let Some(diag) = diag {
+        diag.emit(root, "execution", Instant::now(), None, serde_json::json!({
+            "review_id": staged.job.id,
+            "settings_revision": staged.material.settings.revision.0,
+        }));
+    }
     let originals: Vec<_> = staged
         .material
         .inputs
@@ -230,6 +236,10 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
             "gate_permission_recorded": observed.job.permission == 1,
             "grant_attempted": observed.grant_attempted,
             "channel_closed": observed.channel_closed,
+            "duration_expired": observed.duration_expired,
+            "drain_expired": observed.drain_expired,
+            "interrupted": observed.interruption.is_some(),
+            "transport_error_count": observed.transport_errors.len(),
         }));
     }
     let reply_start = Instant::now();
@@ -289,6 +299,13 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
             });
         }
         return Err(persist);
+    }
+    if let Some(diag) = diag {
+        diag.emit(root, "receipt", receipt_start, None, serde_json::json!({
+            "review_id": receipt.job.id,
+            "failed": receipt.failed,
+            "waited": receipt.waited,
+        }));
     }
     if receipt.failed {
         let primary = error
@@ -386,8 +403,9 @@ impl RootStore {
         let mut known=None;
         let intent = crate::encode_model(&request).map_err(E::Encode)?;
         let correlation = crate::provider_configuration::configuration_digest(&intent);
-        let result=super::sources::request(self,work,&request,|source| {
+        let started = Instant::now();
         let mut preflight = diagnostics::Preflight::default();
+        let result=super::sources::request(self,work,&request,|source| {
         let reservation_start = Instant::now();
         let staged = claim::record_using_candidate(self, work, &request, lease, source, &mut preflight);
         let reservation_start = preflight.ended_at().unwrap_or(reservation_start);
@@ -416,7 +434,7 @@ impl RootStore {
             claim::Recorded::Replay(j) => recover(self, &j.id, Recovery::ApplyOriginal),
         }
         });
-        result.map_err(|primary| {
+        let result = result.map_err(|primary| {
             if primary.recorded_work().is_some() || known.is_none() {
                 primary
             } else {
@@ -426,7 +444,9 @@ impl RootStore {
                     revision: known.as_ref().unwrap().1,
                 }
             }
-        })
+        });
+        preflight.summarize(self, &correlation, failures, started, lease.is_some(), &result);
+        result
     }
     /// Reconcile a known reviewer original without any new invocation. Exact current
     /// owner or confirmed-departed owner is required before nonterminal application;

@@ -64,6 +64,14 @@ projection grants neither retry nor approval permission.
 
 ### Native Rust review phases
 
+Filter for `"phase":"summary"` to see the end-of-attempt event. It combines
+total elapsed time, the last observed phase, stable cause, known revision,
+preflight sizes and compiled version. Missing or null outcome fields mean the
+fact is unknown. Phase lines remain available during execution, and exact replay
+creates no summary. The `receipt` line confirms receipt retention or reports
+its failure. `process` also reports observed deadlines, interruption and the
+count of transport errors.
+
 In **Monitoring → Logs**, select the producer of the submitted task. Search for
 `review_attempt`, then paste its full digest into the text filter to follow one
 attempt. The type filter accepts `review-info`, `review-warn` and `review-error`.
@@ -86,6 +94,7 @@ supplies the business outcome.
 | --- | --- |
 | `preflight` | Effective source, file and prompt limits, with sizes already observed. A size refusal can precede reservation. |
 | `reservation` | Created review ID, committed revision and call counts and limit, or the refusal code. |
+| `execution` | Process preparation begins after reservation, with the review ID and settings revision. |
 | `grant` and `process` | Helper registration, gate permission, grant delivery, channel state and safe refusals, including known identity and Biba codes. Grant delivery leaves provider execution undetermined. |
 | `reply` and `receipt` | Decode result, aggregate opinion, observed exit code, byte counts and truncation. Receipt retention failure has its own phase. |
 | `publication` | Recorded opinion, applicability and task state where known. |

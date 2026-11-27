@@ -5,7 +5,10 @@ use super::{
 };
 use crate::{RootStore, RootStoreError as E};
 use serde::Serialize;
-use std::{cell::RefCell, time::Instant};
+use std::{
+    cell::{Cell, RefCell},
+    time::Instant,
+};
 
 /// Collected safe observation failures, separate from CLI and provider streams.
 pub(super) type Failures = RefCell<Vec<&'static str>>;
@@ -66,6 +69,7 @@ pub(super) struct Preflight {
     policy_unavailable: bool,
     pub sizes: Sizes,
     ended: Option<(Instant, u128, Option<&'static str>)>,
+    last_phase: Cell<Option<&'static str>>,
 }
 
 impl Preflight {
@@ -118,6 +122,7 @@ impl Preflight {
     ) -> Option<Attempt<'a>> {
         Some(Attempt {
             scope: self.scope.as_ref()?,
+            last_phase: &self.last_phase,
             correlation,
             failures,
         })
@@ -141,9 +146,81 @@ impl Preflight {
     }
 }
 
+impl Preflight {
+    /// Record the terminal result after the controller releases its sources.
+    /// Without a verified producer scope no mission journal is written. Exact
+    /// replay has no preflight and creates no summary; the sink deduplicates
+    /// repeated identical outcomes without changing business state.
+    pub(super) fn summarize(
+        &self,
+        root: &RootStore,
+        correlation: &str,
+        failures: &Failures,
+        started: Instant,
+        automatic: bool,
+        result: &Result<super::TaskReviewOutcome, E>,
+    ) {
+        let Some(attempt) = self.attempt(correlation, failures) else {
+            return;
+        };
+        let version = match crate::binary_version() {
+            Ok(value) => Some(value),
+            Err(_) => {
+                failures
+                    .borrow_mut()
+                    .push("review-diagnostic-build-identity");
+                None
+            }
+        };
+        let success = result.as_ref().ok();
+        let recorded_revision = match result {
+            Ok(value) => Some(value.work.revision),
+            Err(error) => error.recorded_work().map(|(_, revision)| revision),
+        };
+        attempt.emit(
+            root,
+            "summary",
+            started,
+            result.as_ref().err().map(primary_code),
+            serde_json::json!({
+                "last_phase": self.last_phase.get(),
+                "automatic": automatic,
+                "review_id": success.map(|value| &value.review_id),
+                "review_recorded": success.map(|value| value.review_recorded),
+                "verdict_applicable": success.map(|value| value.verdict_applicable),
+                "task_accepted": success.map(|value| value.task_accepted),
+                "recorded_revision": recorded_revision,
+                "source_count": self.sizes.source_count,
+                "source_bytes": self.sizes.source_bytes,
+                "prompt_bytes": self.sizes.prompt_bytes,
+                "build": version,
+            }),
+        );
+    }
+}
+
+/// Project the primary stable code through recorded state and compound cleanup
+/// wrappers. The business error separately retains the full typed cause graph.
+fn primary_code(mut error: &E) -> &'static str {
+    loop {
+        match error {
+            E::WorkRecorded { primary, .. }
+            | E::Cleanup {
+                primary: Some(primary),
+                ..
+            } => {
+                error = primary;
+            }
+            E::Context(context) => return context.reason(),
+            _ => return error.code(),
+        }
+    }
+}
+
 /// Restricted writer for one exact intent in an already bound mission scope.
 pub(super) struct Attempt<'a> {
     scope: &'a Scope,
+    last_phase: &'a Cell<Option<&'static str>>,
     correlation: &'a str,
     failures: &'a Failures,
 }
@@ -216,7 +293,13 @@ impl Attempt<'_> {
         cause: Option<&'static str>,
         facts: T,
     ) {
-        let (level, outcome) = match (phase, cause) {
+        let severity_phase = if phase == "summary" {
+            self.last_phase.get().unwrap_or(phase)
+        } else {
+            self.last_phase.set(Some(phase));
+            phase
+        };
+        let (level, outcome) = match (severity_phase, cause) {
             (_, None) => ("info", "observed"),
             ("preflight" | "reservation" | "reply", Some(_)) => ("warn", "refused"),
             (_, Some(_)) => ("error", "failed"),

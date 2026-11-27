@@ -234,13 +234,15 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   warning=[(row,json.loads(row['message'])) for row in warning_rows
            if 'review-context-bytes-exceeded' in row['message']
            and json.loads(row['message'])['work_revision']==refusal_state['revision']]
-  assert len(warning)==1,warning
-  warning_row,refusal=warning[0]
+  assert [event['phase'] for _,event in warning]==['preflight','summary'],warning
+  (warning_row,refusal),(summary_row,refused_summary)=warning
   assert refusal['phase']=='preflight' and refusal['level']=='warn' and refusal['outcome']=='refused'
   assert refusal['facts']['limits']['prompt_bytes']==low_cap
   assert refusal['facts']['prompt_bytes']>low_cap and refusal['facts']['source_bytes']==inputs['source_bytes']
   assert refusal['resume']=='resolve-effective-review-limit'
-  assert diagnostic_rows(call,work,producer,'diagnostic-refusal-correlation',refusal['review_attempt'])==[warning_row]
+  assert diagnostic_rows(call,work,producer,'diagnostic-refusal-correlation',refusal['review_attempt'])==[warning_row,summary_row]
+  assert refused_summary['facts']['last_phase']=='preflight' and refused_summary['facts']['review_id'] is None
+  assert refused_summary['facts']['prompt_bytes']==refusal['facts']['prompt_bytes']
   assert refused_request['event_id'] not in warning_row['message']
   # Use the actual saved message cap to make just the diagnostic too large.
   # The authorized Root schema and review prompt cap remain the same.
@@ -426,22 +428,30 @@ def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dep
   if case=='pass':
    candidates=diagnostic_rows(call,work,producer,'diagnostic-info-query','review_attempt','review-info')
    phases=[json.loads(row['message']) for row in candidates]
-   expected=['preflight','reservation','grant','process','reply','publication']
+   expected=['preflight','reservation','execution','grant','process','reply','receipt','publication','summary']
    assert [event['phase'] for event in phases]==expected,phases
    ids={event['review_attempt'] for event in phases}
    assert len(ids)==1 and refusal['review_attempt'] not in ids
    diagnostic_attempt=ids.pop()
-   preflight,reserve,grant,process,reply,publish=phases
+   preflight,reserve,execution,grant,process,reply,receipt,publish,summary=phases
    assert all(event['elapsed_ms']>=0 and event['producer_attempt']==inputs['preview']['attempt_id'] for event in phases)
    assert reserve['facts']['review_id']==review['id'] and reserve['facts']['calls']==after['planning']['reviewer']['calls']
    assert grant['facts']['grant_written'] and process['facts']['helper_registered']
    assert reply['facts']['opinion']=='passed' and reply['facts']['exit_code']==0
    assert publish['facts']['review_recorded'] and publish['facts']['verdict_applicable'] and not publish['facts']['task_accepted']
+   assert execution['facts']['review_id']==receipt['facts']['review_id']==review['id']
+   assert receipt['facts']['waited'] and not receipt['facts']['failed']
+   assert not process['facts']['duration_expired'] and process['facts']['transport_error_count']==0
+   facts=summary['facts']
+   assert facts['last_phase']=='publication' and facts['review_id']==review['id']
+   assert facts['review_recorded'] and facts['verdict_applicable'] and not facts['task_accepted']
+   assert facts['prompt_bytes']==preflight['facts']['prompt_bytes']
+   assert facts['build']==call('diagnostic-binary-version',['version'])['binary']
    retained='\n'.join(row['message'] for row in candidates+warning_rows)
    for private in (str(root),request['event_id'],'Current candidate inspected through actual native fixture',
                    'UNTRACKED-PRIVATE-SOURCE-NOT-IN-CANDIDATE','Return only JSON','stdin_sha256','context_sha256'):
     assert private not in retained,private
-   checks.append('review-diagnostics-six-correlated-phases-no-private-data')
+   checks.append('review-diagnostics-phases-and-summary-no-private-data')
   replay=call('event-replay',['task','review',work],request);assert replay['replayed'] and replay['review_id']==review['id'] and not replay['task_accepted']
   assert shown('after-replay')==after and finance(root,work)==rows and read_reviewer_marker(root,request['event_id'])==marker
   checks.append('exact-event-and-explicit-original-replay-never-rerun-provider-or-debit')

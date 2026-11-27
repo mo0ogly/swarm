@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Les revues Rust remontent le début de l’exécution, la conservation du reçu et une synthèse corrélée avec la cause, la durée et la version du binaire.",
+        "en": "Rust reviews record the start of execution, receipt retention and a correlated summary with the cause, duration and binary version."
+      },
+      {
         "fr": "Les journaux de mission corrèlent les phases des tentatives de revue Rust et indiquent les refus de taille et les pannes de journalisation.",
         "en": "Mission logs correlate the phases of Rust review attempts and show size refusals and logging failures."
       },
