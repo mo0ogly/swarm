@@ -148,6 +148,24 @@ impl Journal {
         )
     }
 
+    /// Submit one pre-admission refusal. Even when admission returns 503,
+    /// this is a refusal before a job started, with no known Work effect.
+    #[cfg(target_os = "linux")]
+    pub(super) fn http_refusal(&self, status: u16, code: &'static str) -> Result<(), Unavailable> {
+        self.send(4, Event {
+            schema_version: 1,
+            component: "swarm-web",
+            operation: "http-admission",
+            level: "warn",
+            outcome: "refused",
+            code,
+            elapsed_ms: None,
+            exit_code: None,
+            http_status: Some(status),
+            known_work_effect: false,
+        })
+    }
+
     /// The native socket accepts one UTF-8 field per line. JSON escapes line
     /// breaks by construction. Send once, nonblocking, and report absence or
     /// congestion separately. Successful send does not establish retention.

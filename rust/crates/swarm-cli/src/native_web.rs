@@ -74,6 +74,7 @@ pub(super) fn execute(
         ));
     }
     let mut signal_error = None;
+    let mut first_refusal_log_failure = None;
     let result = {
         let mut observer = |outcome: &NativeJobOutcome| {
             let code = outcome.failure.as_ref().map(swarm_web::HttpServiceError::code)
@@ -91,6 +92,13 @@ pub(super) fn execute(
                 },
             )
         };
+        let mut observe_refusal = |status, code| {
+            if let Some(sink) = journal {
+                if let Err(error) = sink.http_refusal(status, code) {
+                    first_refusal_log_failure.get_or_insert(error);
+                }
+            }
+        };
         conductor::serve(
             server, std::path::PathBuf::from(&a.root),
             async {
@@ -99,6 +107,7 @@ pub(super) fn execute(
                 }
             },
             &mut observer,
+            &mut observe_refusal,
         )
     };
     let result = match signal_error {
@@ -121,7 +130,7 @@ pub(super) fn execute(
         }),
     };
     let result = match result {
-        Ok(report) => match line(out, &stop_record(&report)) {
+        Ok(report) => match line(out, &stop_record(&report, first_refusal_log_failure.as_ref())) {
             Ok(()) => Ok(report),
             Err(cause) => Err(NativeServerError::SessionState {
                 primary: Box::new(NativeServerError::StoppedOutput {
@@ -168,6 +177,8 @@ struct StopRecord<'a> {
     accepted_connections: u64,
     completed_jobs: u64,
     rejected_requests: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refusal_application_log: Option<&'a super::application_journal::Unavailable>,
     rejected_connections: u64,
     rejected_queued_jobs: u64,
     connection_failures: u64,
@@ -193,13 +204,17 @@ struct ConnectionFailure {
 }
 /// Borrow final counters/known values and classify first causes; no IO or retry.
 /// A last known configuration entry is not a claim about later uncertain writes.
-fn stop_record(report: &swarm_web::NativeServerReport) -> StopRecord<'_> {
+fn stop_record<'a>(
+    report: &'a swarm_web::NativeServerReport,
+    refusal_application_log: Option<&'a super::application_journal::Unavailable>,
+) -> StopRecord<'a> {
     StopRecord {
         schema_version: 1,
         event: "web-stopped",
         accepted_connections: report.accepted_connections,
         completed_jobs: report.completed_jobs,
         rejected_requests: report.rejected_requests,
+        refusal_application_log,
         rejected_connections: report.rejected_connections,
         rejected_queued_jobs: report.rejected_queued_jobs,
         connection_failures: report.connection_failures,
@@ -371,7 +386,7 @@ pub(super) fn details(error: &CliError, document: &mut serde_json::Value) {
             document["recorded_configuration"] = serde_json::json!(configuration);
         }
         if let Some(report) = native.stopped_report() {
-            document["stopped_report"] = serde_json::json!(stop_record(report));
+            document["stopped_report"] = serde_json::json!(stop_record(report, None));
         }
         if let Some(failure) = native.observation_failure() {
             document["pending_outcomes"] = serde_json::json!(failure
@@ -407,7 +422,7 @@ mod tests {
             ..Default::default()
         };
         let mut witness = Vec::new();
-        line(&mut witness, &stop_record(&report)).unwrap();
+        line(&mut witness, &stop_record(&report, None)).unwrap();
         assert_eq!(
             serde_json::from_slice::<serde_json::Value>(&witness).unwrap()["event"],
             "web-stopped"

@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Les refus HTTP avant admission dans le moteur Rust sont journalisés avec leur statut et leur cause stable.",
+        "en": "HTTP refusals before admission to the Rust engine are logged with their status and stable cause."
+      },
+      {
         "fr": "Les erreurs de la CLI Rust et les incidents observés par le serveur HTTP natif remontent dans le journal système Linux avec des codes stables. Un relais protège les arguments de la commande d’origine.",
         "en": "Rust CLI failures and incidents observed by the native HTTP server reach the Linux system journal with stable codes. A relay protects the original command arguments."
       },

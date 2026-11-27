@@ -11,7 +11,7 @@ mod login;
 mod native_admin;
 mod native_preparation;
 mod transport;
-pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerReport};
+pub use transport::{NativeOutcomeObserver, NativeRefusalObserver, NativeRequestError, NativeServerReport};
 mod observation;
 mod settings;
 mod paea_reconcile;

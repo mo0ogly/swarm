@@ -148,6 +148,8 @@ ce canal de réponse est disponible. L’observateur web ajoute le même champ
 pas tous les `Result` intermédiaires, les arrêts forcés ou les paniques.
 Le journal applicatif du relais et les journaux de mission restent distincts.
 
+Un refus avant admission HTTP est publié sous SWARM_OPERATION=http-admission avec le statut envoyé et la cause stable. Le premier échec de journalisation de ces refus figure sous refusal_application_log dans le résumé de sortie normale. Les erreurs de connexion HTTP avant réception des en-têtes restent dans le résumé du serveur.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

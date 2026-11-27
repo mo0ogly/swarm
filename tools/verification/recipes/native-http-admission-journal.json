@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "native-http-admission-journal",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-web/src/**/*.rs",
+    "rust/crates/swarm-cli/src/**/*.rs",
+    "docs/architecture/ADMIN-DEBUG.md",
+    "docs/en/ADMIN-DEBUG.md",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "admission-refusal-observed-once-and-lease-retained",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "service::transport::tests::queued_diagnostic_retains_connection_reservation_until_owner_consumes_it",
+        "--",
+        "--exact"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test service::transport::tests::queued_diagnostic_retains_connection_reservation_until_owner_consumes_it ... ok",
+        "test result: ok. 1 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

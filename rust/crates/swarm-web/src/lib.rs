@@ -16,7 +16,7 @@ pub use authority_ledger::reset_witness;
 pub use service::{
     HttpReply, HttpServiceError, NativeHttpServer, NativeHttpService, NativeJobOutcome,
     NativeObservationCause, NativeObservationFailure, NativeOutcomeObserver, NativeOutcomeRecord,
-    NativeRequestError, NativeServerError, NativeServerReport, RecordedConfiguration,
+    NativeRefusalObserver, NativeRequestError, NativeServerError, NativeServerReport, RecordedConfiguration,
     TrustEnrollmentSource, TrustEnrollmentSourceError,
 };
 #[cfg(target_os = "linux")]

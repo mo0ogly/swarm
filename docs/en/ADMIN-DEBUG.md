@@ -137,6 +137,12 @@ event. Coverage is limited to the observed boundaries. Intermediate
 `Result` values, forced termination and panics are outside this increment.
 The relay application log and mission logs keep their own scopes.
 
+An HTTP pre-admission refusal is published under
+`SWARM_OPERATION=http-admission` with the response status and stable failure code.
+The first journal submission failure for these refusals appears under
+`refusal_application_log` in the normal shutdown summary. HTTP connection
+errors before header admission remain in the server summary.
+
 ## Application logs for the relay
 
 Open the dedicated console in **Administration → Accounts and access →
