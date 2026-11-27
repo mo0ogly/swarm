@@ -169,7 +169,9 @@ async function verify(){
   await filter.type('markdown');
   assert.equal(await page.$$eval(dialog+' .task-detail-file-item:not([hidden])',rows=>rows.length),2);
   await filter.focus();
-  await page.keyboard.press('Control+A');
+  await page.keyboard.down('Control');
+  await page.keyboard.press('a');
+  await page.keyboard.up('Control');
   await page.keyboard.press('Backspace');
   console.log('PASS the file tree filters by displayed type and shows counts');
   await filter.type('no-such-file-fixture');
