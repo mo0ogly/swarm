@@ -31,6 +31,12 @@ pub(crate) fn prepare(root: &Path, workspace: &Path, expected: (u64, u64)) -> Re
     Sandbox::prepare_bound(root, workspace, expected).map_err(convert)
 }
 
+/// Prepare I0 with readonly access to the already attributed candidate files.
+/// This retains the same kernel and error conversion as the full workspace.
+pub(crate) fn prepare_readonly_inputs(root: &Path, workspace: &Path, expected: (u64,u64), files: &[std::fs::File]) -> Result<Sandbox,E> {
+    Sandbox::prepare_readonly_inputs(root, workspace, expected, files).map_err(convert)
+}
+
 /// Irreversibly restrict this single-threaded, unprivileged helper before exec.
 /// Descendants inherit the boundary. Any returned error requires helper exit;
 /// retrying or executing without the boundary is forbidden. No effect is accepted.

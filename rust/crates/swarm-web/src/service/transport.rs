@@ -26,6 +26,10 @@ type ConnectionLease = Arc<Option<OwnedSemaphorePermit>>;
 /// Owner callback is required even for reads. Acknowledgement is not durability,
 /// HTTP receipt, authenticated identity or acceptance; caller owns those proofs.
 pub type NativeOutcomeObserver<'a> = dyn FnMut(&NativeJobOutcome) -> io::Result<()> + 'a;
+/// Optional diagnostic callback for a refused request before Root admission.
+/// Receives only the response status and stable failure family, with no request
+/// bytes, session data or Root authority. It must return promptly.
+pub type NativeRefusalObserver<'a> = dyn FnMut(u16, &'static str) + 'a;
 /// Counters and first parser/request/service failures for one serve cycle. Each
 /// completed job additionally reaches the required observer, or remains in the
 /// returned observation failure. Counts include replay, not just new mutations.
@@ -111,7 +115,7 @@ impl std::error::Error for NativeRequestError {
 /// Queued job owns a lane; queued diagnostic owns its connection reservation.
 pub(super) enum Message {
     Job(Box<Submission>),
-    Rejected(NativeRequestError, ConnectionLease),
+    Rejected(StatusCode, NativeRequestError, ConnectionLease),
 }
 /// Body passed access/framing checks; Root is not executed until owner dispatch.
 pub(super) struct Submission {
@@ -359,6 +363,19 @@ impl NativeHttpServer {
         shutdown: F,
         observer: &'a mut NativeOutcomeObserver<'a>,
     ) -> Result<NativeServerReport, NativeServerError> {
+        self.serve_until_with_refusals(shutdown, observer, &mut |_, _| {})
+    }
+
+    /// Serve with an additional best-effort callback for requests refused before
+    /// reaching a Root job. Retain the original summary and response behavior.
+    /// Only delivered refusal messages are observed, including those drained on
+    /// shutdown. Connection/parser errors still belong to the transport summary.
+    pub fn serve_until_with_refusals<'a, F: Future<Output = ()>>(
+        self,
+        shutdown: F,
+        observer: &'a mut NativeOutcomeObserver<'a>,
+        refusal_observer: &mut NativeRefusalObserver<'_>,
+    ) -> Result<NativeServerReport, NativeServerError> {
         let runtime = match tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .max_blocking_threads(
@@ -441,6 +458,7 @@ impl NativeHttpServer {
             Arc::new(policy),
             shutdown,
             observer,
+            refusal_observer,
         ));
         #[cfg(target_os = "linux")]
         let result = finish(
@@ -488,6 +506,7 @@ async fn run<'a, F: Future<Output = ()>>(
     policy: Arc<WebTransportPolicy>,
     shutdown: F,
     observer: &'a mut NativeOutcomeObserver<'a>,
+    refusal_observer: &mut NativeRefusalObserver<'_>,
 ) -> Result<NativeServerReport, NativeServerError> {
     let listener =
         tokio::net::TcpListener::from_std(listener).map_err(|cause| NativeServerError::Io {
@@ -524,7 +543,7 @@ async fn run<'a, F: Future<Output = ()>>(
          },
          Some(message)=receiver.recv()=>match message {
           Message::Job(message)=>spawn_job(&mut jobs,Arc::clone(&service),*message),
-          Message::Rejected(error,_lease)=>if let Err(error)=record_rejection(error,&mut report){owner.fail(error);},
+          Message::Rejected(status,error,_lease)=>if let Err(error)=record_rejection(status,error,&mut report,refusal_observer){owner.fail(error);},
          },
          Some(result)=jobs.join_next()=>complete_job(result,&mut report,&mut owner),
          Some(result)=sockets.join_next()=>if let Err(error)=complete_connection(result,&mut report){owner.fail(error);},
@@ -545,8 +564,8 @@ async fn run<'a, F: Future<Output = ()>>(
     while let Some(message) = receiver.recv().await {
         match message {
             Message::Job(message) => reject_queued(*message, &mut report, &mut owner),
-            Message::Rejected(error, _lease) => {
-                if let Err(error) = record_rejection(error, &mut report) {
+            Message::Rejected(status, error, _lease) => {
+                if let Err(error) = record_rejection(status, error, &mut report, refusal_observer) {
                     owner.fail(error);
                 }
             }
@@ -792,22 +811,26 @@ fn reject(
     error: NativeRequestError,
     connection: ConnectionLease,
 ) -> Response<Body> {
-    match sender.send(Message::Rejected(error, connection)) {
+    match sender.send(Message::Rejected(status, error, connection)) {
         Ok(()) => (),
         Err(_closed) => (),
     };
     refusal(status, code)
 }
-/// Bounded diagnostic retention: keep first cause and total count, never an
-/// unbounded history of client failures or request bodies.
+/// Keep the first typed cause and total count. Emit one safe diagnostic per
+/// consumed message after accounting, without retaining a request history.
 fn record_rejection(
+    status: StatusCode,
     error: NativeRequestError,
     report: &mut NativeServerReport,
+    observer: &mut NativeRefusalObserver<'_>,
 ) -> Result<(), NativeServerError> {
+    let code = error.code();
     count(&mut report.rejected_requests)?;
     if report.first_request_failure.is_none() {
         report.first_request_failure = Some(error);
     }
+    observer(status.as_u16(), code);
     Ok(())
 }
 
@@ -880,7 +903,20 @@ mod tests {
         assert_eq!(response.status(), StatusCode::FORBIDDEN);
         drop(connection);
         assert!(Arc::clone(&semaphore).try_acquire_owned().is_err());
-        drop(receiver.try_recv().unwrap());
+        let Message::Rejected(status, error, lease) = receiver.try_recv().unwrap() else {
+            panic!("expected a pre-admission refusal");
+        };
+        let mut report = NativeServerReport::default();
+        let mut observed = Vec::new();
+        record_rejection(status, error, &mut report, &mut |status, code| {
+            assert!(Arc::clone(&semaphore).try_acquire_owned().is_err());
+            observed.push((status, code));
+        }).unwrap();
+        assert_eq!(observed, [(403, "web-session-required")]);
+        assert_eq!(report.rejected_requests, 1);
+        assert_eq!(report.first_request_failure.unwrap().code(), "web-session-required");
+        assert!(receiver.try_recv().is_err());
+        drop(lease);
         assert!(Arc::clone(&semaphore).try_acquire_owned().is_ok());
     }
     /// Actual completion helper keeps its permit while observing, retains service

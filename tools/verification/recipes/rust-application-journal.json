@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "rust-application-journal",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/**/*.rs",
+    "docs/architecture/ADMIN-DEBUG.md",
+    "docs/en/ADMIN-DEBUG.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "journal-safe-refusal-and-unavailable-sink",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "application_journal::tests::application_journal_records_safe_failures_and_preserves_cli_result",
+        "--",
+        "--exact"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test application_journal::tests::application_journal_records_safe_failures_and_preserves_cli_result ... ok",
+        "test result: ok. 1 passed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

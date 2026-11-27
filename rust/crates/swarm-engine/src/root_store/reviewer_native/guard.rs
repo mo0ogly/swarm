@@ -64,7 +64,7 @@ pub(super) fn departed(job: &Job) -> Result<(), E> {
 /// in the caller snapshot. This is not admission: original preflight TTL belongs
 /// separately to fresh() before any new grant. No process, debit, workspace probe
 /// or future lease is created here; IO/SQL/codec refusal remains explicit.
-fn frame(
+pub(super) fn frame(
     root: &RootStore,
     tx: &Transaction<'_>,
     settings: &EngineSettingsDocument,
@@ -327,7 +327,7 @@ fn dependencies(
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let prepared =
-        root.prepare_review_snapshot_using(tx, settings, &job.work_id, &request, Some(review),source)?;
+        root.prepare_review_snapshot_using(tx, settings, &job.work_id, &request, Some(review),source,false)?;
     let inputs=root.assemble_review_inputs_using(tx,prepared,source,true)?;
     Ok((work, inputs))
 }
@@ -363,14 +363,15 @@ pub(super) fn fresh_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSet
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let material =
-        material::prepare_for_job_using(root, tx, settings, &job.work_id, &request, Some(review),source)?;
+        material::prepare_for_job_using(root, tx, settings, &job.work_id, &request, Some(review),source,&mut Default::default())?;
     if !bound_inputs_match(tx,&material.inputs, job)? {
         return Err(E::Refused("review-guard-preparation-changed"));
     }
-    if material.host.executable_digest != job.executable_sha256
-        || material.host.preflight.scope != job.host_scope
-    {
-        return Err(E::Refused("review-guard-preparation-changed"));
+    if material.host.executable_digest != job.executable_sha256 {
+        return Err(E::Refused("review-guard-executable-changed"));
+    }
+    if material.host.preflight.scope != job.host_scope {
+        return Err(E::Refused("review-guard-host-scope-changed"));
     }
     material
         .fresh(&root.root)

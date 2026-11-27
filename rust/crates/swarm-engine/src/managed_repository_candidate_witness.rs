@@ -168,6 +168,14 @@ impl CandidateWitness {
         review_link(&self.copy, name)
     }
 
+    /// Recheck exactly one named entry against its bound checkpoint while the
+    /// copy descriptor is held. Separately verify full integrity on publication.
+    pub(crate) fn verify_review_source(&self, name: &str) -> Result<(), E> {
+        self.record.tracked.get(name)
+            .ok_or(E::Refused("review-focused-source-missing"))?
+            .verify_review_bytes(&self.copy, name)
+    }
+
     /// Re-compare the held descriptors' actual identities with the record.
     ///
     /// Purpose: let a custodian confirm, at any point while the witness lives,

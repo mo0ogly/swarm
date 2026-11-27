@@ -87,10 +87,18 @@ fn append_log(
         (LogFamily::Incident, false) => "incident",
         (LogFamily::Incident, true) => "incident-truncated",
     };
+    insert_log(tx, &agent.id, &agent.heartbeat, kind, &detail)
+}
+
+/// Insert and verify one row within the owning transaction. The caller supplies
+/// a scope-checked agent, timestamp and bounded, display-safe detail.
+pub(crate) fn insert_log(
+    tx: &Transaction<'_>, agent: &str, at: &str, kind: &str, detail: &str,
+) -> Result<(), AgentLaunchError> {
     let sequence: i64 = query(
         tx,
         "INSERT INTO main.agent_logs(agent_id,at,kind,message) VALUES(?,?,?,?) RETURNING seq",
-        rusqlite::params![agent.id, agent.heartbeat, kind, detail],
+        rusqlite::params![agent, at, kind, detail],
         |rows| {
             Ok(rows
                 .next()?
@@ -103,9 +111,9 @@ fn append_log(
     let valid = query(
         tx,
         "SELECT at,kind,message FROM main.agent_logs WHERE seq=? AND agent_id=?",
-        rusqlite::params![sequence, agent.id],
+        rusqlite::params![sequence, agent],
         |rows| match rows.next()? {
-            Some(row) => Ok(row.get::<_, String>(0)? == agent.heartbeat
+            Some(row) => Ok(row.get::<_, String>(0)? == at
                 && row.get::<_, String>(1)? == kind
                 && row.get::<_, String>(2)? == detail),
             None => Ok(false),

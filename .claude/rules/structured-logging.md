@@ -11,6 +11,11 @@ aux validations, aux revues et aux reprises des agents.
   la décision, l'issue et, en cas d'échec, le motif et la condition de reprise
   si le moteur la connaît. Une étape seulement planifiée ne devient pas un
   contrôle effectué. Un succès de transport ne devient pas un succès métier.
+- Une erreur propagée ou récupérée doit avoir un événement observable à la
+  frontière qui connaît son issue. Conserver le code stable, le résultat et
+  la portée autorisée. Les couches qui relaient la même erreur préservent sa
+  cause. Une erreur sans mission vérifiée relève du journal applicatif quand
+  ce canal existe. Son absence reste un manque de couverture.
 - Utiliser l'émetteur structuré partagé. Donner un horodatage, le niveau, le
   composant, la famille, l'opération, l'étape et le résultat. Pour un refus,
   conserver le code stable du producteur et l'identifiant de corrélation

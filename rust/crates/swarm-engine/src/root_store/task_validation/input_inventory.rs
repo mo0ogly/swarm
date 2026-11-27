@@ -140,6 +140,19 @@ pub(super) fn observe(
     workspace: &Path,
     expected: &BTreeMap<String, String>,
 ) -> Result<BTreeMap<String, String>, E> {
+    observe_with(root, workspace, expected, |_| None)
+}
+
+/// Revalidate a retained input inventory against hashes observed under the same
+/// candidate custody. The caller supplies hashes only for regular files read
+/// from that custody in this pass. Every other file is opened and checked here.
+/// A conflicting observed hash refuses. No cache survives the observation.
+pub(super) fn observe_with<'a>(
+    root: &Path,
+    workspace: &Path,
+    expected: &BTreeMap<String, String>,
+    observed: impl Fn(&Path) -> Option<&'a str>,
+) -> Result<BTreeMap<String, String>, E> {
     let prefix = workspace
         .strip_prefix(root)
         .map_err(|e| caused("managed-input-inventory-workspace", e))?;
@@ -147,6 +160,13 @@ pub(super) fn observe(
     for (name, hash) in expected {
         if !Path::new(name).starts_with(prefix) || Path::new(name).components().any(|p| !matches!(p,std::path::Component::Normal(_))) {
             return Err(E::Refused("managed-input-inventory-outside-workspace"));
+        }
+        if let Some(actual) = observed(&root.join(name)) {
+            if actual != hash {
+                return Err(E::Refused("managed-input-inventory-changed"));
+            }
+            result.insert(name.clone(), actual.to_owned());
+            continue;
         }
         let (actual_path, actual) = crate::gate_evaluation::artifact_hash(root, name)
             .map_err(|e| caused("managed-input-inventory-read", e))?;

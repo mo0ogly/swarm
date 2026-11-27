@@ -82,6 +82,8 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
+        "PASS managed-review-inventory-separates-delta-and-full-tree",
+        "PASS managed-review-inventory-binds-unchanged-control-inputs",
         "INSPECTION_MANAGED_TEXT_PASS"
       ],
       "required_stderr": []
@@ -95,6 +97,8 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
+        "PASS managed-review-inventory-separates-delta-and-full-tree",
+        "PASS managed-review-inventory-binds-unchanged-control-inputs",
         "INSPECTION_MANAGED_NONTEXT_PASS"
       ],
       "required_stderr": []

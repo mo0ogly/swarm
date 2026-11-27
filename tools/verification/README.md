@@ -5461,3 +5461,30 @@ synthetic settings. Secondary messages stay out of result.json. Early failed
 dossiers may lack environment.json: no new verify integrity claim is made for
 those incomplete dossiers. Written evidence is not independent receipt; Rust/
 R04, shared integration and global BF-L0 acceptance remain open.
+
+### Prévol de revue sur un grand dépôt / Review preflight on a large repository
+
+La recette `native-managed-reviewer-scale` utilise le binaire natif et son
+profil qualifié (`SWARM_STATUS_CONTRACT_BINARY`, `SWARM_STATUS_CONTRACT_PROFILE`).
+Elle crée un dépôt isolé contenant au moins 21 466 fichiers suivis, garde un
+dossier de revue ciblé sous la limite de fixture et utilise le prévol de 120 s
+du cas de référence. La recette exige un marqueur du
+fournisseur local simulé et un reçu natif. Aucun appel payant ni acceptation
+de la tâche ne sont nécessaires à ce test.
+
+The `native-managed-reviewer-scale` recipe uses the qualified native binary and
+profile. It creates an isolated repository with at least 21,466 tracked files,
+checks the focused dossier under the fixture limit, uses the reference 120s
+preflight and requires a native
+receipt and an execution marker from the local provider double. It requires
+neither a paid call nor task acceptance.
+
+La qualification identifie l’empreinte Cargo par le nom et le hash de l’artefact.
+Elle vérifie le même fichier dans l’arborescence classique ou dans celle de
+`CARGO_BUILD_BUILD_DIR` selon le chemin effectif de l’artefact. Une arborescence
+inconnue, un hash de répertoire incohérent ou une empreinte absente refuse.
+
+Profile qualification locates the Cargo fingerprint by artifact name and unit
+hash in the classic layout or the explicit `CARGO_BUILD_BUILD_DIR` layout,
+as indicated by the actual artifact. An unknown layout, a mismatched directory
+hash or missing fingerprint fails qualification.

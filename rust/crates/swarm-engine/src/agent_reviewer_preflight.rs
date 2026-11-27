@@ -55,6 +55,21 @@ pub(crate) fn check_reserved(
     }
     configuration(root, directory, planning, policy)
 }
+/// Observe the configured managed reviewer before an operator raises exhausted
+/// quota. Only a consistent authorized counter at or below its cap is readable.
+/// Configuration and cooldown still apply. Private claim and gate checks never
+/// use this function and continue to require available or reserved capacity.
+pub(crate) fn observe(
+    root: &Path, directory: &LocalDirectory, planning: &PlanningState, policy: &AgentLaunchPolicy,
+) -> Result<(), AgentLaunchError> {
+    let reviewer = planning.reviewer.as_deref().ok_or(AgentLaunchError::Refused("reviewer_required"))?;
+    if reviewer.authorized.is_empty() || reviewer.calls < 0 || reviewer.calls > reviewer.max_calls
+        || !reviewer.failure.is_empty()
+    {
+        return Err(AgentLaunchError::Refused("reviewer-configuration-not-active"));
+    }
+    configuration(root, directory, planning, policy)
+}
 /// Reuse exact catalogue/digest/cooldown/tool-free configuration observations.
 /// Capacity/claim funding belongs to the caller's new-call or reserved-call guard;
 /// these read operations grant no execution. Original IO/codec causes survive.

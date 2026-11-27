@@ -2,8 +2,11 @@
 //! Complete text inputs are observations; no invocation grant or publication.
 pub(super) mod inputs;
 mod managed_context;
+mod evidence;
 mod file_reader;
 pub use file_reader::TaskReviewFileReader;
+pub(super) mod inventory;
+pub use inventory::{ManagedReviewControlInput, ManagedReviewInventory, ManagedReviewPath};
 mod check;
 pub use check::TaskReviewCheck;
 pub use inputs::{TaskReviewInputs, ReviewInputSource};
@@ -31,6 +34,9 @@ pub struct TaskReviewPreview {
     pub criterion_count: usize,
     pub remaining_review_calls: i64,
     pub native_control_evidence_verified: bool,
+    /// Readonly Git tree inventory, populated only by the public managed preview.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub managed_inventory: Option<ManagedReviewInventory>,
     pub invocation_context_materialized: bool,
     pub invocation_authorized: bool,
     pub provider_started: bool,
@@ -59,8 +65,31 @@ impl RootStore {
     /// an already published controller may remain alive. Actual budget reservation,
     /// provider/model availability, full context/images and native reviewer job
     /// permission are not established. Typed IO/SQL/codec and cleanup causes remain.
+    /// Managed previews additionally compare the exact retained Git trees outside
+    /// SQL locks. A tree refusal is preserved and grants no provider invocation.
     pub fn preview_task_review(&self, work: &str, raw: &[u8]) -> Result<TaskReviewPreview, E> {
-        self.with_prepared_review(work, raw, |_, prepared, _| Ok(prepared.preview))
+        self.with_prepared_review(
+            work,
+            raw,
+            |_, prepared, _| {
+                let planning = prepared.work.planning.as_deref();
+                let delivery_limit = planning.and_then(|planning| planning.reviewer.as_deref())
+                    .and_then(|reviewer| reviewer.max_files.as_deref()).copied();
+                let project_subdir = planning.and_then(|planning| planning.repository.as_deref())
+                    .map(|repo| repo.project_subdir.clone());
+                Ok((prepared.preview, prepared.settings, delivery_limit, project_subdir))
+            },
+            |(mut preview, settings, delivery_limit, project_subdir), candidate| {
+                if let Some(candidate) = candidate {
+                    let project_subdir = project_subdir.as_deref()
+                        .ok_or(E::Refused("review-managed-repository-required"))?;
+                    preview.managed_inventory = Some(inventory::observe(
+                        candidate, &settings, delivery_limit, project_subdir,
+                    )?);
+                }
+                Ok(preview)
+            },
+        )
     }
 
     /// Materialize complete original text and current task framing, or the full
@@ -73,7 +102,7 @@ impl RootStore {
     pub fn materialize_task_review(&self, work: &str, raw: &[u8]) -> Result<TaskReviewInputs, E> {
         self.with_prepared_review(work, raw, |tx, prepared, candidate| {
             self.assemble_review_inputs(tx, prepared, candidate)
-        })
+        }, |value, _| Ok(value))
     }
 
     /// Share complete ordinary/managed assembly within the caller's current
@@ -91,6 +120,16 @@ impl RootStore {
         &self, tx:&rusqlite::Transaction<'_>,prepared:PreparedReview,
         candidate:Option<&task_validation::ReviewCandidate>,invocation:bool,
     )->Result<TaskReviewInputs,E>{
+        self.assemble_review_inputs_observed(tx, prepared, candidate, invocation, &mut Default::default())
+    }
+
+    /// Assemble from the same snapshot while collecting only numeric limits and
+    /// observations. The caller decides whether the attempt is authorized to log.
+    fn assemble_review_inputs_observed(
+        &self, tx: &rusqlite::Transaction<'_>, prepared: PreparedReview,
+        candidate: Option<&task_validation::ReviewCandidate>, invocation: bool,
+        sizes: &mut reviewer_candidate::diagnostics::Sizes,
+    ) -> Result<TaskReviewInputs, E> {
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
             match candidate {
@@ -98,22 +137,24 @@ impl RootStore {
                     let plan=candidate.candidate().control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
                     let reports=plan.policies.iter().map(|policy|task_validation::submission(tx,&prepared.work,&policy.task_id)
                         .map_err(|e|E::Launch(Box::new(e)))).collect::<Result<Vec<_>,E>>()?;
-                    inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation)
+                    inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation,sizes)
                 }
-                None => inputs::assemble(&self.root, prepared, &submitted),
+                None => inputs::assemble(&self.root, prepared, &submitted, sizes),
             }
     }
 
     /// Keep source admission and caller assembly inside one settings/SQL read
     /// snapshot. Managed pin/final refresh run outside those locks; an external
-    /// owner retains descriptors through every read. Rollback/release failures
+    /// owner retains descriptors through every read. The inspection callback
+    /// runs outside those locks before the final refresh. Rollback/release failures
     /// retain both causes; no writer, provider reservation or process permit.
-    fn with_prepared_review<T>(
+    fn with_prepared_review<T, U>(
         &self,
         work: &str,
         raw: &[u8],
         consume: impl FnOnce(&rusqlite::Transaction<'_>, PreparedReview, Option<&task_validation::ReviewCandidate>) -> Result<T, E>,
-    ) -> Result<T, E> {
+        inspect: impl FnOnce(T, Option<&task_validation::ReviewCandidate>) -> Result<U, E>,
+    ) -> Result<U, E> {
         let launch = |e| E::Launch(Box::new(e));
         let request = task_validation::decode(raw).map_err(launch)?;
         // Custody stays outside every snapshot/result wrapper, including failures
@@ -124,13 +165,14 @@ impl RootStore {
             let result=(||{
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
-            let result = self.prepare_review_snapshot_using(&tx, settings, work, &request,None,candidate.as_ref())
+            let result = self.prepare_review_snapshot_using(&tx, settings, work, &request,None,candidate.as_ref(),true)
                 .and_then(|prepared| consume(&tx, prepared,candidate.as_ref()));
             finished(result, tx.rollback().map_err(E::Sql))
             })();
             finished(result,reservation.close().map_err(E::Storage))
         })();
         let result=result.and_then(|value|{
+            let value = inspect(value, candidate.as_ref())?;
             if let Some(candidate)=&candidate{candidate.refresh(self)?;}
             Ok(value)
         });
@@ -169,7 +211,7 @@ impl RootStore {
         request: &task_validation::Request,
         review: Option<&crate::IndependentReview>,
     ) -> Result<PreparedReview, E> {
-        self.prepare_review_snapshot_using(tx,settings,work,request,review,None)
+        self.prepare_review_snapshot_using(tx,settings,work,request,review,None,false)
     }
     /// Build observations for a readonly managed inspector with actual external
     /// candidate custody. Native invocation supplies the same borrowed holder;
@@ -179,7 +221,7 @@ impl RootStore {
     fn prepare_review_snapshot_using(
         &self, tx:&rusqlite::Transaction<'_>,settings:crate::EngineSettingsDocument,
         work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
-        candidate:Option<&task_validation::ReviewCandidate>,
+        candidate:Option<&task_validation::ReviewCandidate>, inspect: bool,
     )->Result<PreparedReview,E>{
         let launch = |e| E::Launch(Box::new(e));
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
@@ -216,6 +258,8 @@ impl RootStore {
         match review {
             Some(_) => crate::agent_reviewer_preflight::check_reserved(
                 &self.root, &self.directory, planning, &launch_policy),
+            None if inspect && candidate.is_some() => crate::agent_reviewer_preflight::observe(
+                &self.root, &self.directory, planning, &launch_policy),
             None => crate::agent_reviewer_preflight::check(
                 &self.root, &self.directory, Some(planning), &launch_policy),
         }.map_err(launch)?;
@@ -234,7 +278,10 @@ impl RootStore {
             .validation_output_limit()
             .map_err(E::Settings)?;
         let quality = settings.quality_policy_snapshot().map_err(E::Settings)?;
-        let controls = crate::check_validation_evidence(&self.root, task, Some(&quality), output)
+        let controls = crate::validation_evidence::check_validation_evidence_with(
+            &self.root, task, Some(&quality), output,
+            |name| candidate.and_then(|held| held.observed_artifact(name)),
+        )
             .map_err(E::ValidationEvidence)?
             .ok_or(E::Refused("review-current-controls-required"))?;
         let limits = settings
@@ -268,6 +315,7 @@ impl RootStore {
             criterion_count: task.criteria.as_ref().map_or(0, Vec::len),
             remaining_review_calls: remaining,
             native_control_evidence_verified: true,
+            managed_inventory: None,
             invocation_context_materialized: false,
             invocation_authorized: false,
             provider_started: false,

@@ -36,15 +36,27 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             .map_err(CliError::CommandInput)?,
         )
     };
+    let reviewer = a.pos[0] == "role-model";
     let root_error = |e| CliError::Root(Box::new(e));
     if let Some(raw) = input.as_deref() {
-        swarm_engine::decode_task_model_request(raw)
-            .map_err(|e| root_error(swarm_engine::RootStoreError::Launch(Box::new(e))))?;
+        let checked = if reviewer {
+            swarm_engine::decode_reviewer_model_request(raw).map(|_| ())
+        } else {
+            swarm_engine::decode_task_model_request(raw).map(|_| ())
+        };
+        checked.map_err(|e| root_error(swarm_engine::RootStoreError::Launch(Box::new(e))))?;
     }
     let mut store = swarm_engine::RootStore::open(std::path::Path::new(&a.root), op == "apply")
         .map_err(root_error)?;
     let mut committed = None;
     let result = (|| match op {
+        "show" if reviewer => {
+            json_bytes(&store.reviewer_model(&a.pos[2]).map_err(root_error)?).map_err(CliError::Output)
+        }
+        #[cfg(target_os = "linux")]
+        "preview" if reviewer => json_bytes(&store.preview_reviewer_model(
+            &a.pos[2], input.as_deref().ok_or(CliError::Usage)?, &mut swarm_engine::SystemEnvironment,
+        ).map_err(root_error)?).map_err(CliError::Output),
         "show" => {
             json_bytes(&store.read_work(&a.pos[2]).map_err(root_error)?).map_err(CliError::Output)
         }
@@ -62,14 +74,20 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             let outcome = store
                 .execute_external(
                     &a.pos[2],
-                    "task.model",
+                    if reviewer { "reviewer.model" } else { "task.model" },
                     input.as_deref().ok_or(CliError::Usage)?,
                     &mut swarm_engine::SystemEnvironment,
                 )
                 .map_err(root_error)?;
             let work = outcome.result.work;
             committed = Some((work.id.clone(), work.revision));
-            json_bytes(&work).map_err(CliError::Output)
+            if reviewer {
+                let view = swarm_engine::ReviewerModelView::from_work(&work)
+                    .map_err(|e| root_error(swarm_engine::RootStoreError::Launch(Box::new(e))))?;
+                json_bytes(&view).map_err(CliError::Output)
+            } else {
+                json_bytes(&work).map_err(CliError::Output)
+            }
         }
         _ => Err(CliError::Usage),
     })();

@@ -62,7 +62,8 @@ mod review_recovery;
 #[cfg(target_os = "linux")]
 pub(crate) use native_worker_retry::WorkerCompletionInput;
 #[cfg(target_os = "linux")]
-pub use review_preview::{TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, TaskReviewOutcome, execute_review_gate};
+pub use review_preview::{TaskReviewPreview, ManagedReviewControlInput, ManagedReviewInventory, ManagedReviewPath, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, TaskReviewOutcome, execute_review_gate};
+#[cfg(target_os = "linux")]
 pub use review_preview::TaskReviewFileReader;
 #[cfg(target_os = "linux")]
 pub use planning_native::{execute_planning_gate, PlanningRunOutcome};
@@ -71,7 +72,7 @@ pub use planning_step::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
 pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence, ReviewRefreshOutcome};
 #[cfg(target_os = "linux")]
-pub(crate) use task_validation::{require_validation_idle, attach_managed_submission_controls};
+pub(crate) use task_validation::{require_validation_idle, attach_managed_submission_controls, attach_managed_unstarted_policy};
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
@@ -286,6 +287,9 @@ pub enum RootStoreError {
     /// Unpublished mission status observation invalidated by concurrent change.
     /// Retains the typed recheck and ancillary causes without authorizing retry.
     MissionStatusChanged { primary: Box<Self> },
+    /// Original review refusal plus independent safe sink codes. The logging
+    /// failure grants no retry and leaves the original exit/recorded state intact.
+    ReviewDiagnostics { primary: Box<Self>, failures: Vec<&'static str> },
     Cleanup {
         primary: Option<Box<Self>>,
         cleanup: Box<Self>,
@@ -319,6 +323,7 @@ impl RootStoreError {
     #[cfg(target_os="linux")]
     pub fn recorded_execution_interruption(&self)->Option<(&'static str,&str,i64)>{
         match self{
+            Self::ReviewDiagnostics { primary, .. } => primary.recorded_execution_interruption(),
             Self::WorkRecorded{primary,work,revision}=>match primary.as_ref(){
                 Self::Refused("planning-execution-interrupted")=>Some(("planner",work,*revision)),
                 Self::Runtime(runtime)=>std::error::Error::source(runtime).and_then(|e|e.downcast_ref::<crate::execution_interrupt::CompletedRoleInterrupt>()).map(|m|(m.role(),work.as_str(),*revision)),
@@ -502,6 +507,7 @@ impl RootStoreError {
             Self::SqlTransaction(_) => "root-sql-transaction-failed",
             Self::Refused(s) => s,
             Self::MissionStatusChanged { .. } => "mission-status-observation-changed",
+            Self::ReviewDiagnostics { primary, .. } => primary.code(),
             Self::Cleanup { .. } => "root-cleanup",
             Self::Busy { .. } => "root-storage-busy",
         }
@@ -536,6 +542,10 @@ impl fmt::Display for RootStoreError {
             Self::AuxiliaryRecorded { .. } => f.write_str("auxiliary-state-preserved; read back before retrying"),
             Self::Published { .. } => {
                 f.write_str("root-state-preserved; re-read recorded configuration before retrying")
+            }
+            Self::ReviewDiagnostics { primary, failures } => {
+                fmt::Display::fmt(primary, f)?;
+                write!(f, " (review diagnostic sink: {})", failures.join(", "))
             }
             Self::Context(e) => fmt::Display::fmt(e, f),
             Self::Workflow(e) => fmt::Display::fmt(e, f),
@@ -621,7 +631,7 @@ impl Error for RootStoreError {
             #[cfg(target_os = "linux")]
             Self::View(e) => Some(e),
             Self::SchemaCommit { cause, .. } => Some(cause),
-            Self::MissionStatusChanged { primary } => Some(primary.as_ref()),
+            Self::MissionStatusChanged { primary } | Self::ReviewDiagnostics { primary, .. } => Some(primary.as_ref()),
             Self::Cleanup {
                 primary: Some(e), ..
             } => Some(e.as_ref()),
@@ -1981,6 +1991,39 @@ impl RootStore {
         })();
         settings_finished(result, reservation.close().map_err(RootStoreError::Storage))
     }
+    /// Read the saved independent reviewer in a minimal public projection.
+    pub fn reviewer_model(&self, work: &str) -> Result<crate::ReviewerModelView, RootStoreError> {
+        let work = self.read_work(work)?;
+        crate::ReviewerModelView::from_work(&work).map_err(|e| RootStoreError::Launch(Box::new(e)))
+    }
+
+    /// Preview the same revision, owner and provider checks as apply in one
+    /// read-only SQL snapshot, without a provider call or Work write.
+    #[cfg(target_os = "linux")]
+    pub fn preview_reviewer_model(
+        &self, work: &str, raw: &[u8], environment: &mut impl WorkEnvironment,
+    ) -> Result<crate::ReviewerModelView, RootStoreError> {
+        use RootStoreError as E;
+        crate::check_command_input_size(raw).map_err(E::Input)?;
+        let request = crate::decode_reviewer_model_request(raw).map_err(|e| E::Launch(Box::new(e)))?;
+        let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;
+        let result = (|| {
+            let settings = self.read_settings()?;
+            let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
+            let result = (|| {
+                let mut current = crate::read_recorded_work(&tx, work).map_err(E::Work)?;
+                if current.revision != request.expected_revision {
+                    return Err(E::Refused("revision_conflict"));
+                }
+                crate::reviewer_model::apply(&tx, &self.root, &mut current, &request, &settings, environment)
+                    .map_err(|e| E::Launch(Box::new(e)))?;
+                crate::ReviewerModelView::from_work(&current).map_err(|e| E::Launch(Box::new(e)))
+            })();
+            finished(result, tx.rollback().map_err(E::Sql))
+        })();
+        finished(result, reservation.close().map_err(E::Storage))
+    }
+
     /// Preview the current task choice under saved settings without SQL writes.
     /// Strict request/revision, idle guards and provider resolution apply. Local
     /// actor/time are unverified observations, not identity or launch permission;

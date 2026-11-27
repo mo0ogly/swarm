@@ -33,6 +33,14 @@
     "tests/rust_managed_result_recovery.py",
     "tests/rust_managed_repository_bootstrap.py",
     "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/src/agent_execution_store.rs",
+    "rust/crates/swarm-engine/src/agent_live_read.rs",
+    "rust/crates/swarm-engine/src/root_store/log_query.rs",
+    "rust/crates/swarm-web/src/service/log_query.rs",
+    "rust/crates/swarm-authority/src/policy.rs",
+    "rust/crates/swarm-authority/tests/policy.rs",
+    "docs/architecture/ADMIN-DEBUG.md",
+    "docs/en/ADMIN-DEBUG.md",
     "tests/rust_mission_watch_worker.py",
     "tests/rust_mission_task_order.py",
     "tests/rust_workspace_fifo_completion.py",
@@ -84,7 +92,7 @@
       "command": [
         "python3",
         "-c",
-        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='managed-native-reviewer-pass-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_managed_reviewer.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--case','pass','--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and not r['accepted'] and not r['paid_provider'] and set(['actual-helper-provider-stream-and-one-budget-reservation-without-acceptance', 'framed-original-retains-full-cohort-protocol-frozen-policy-and-actual-wait', 'exact-event-and-explicit-original-replay-never-rerun-provider-or-debit', 'complete-cohort-candidate-and-content-addressed-context-published', 'published-context-corruption-refuses-and-restores-without-state-change']).issubset(r['checks'])\nprint('MANAGED_NATIVE_PASS_PASS '+str(p))"
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='managed-native-reviewer-pass-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_managed_reviewer.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--case','pass','--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and not r['accepted'] and not r['paid_provider'] and set(['review-diagnostics-size-refusal-no-job-no-provider-no-duplicate', 'review-diagnostics-phases-and-summary-no-private-data', 'review-diagnostics-replay-filter-and-protected-http', 'review-diagnostic-sink-failure-preserves-business-json', 'actual-helper-provider-stream-and-one-budget-reservation-without-acceptance', 'framed-original-retains-full-cohort-protocol-frozen-policy-and-actual-wait', 'exact-event-and-explicit-original-replay-never-rerun-provider-or-debit', 'complete-cohort-candidate-and-content-addressed-context-published', 'published-context-corruption-refuses-and-restores-without-state-change']).issubset(r['checks'])\nprint('MANAGED_NATIVE_PASS_PASS '+str(p))"
       ],
       "expected_exit": 0,
       "required_stdout": [

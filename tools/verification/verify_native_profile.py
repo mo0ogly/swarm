@@ -210,6 +210,26 @@ def run(root,out,target):
         return _run_admitted(root,out,target,admission)
 
 
+def library_fingerprint(target, filename, library):
+    """Map this exact Cargo rlib to its fingerprint on the admitted target.
+
+    Accept the classic deps directory and Cargo's explicit build-dir layout.
+    The path and unit hash must agree with the artifact event. Missing metadata
+    is handled by the caller as a failed qualification, with no fallback.
+    """
+    match=re.fullmatch(r'lib'+re.escape(library)+r'-([0-9a-f]+)\.rlib',filename.name)
+    require(match is not None, 'profile-library-name')
+    package=library.replace('_', '-')
+    debug=target/'debug'
+    unit=debug/'build'/package/match[1]
+    if filename.parent == unit/'out':
+        directory=unit/'fingerprint'
+    else:
+        require(filename.parent == debug/'deps', 'profile-library-layout')
+        directory=debug/'.fingerprint'/f'{package}-{match[1]}'
+    return directory/f'lib-{library}.json'
+
+
 def _run_admitted(root,out,target,admission):
     """Build offline/locked without fixture features, retain exact observations.
 
@@ -241,8 +261,10 @@ def _run_admitted(root,out,target,admission):
         fingerprints={}
         for artifact in selected:
             if artifact['target']['name']=='swarm-rust':continue
-            filename=next(p for p in artifact['filenames'] if p.endswith('.rlib'));match=re.fullmatch(r'lib(.+)-([0-9a-f]+)\.rlib',Path(filename).name);require(match is not None,'profile-library-name')
-            package=artifact['target']['name'].replace('_','-');path=target/'debug/.fingerprint'/(package+'-'+match[2])/('lib-'+artifact['target']['name']+'.json');value=json.loads(path.read_bytes());require(value['rustflags']==[],'profile-compiler-flags')
+            filename=Path(next(p for p in artifact['filenames'] if p.endswith('.rlib')))
+            path=library_fingerprint(target, filename, artifact['target']['name'])
+            value=json.loads(path.read_bytes())
+            require(value['rustflags']==[], 'profile-compiler-flags')
             fingerprints[str(path.relative_to(root)) if path.is_relative_to(root) else str(path)]=dict(sha256=digest(path),features=value['features'],rustflags=value['rustflags'],compile_kind=value['compile_kind'])
         actual=dependencies(root,depfile);publish(out/'after.json',json.dumps(actual,indent=2)+'\n');effective_unchanged(root,before,actual)
         source_archive=archive_effective_sources(root,out,actual)

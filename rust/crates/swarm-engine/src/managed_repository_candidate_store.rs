@@ -52,7 +52,7 @@ impl ManagedCandidate {
     /// mode and digest describe raw regular bytes or a symlink's target bytes.
     /// This grants no path access, permission or freshness; actual readers must
     /// keep the witness and reject changed, unsupported or unreadable content.
-    pub(crate) fn review_entries(&self) -> impl Iterator<Item = (&str, &str, &str)> {
+    pub(crate) fn review_entries(&self) -> impl ExactSizeIterator<Item = (&str, &str, &str)> {
         self.tracked.iter().map(|(name, source)| {
             let (mode, sha256) = source.review_identity();
             (name.as_str(), mode, sha256)
@@ -276,6 +276,7 @@ fn inspect(
     plan: &ControlPlan,
     settings: &EngineSettingsDocument,
     pinned: &mut Option<CandidateWitness>,
+    verify_full_tree: bool,
 ) -> Result<ManagedCandidate, E> {
     if pinned.is_some() {
         return Err(E::Refused("managed-candidate-witness-already-retained"));
@@ -351,7 +352,7 @@ fn inspect(
                                         ));
                                     }
                                     source_state(copy, &saved.commit, &saved.previous, settings)?;
-                                    if tracked_sources(copy, &saved.commit, settings)?
+                                    if verify_full_tree && tracked_sources(copy, &saved.commit, settings)?
                                         != saved.tracked
                                     {
                                         return Err(E::Refused(
@@ -395,7 +396,7 @@ pub(crate) fn prepare_candidate(
     let result = with_storage(root,work,true,|storage|{
         repository(storage,work,settings)?;
         inside(storage.child("repository.git",false).map_err(|e|E::caused("managed-candidate-repository",e))?,|bare|inside(storage.child("candidates",true).map_err(|e|E::caused("managed-candidate-parent",e))?,|parent|inside(parent.child(&key,true).map_err(|e|E::caused("managed-candidate-directory",e))?,|directory|{
-            if directory.names().map_err(|e|E::caused("managed-candidate-list",e))?.iter().any(|name|name==b"candidate.json"){return inspect(directory,bare,work,agent,&frozen.commit,&key,&plan,settings,&mut pinned);}
+            if directory.names().map_err(|e|E::caused("managed-candidate-list",e))?.iter().any(|name|name==b"candidate.json"){return inspect(directory,bare,work,agent,&frozen.commit,&key,&plan,settings,&mut pinned,true);}
             let reference=format!("refs/swarm/native-candidates/{key}");
             let prior=result::reference(&bare.process_path(),&reference,settings)?;
             inside(directory.child("stages",true).map_err(|e|E::caused("managed-candidate-stages",e))?,|stages|{
@@ -424,7 +425,7 @@ pub(crate) fn prepare_candidate(
                         value.binding_sha256=Some(value.binding_digest()?);
                         let raw=crate::encode_model(&value).map_err(|e|E::caused("managed-candidate-encode",e))?;
                         directory.publish_new_with_fault("candidate.json",&raw,crate::local_storage::AtomicStorageFault::None).map_err(|e|E::caused("managed-candidate-publication-incomplete",e))?;
-                        inspect(directory,bare,work,agent,&frozen.commit,&key,&plan,settings,&mut pinned)
+                        inspect(directory,bare,work,agent,&frozen.commit,&key,&plan,settings,&mut pinned,true)
                     }))
                 })
             })
@@ -450,6 +451,30 @@ pub(crate) fn pin_candidate(
     work: &Work,
     agent: &Agent,
     settings: &EngineSettingsDocument,
+) -> Result<CandidateWitness, E> {
+    pin_with_scope(root, work, agent, settings, true)
+}
+
+/// Pin the original checkpoint/ref and directory identities for an opinion.
+/// The caller must check its selected raw sources before using this witness.
+/// It confers no full snapshot proof and is unsuitable for publishing a task.
+pub(crate) fn pin_for_opinion(
+    root: &Path,
+    work: &Work,
+    agent: &Agent,
+    settings: &EngineSettingsDocument,
+) -> Result<CandidateWitness, E> {
+    pin_with_scope(root, work, agent, settings, false)
+}
+
+/// Hold the immutable Git identities with either a complete raw check or a
+/// later scoped review observation. Failures preserve all close causes.
+fn pin_with_scope(
+    root: &Path,
+    work: &Work,
+    agent: &Agent,
+    settings: &EngineSettingsDocument,
+    verify_full_tree: bool,
 ) -> Result<CandidateWitness, E> {
     let frozen = result::verify_result(root, work, agent, settings)?;
     let (key, plan) = coordinates(work, agent, &frozen.commit, settings)?;
@@ -481,6 +506,7 @@ pub(crate) fn pin_candidate(
                                     &plan,
                                     settings,
                                     &mut pinned,
+                                    verify_full_tree,
                                 )
                             },
                         )

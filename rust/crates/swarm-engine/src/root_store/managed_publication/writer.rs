@@ -168,7 +168,7 @@ impl RootStore {
         }).map_err(|primary|match &known { Some((work,revision))=>E::WorkRecorded {primary:Box::new(primary),work:work.clone(),revision:*revision},None=>primary })?;
         if let Some(value) = replayed { return Ok(value); }
         let before = observe(self,work_id,&request,None)?;
-        let candidate = task_validation::acquire_claimed_review_candidate(self,work_id,&request,Some(&before.review))?
+        let candidate = task_validation::acquire_publication_candidate(self,work_id,&request,Some(&before.review))?
             .ok_or(E::Refused("managed-publication-candidate-required"))?;
         let result = (|| {
             candidate.refresh(self)?;

@@ -60,12 +60,20 @@ pub(super) fn name(id: &str) -> String {
 /// never operator cutoffs. This validates no current source, model or authority;
 /// received journal bytes remain untrusted data for a later publication fence.
 fn validate(value: &Receipt) -> Result<(), E> {
-    if !matches!(value.schema_version, 1 | 2)
+    if !matches!(value.schema_version, 1 | 2 | 3)
         || !swarm_identity_contract::name(value.job.id.as_bytes())
         || (value.schema_version == 1 && value.raw_capture.is_some())
         || (value.schema_version == 2 && value.raw_capture.is_none())
     {
         return Err(E::Refused("review-receipt-schema-or-id"));
+    }
+    if value.schema_version == 3 && (!unstarted(&value.job)
+        || value.process_attempted || value.grant_attempted || value.channel_closed
+        || value.waited || !value.failed || value.output_complete || value.original_reply.is_some()
+        || value.raw_capture.is_some() || value.gate.is_some() || value.duration_expired
+        || value.drain_expired || value.source_interrupted)
+    {
+        return Err(E::Refused("review-unstarted-receipt-invalid"));
     }
     if let Some(managed)=&value.managed_review {
         managed.validate().map_err(|e|caused("review-managed-original-invalid",e))?;
@@ -230,6 +238,82 @@ pub(super) fn persist(root: &RootStore, value: &Receipt) -> Result<String, E> {
     validate(value)?;
     root_binding(root, value)?;
     guard::owner(&value.job)?;
+    publish(root, value)
+}
+
+/// A monotonic ledger claim with no registered child/grant/output. This
+/// establishes that no reviewer grant exists, not that a helper was reaped.
+pub(super) fn unstarted(job: &Job) -> bool {
+    job.phase == super::store::Phase::Claimed && job.permission == 0
+        && job.child_pid.is_none() && job.parent_pid.is_none() && job.group_id.is_none()
+        && job.child_stamp.is_none() && job.receipt_sha256.is_none() && job.published_revision.is_none()
+}
+
+/// Recognize a failed, reaped helper which never received a reviewer grant.
+pub(super) fn waited_before_grant(receipt: &Receipt) -> bool {
+    receipt.schema_version == 2 && (unstarted(&receipt.job) || registered_without_grant(&receipt.job))
+        && receipt.failed && receipt.process_attempted && receipt.waited
+        && !receipt.grant_attempted && !receipt.output_complete
+        && receipt.original_reply.is_none()
+}
+
+/// A registered helper remains revocable until the ledger grants permission.
+fn registered_without_grant(job: &Job) -> bool {
+    job.phase == super::store::Phase::Registered && job.permission == 0
+        && job.child_pid.is_some() && job.parent_pid.is_some() && job.group_id.is_some()
+        && job.child_stamp.is_some() && job.receipt_sha256.is_none() && job.published_revision.is_none()
+}
+
+/// Recognize either compatible original of a terminal no-grant failure.
+pub(super) fn no_grant_original(receipt: &Receipt) -> bool {
+    receipt.schema_version == 3 || waited_before_grant(receipt)
+}
+
+/// Preserve the observed departure of a claim with no grant. Existing bytes
+/// must be the exact no-grant original. This creates no fake wait or verdict.
+/// Caller must hold the current ledger transaction and verify Root funding.
+pub(super) fn retire_unstarted(
+    root: &RootStore, job: &Job, owner: super::publication::OwnerBoundary,
+) -> Result<(), E> {
+    if !root.writable || !(unstarted(job) || registered_without_grant(job)) {
+        return Err(E::Refused("review-unstarted-claim-required"));
+    }
+    use super::publication::OwnerBoundary;
+    match owner {
+        OwnerBoundary::CurrentOriginal => guard::owner(job)?,
+        OwnerBoundary::ConfirmedDeparted => guard::departed(job)?,
+    }
+    let name = name(&job.id);
+    if root.directory.names().map_err(E::Storage)?.iter().any(|entry| entry == name.as_bytes()) {
+        let (prior, _) = read(root, &job.id)?;
+        let compatible = match owner {
+            OwnerBoundary::CurrentOriginal => waited_before_grant(&prior),
+            OwnerBoundary::ConfirmedDeparted => no_grant_original(&prior),
+        };
+        if !compatible || prior.job != *job {
+            return Err(E::Refused("review-unstarted-original-changed"));
+        }
+        return Ok(());
+    }
+    if !unstarted(job) || matches!(owner, OwnerBoundary::CurrentOriginal) {
+        return Err(E::Refused("review-unstarted-waited-original-required"));
+    }
+    let value = Receipt {
+        schema_version: 3, managed_review: None, job: job.clone(),
+        finished_at: crate::system_timestamp().map_err(|e| caused("review-unstarted-clock", e))?,
+        process_attempted: false, grant_attempted: false, channel_closed: false, waited: false,
+        exit_code: None, signal: None, unresolved_pid: None, ownership_lost_pid: None,
+        failed: true, output_complete: false, duration_expired: false, drain_expired: false,
+        source_interrupted: false, original_reply: None, provider_facts: Default::default(),
+        raw_capture: None, causes: Vec::new(), gate: None,
+    };
+    validate(&value)?;
+    root_binding(root, &value)?;
+    publish(root, &value).map(|_| ())
+}
+
+/// Frame and durably create one original after the caller's ownership checks.
+fn publish(root: &RootStore, value: &Receipt) -> Result<String, E> {
     let raw = serde_json::to_vec(value).map_err(|e| caused("review-receipt-encode", e))?;
     let frame =
         crate::native_receipt::encode(&raw).map_err(|e| caused("review-receipt-frame", e))?;

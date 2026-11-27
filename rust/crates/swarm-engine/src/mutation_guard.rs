@@ -216,8 +216,10 @@ pub(crate) fn edits_definition(r: &Request) -> bool {
         || r.max_tool_calls != 0
         || r.validation_policy.is_some()
 }
-/// Identify an explicitly confirmed, policy-only update for managed submissions.
-/// This class selects stricter submission-specific checks in the Work writer.
+/// Identify an explicitly confirmed, policy-only update for a managed task.
+/// The Work writer then applies stricter checks chosen by task status: the
+/// unstarted-task path for `todo`, otherwise the submission path. Matching
+/// this shape grants nothing by itself; every refusal comes from those checks.
 pub(crate) fn managed_submission_controls_only(r: &Request) -> bool {
     r.confirm_contract_revision && r.validation_policy.is_some() && *r == Request {
         schema_version: r.schema_version,

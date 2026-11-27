@@ -182,7 +182,7 @@ impl RootStore {
     /// Errors retain their causes and close the pinned candidate. No write admission.
     pub(super) fn observe_managed_publication(&self, work: &str, request: &task_validation::Request) -> Result<ManagedPublicationPreview, E> {
         let before = observe(self, work, request, None)?;
-        let candidate = task_validation::acquire_claimed_review_candidate(
+        let candidate = task_validation::acquire_publication_candidate(
             self, work, request, Some(&before.review))?
             .ok_or(E::Refused("publication-preview-candidate-required"))?;
         let result = (|| {

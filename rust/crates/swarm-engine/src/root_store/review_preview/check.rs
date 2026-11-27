@@ -109,6 +109,6 @@ impl RootStore {
                 verdict_applicable: false,
                 task_accepted: false,
             })
-        })
+        }, |value, _| Ok(value))
     }
 }

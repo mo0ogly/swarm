@@ -212,7 +212,7 @@ mod tests {
         input.help = true;
         let mut output = Vec::new();
         assert!(matches!(
-            crate::execute(&input, &mut output),
+            crate::execute(&input, &mut output, None),
             Err(CliError::Usage)
         ));
         assert!(output.is_empty());

@@ -64,6 +64,12 @@ impl RootStore {
                 }
             }
         };
+        if claimed.is_some()
+            && (self.archived_unstarted_review(tx, &work.id, task_id, &previous.id)?
+                || self.archived_failed_task_review(tx, work, task_id, previous)?)
+        {
+            return Ok(None);
+        }
         let planning = work.planning.as_deref().ok_or(E::Refused("review-recovery-planning-required"))?;
         if planning.repository.is_some() || task.plan_role != "worker" || task.status != "submitted" || task.launch_held || task.planning_retry
             || task.attempts.iter().flatten().last().is_none_or(|a| a.id != previous.attempt || a.status != "completed") {

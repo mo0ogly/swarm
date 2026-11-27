@@ -340,6 +340,11 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
 
     if let Some(e) = native_ref::<crate::RootStoreError>(e, &mut result, &mut explicit) {
         result.labels.push(e.code().into());
+        if let crate::RootStoreError::ReviewDiagnostics { primary, failures } = e {
+            result.labels.extend(failures.iter().map(|code| format!("review-diagnostic-sink:{code}")));
+            result.children.push(("primary", primary.as_ref()));
+            explicit = true;
+        }
         if let crate::RootStoreError::Cleanup { primary, cleanup } = e {
             if let Some(primary) = primary {
                 result.children.push(("primary", primary.as_ref()));

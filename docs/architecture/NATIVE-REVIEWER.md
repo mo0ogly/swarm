@@ -11,6 +11,29 @@ intermédiaires de revue restent hors de cette projection.
 Les preuves natives décrites ici ciblent Linux ; aucune équivalence entre
 plateformes n’est établie.
 
+
+Le processus privé de revue fixe `TMPDIR` à son espace I0 vérifié. Le dossier
+temporaire hôte configuré ne devient pas un espace d’écriture du fournisseur.
+Les chemins du compte et la politique réseau gardent leurs contrôles existants.
+
+## Contrôle géré en lecture seule à entrées déclarées
+
+L’opérateur peut employer `schema_version: 2` avec `task validation-preview`
+et `task validate` pour un candidat géré qui a déjà un point de contrôle et
+un seul contrôle enregistré à entrées explicites. L’aperçu expose
+`declared_candidate_inputs`. Le moteur compare ces fichiers réguliers au
+point de contrôle Git et vérifie séparément le rapport conservé. Ce parcours
+ne recrée pas le candidat et ne parcourt pas la copie complète.
+
+Le processus privé Linux donne accès en lecture aux inodes vérifiés du
+candidat. Le listage, les autres fichiers du candidat et les écritures sont
+refusés. Les sorties et le runtime hôte en lecture seule restent disponibles
+comme auparavant. Une entrée absente, modifiée, redirigée ou non déclarée fait
+échouer le contrôle. La version 1 couvre les dépendances implicites et les
+copies modifiables. La demande et l’empreinte de source lient le mode au job.
+La revue réutilise les entrées du job. La publication conserve sa vérification
+d’intégrité du candidat complet et ses contrôles d’approbation.
+
 ## Périmètre réellement disponible
 
 Les aperçus, le contrôleur reviewer, le lecteur de contexte, la publication et
@@ -45,6 +68,34 @@ Les deux aperçus de tâche prennent `schema_version`, `event_id`,
 `expected_revision`, `task_id`. Une identité d’acteur ou commande affirmée par
 l’appelant n’est pas une autorité. L’aperçu public refuse une revue déjà en cours ;
 la relecture interne n’autorise que l’exacte revue liée au job normalisé.
+
+Le parent vérifie le dossier à la réservation. Au démarrage, il réutilise les
+données de planification. Il enregistre l’auxiliaire puis lui permet d’entrer
+dans son contrôle d’admission privé après vérification de son identité, de la
+racine, de la réservation, du financement, du bail, des réglages et de l’échéance
+initiale. L’auxiliaire reconstitue et compare le dossier courant, vérifie la
+route et l’exécutable et vérifie encore l’échéance avant d’exécuter le fournisseur.
+Le ticket reste lié à son échéance d’origine.
+
+```mermaid
+sequenceDiagram
+    participant P as Moteur parent
+    participant A as Auxiliaire enregistré
+    participant F as Fournisseur
+    P->>P: Vérifier le dossier et réserver
+    P->>A: Vérifier l’identité et ouvrir l’admission privée
+    A->>A: Revérifier les sources, la route et l’échéance
+    alt Tous les contrôles passent
+        A->>F: Exécuter dans le périmètre autorisé
+    else Refus
+        A-->>P: Diagnostic, puis clôture selon le reçu
+    end
+```
+Si un auxiliaire déjà récolté échoue avant tout octroi, son reçu d’origine
+peut clore exactement cette réservation comme non-verdict. Le rapport et
+le candidat restent attribués, le quota consommé reste enregistré.
+La recette `native-reviewer-pregrant-recovery` vérifie la forme acceptée
+et les refus, avec une cible Cargo préalablement admise.
 
 ## Correspondance des contrôles natifs
 
@@ -441,6 +492,18 @@ reproduit ; deux résultats et contextes publics09, cinq gardes de départ norma
 quatre stale10, huit publications11 et Clippy/Rustdoc12 PASS sur05. Normal06
 SHA cc2e88 compile255sources effectives, inchangées dans05 (08), sans fixture
 et sans installation.
+
+
+## Archiver un échec du reviewer sur candidat géré
+
+`swarm task review-archive-failure REVIEW_ID --root ROOT --json` archive l’erreur
+courante d’une tâche soumise si le reçu prouve une fin de processus après octroi,
+un code de sortie non nul et l’absence de réponse complète. Un avis existant, un
+refus d’admission, un arrêt sans preuve de fin ou une capture en erreur refuse.
+L’événement d’archive lie l’original au même travail et conserve le reçu,
+l’exécution productrice, les contrôles, le rapport et le débit. Le rejeu vérifie
+l’événement sans muter. Le prochain appel reste une commande distincte, soumise
+au quota, au prévol et aux preuves courantes. L’archivage n’accepte aucune tâche.
 
 ## Exécuter et reprendre depuis le CLI normal
 
@@ -868,6 +931,69 @@ tâche cible reste présent aussi. La projection déclare `inspection_only=true`
 avis historiques acceptés. Un résultat de contrôle dont la sortie est tronquée
 reste une observation déclarée comme telle, pas une sortie complète inventée.
 
+`task review-preview` présente un inventaire compact (`managed_inventory`).
+Il distingue le nombre d’entrées du candidat et les chemins modifiés depuis
+son parent enregistré. La liste indique les ajouts, suppressions, modifications
+et changements de type. Un renommage apparaît comme un ajout et une suppression.
+Le plafond de fichiers en vigueur et son dépassement éventuel portent sur
+l’inventaire complet du candidat. Lorsque celui-ci dépasse le plafond, le
+dossier de revue utilise les fichiers ajoutés ou modifiés et les entrées
+déclarées des contrôles, sans doublons. Les suppressions figurent dans le delta.
+Une entrée de contrôle inchangée et non textuelle conserve son chemin, son
+empreinte vérifiée et son attribution au contrôle. Son contenu n’est pas
+fourni et ne peut pas être cité. Une entrée déclarée absente du candidat
+refuse. Le plafond et les bornes d’octets s’appliquent aux pièces sélectionnées.
+Le contexte précise sa portée et le réviseur doit déclarer `unknown` si une
+pièce requise par un critère lui manque. Le moteur continue de vérifier
+l’intégralité du candidat et les reçus d’origine. Les dossiers qui tiennent
+dans le plafond gardent leur représentation historique. Le dossier ciblé
+contient le reçu attribué de la cohorte et les résultats des contrôles dans
+le protocole de revue. Il ne répète pas la table intégrale des empreintes
+d’artefacts du reçu de validation. La préparation ne
+démarre aucun appel et ne valide aucune tâche.
+
+Une acquisition de dossier ciblé confirme les identités Git et la liaison
+au reçu des contrôles. Elle relit seulement les chemins du dossier, les
+entrées déclarées et les artefacts de preuve utiles. Les empreintes des
+autres fichiers décrivent les originaux au moment des contrôles. La
+publication du résultat exige une vérification complète en lecture réelle.
+Dans un dossier complet, les empreintes vérifiées dans le même passage
+sont réutilisées entre les contrôles d’artefacts.
+
+Chaque lecture du contrôle publié ouvre son reçu privé une fois. Le moteur
+compare l’empreinte réelle au registre et contrôle chaque reçu d’étape. Un
+nouveau passage relit ses originaux pour vérifier leur état courant.
+
+Lorsque Codex est le réviseur, le préflight lie l’annonce locale du modèle et du
+niveau d’effort sélectionnés. Une réécriture du cache portant sur son horodatage
+ou d’autres modèles laisse cette preuve inchangée. Le retrait de l’annonce, un
+cache illisible et une dérive de l’exécutable restent détectés. La première
+admission d’une réservation portant l’ancienne empreinte du cache entier peut
+refuser après une mise à jour. Utiliser la reprise correspondant à l’état du
+processus réellement observé.
+Les réservations des agents conservent leur empreinte historique du cache entier.
+
+`task review-retire-unstarted REVIEW_ID` clôture une réservation sans
+autorisation de lancement, sans enfant enregistré et dont le propriétaire
+a disparu sur le même hôte. L’original privé version 3 conserve ce constat.
+La transaction archive le refus, libère l’exclusion par tâche et conserve
+la consommation. Un nouveau départ exige une commande et une admission
+fraîches. Les opérations de reprise d’un processus lancé conservent leur
+preuve de fin propre. Un propriétaire vivant ou une preuve ambiguë refuse.
+
+Dans Conduite, « Valider » utilise la publication native pour un candidat
+géré dont la politique exige une validation humaine. Le précontrôle reste
+en lecture seule. Le clic est soumis aux contrôles d’identité et de révision
+de la route protégée. La publication enregistre ensemble le candidat et
+l’état accepté. La fiche relit ensuite l’état du travail.
+Elle n’autorise aucun appel au réviseur.
+
+Dans `managed_inventory.control_inputs`, chaque pièce déclarée par un contrôle
+est associée à sa tâche, au contrôle et à son chemin depuis le dépôt. Quand
+la pièce est suivie par Git, son mode et l’empreinte du candidat retenu sont
+fournis, même si le chemin est inchangé. Une pièce hors de l’inventaire Git
+reste listée avec une empreinte Git absente. Cette liste n’ouvre pas les pièces.
+
 Les réglages existants sont conservés : `review_delivery_files` borne l'inventaire
 Git complet présenté, `review_context_files` compte tous les matériaux, doublons
 attribués compris ; `review_source_bytes` compte leurs octets UTF-8 et
@@ -930,6 +1056,28 @@ sequenceDiagram
 ```
 
 
+## Ajouter des observations opérateur à la revue gérée
+
+L’opérateur du projet peut déposer un JSON UTF-8 dans
+`docs/swarm-review-evidence/{work_id}/{task_id}.json` sous la racine du projet,
+hors de la copie du candidat. La version 1 porte `schema_version`, `work_id`,
+`task_id`, `attempt_id`, `candidate_commit`, `report_sha256` et `observations`.
+Chaque observation donne un `criterion` unique compté à partir de 1, une `source`
+et un `detail`. La pièce est attribuée à l’opérateur. Le vérificateur décide
+si elle démontre le critère. Un fichier absent préserve le comportement existant.
+Une liaison invalide, un type de fichier dangereux, un indice répété ou une limite
+dépassée refuse. Les octets d’origine entrent dans le catalogue et le contrôle
+de fraîcheur des artefacts. Le prompt ciblé donne l’index des pièces et réutilise
+le texte porté par le protocole. Les observations opérateur se lisent dans les
+segments du catalogue du prompt. Le protocole conservé et les entrées publiques
+gardent les originaux exacts. `review-inputs` les restitue même lorsque le quota
+est exactement consommé. L’exécution reste soumise à son admission et à son quota.
+
+Après un échec de protocole géré attesté à exit zéro, `review-archive-failure`
+peut conserver la réponse en historique sans la transformer en avis. Un avis
+enregistré ou une réponse que le décodeur courant reconnaît comme favorable
+reste exclu de cet archivage.
+
 ## Vérifier une sortie de cohorte fournie
 
 `task review-check ID --root ROOT --input FILE --json` reprend les quatre champs
@@ -946,6 +1094,13 @@ un candidat ordinaire, une cohorte incomplète, des indices répétés, des cita
 invalides, un outil déclaré ou un flux sans fin explicite refusent. Les limites
 Admin de réponse, d’événement et de texte sont réellement consommées ; un refus
 conserve sa cause et ne produit aucun résultat partiel sur la sortie CLI.
+
+Le décodeur géré accepte le JSON brut ou un bloc Markdown complet étiqueté
+`json`, avec chaque délimiteur sur sa propre ligne et sans texte autour. Les
+limites persistées couvrent la réponse complète, dont les octets et l’empreinte
+d’origine sont conservés. L’objet interne est soumis aux mêmes contrôles de
+champs, cohorte, citations et verdict que le JSON brut. Un critère `unknown`
+empêche toujours un avis favorable.
 
 Le résultat contient l’opinion parsée et les empreintes du contexte, du catalogue
 et de la réponse. `supplied_output_checked=true` décrit seulement les octets

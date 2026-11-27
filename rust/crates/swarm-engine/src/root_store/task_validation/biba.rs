@@ -17,7 +17,7 @@ impl Prepared {
     /// environment to the saved launch allowlist and open null stdin before
     /// restriction. No provider program is started and no policy is invented.
     /// IO/kernel/close failures refuse with causes; no unconfined fallback exists.
-    pub(super) fn prepare(root:&Path,workspace:&Path,mut command:Command,environment:&[String],internet_denied:bool)->Result<Self,E>{
+    pub(super) fn prepare(root:&Path,workspace:&Path,mut command:Command,environment:&[String],internet_denied:bool,focused:Option<&[File]>)->Result<Self,E>{
         let base=workspace.canonicalize().map_err(|e|cause("task-validation-i0-workspace",e))?;
         let cwd=command.get_current_dir().ok_or(E::Refused("task-validation-i0-cwd-required"))?
             .canonicalize().map_err(|e|cause("task-validation-i0-cwd",e))?;
@@ -33,7 +33,13 @@ impl Prepared {
         command.stdin(Stdio::inherit());
         let observed=workspace.metadata().map_err(|e|cause("task-validation-i0-workspace",e))?;
         let input=File::open("/dev/null").map_err(|e|cause("task-validation-i0-stdin",e))?;
-        match boundary::prepare_boundary(root,workspace,(observed.dev(),observed.ino())) {
+        let identity = (observed.dev(), observed.ino());
+        let profile = if let Some(files) = focused {
+            boundary::prepare_boundary_inputs(root, workspace, identity, files)
+        } else {
+            boundary::prepare_boundary(root, workspace, identity)
+        };
+        match profile {
             Ok(profile)=>Ok(Self{command,profile,input,internet_denied}),
             Err(error)=>finished(Err(error),nix::unistd::close(input).map_err(|e|cause("task-validation-i0-stdin-close",e))),
         }

@@ -47,12 +47,21 @@ async function verify(){
      if(!cfg.eligible){
       work.planning={...work.planning,reviewer:{provider:'fixture',calls:5,max_calls:5}};
       task.previous_reviews=[{state:'error',reason:'native-review-helper-waited-before-grant'}];
+      task.independent_review={id:'review-fixture-current',state:'error'};
      }
      await request.respond({contentType:'application/json',body:JSON.stringify(work)});return;
     }
     if(reviewBudgetBlocked&&request.method()==='GET'&&uri.pathname==='/api/v1/action'){
      await request.respond({status:409,contentType:'application/json',body:JSON.stringify({
       failure:{reason:'native-scoped-submitted-review-required'},
+     })});return;
+    }
+    if(uri.pathname==='/api/v1/agent-logs/task-actions'&&uri.searchParams.has('review_revision')){
+     assert.equal(uri.searchParams.get('task'),cfg.task);
+     await request.respond({contentType:'application/json',body:JSON.stringify({
+      work:cfg.work,task:cfg.task,revision:Number(uri.searchParams.get('review_revision')),
+      incident:{review_id:'review-fixture-current',stage:'after-private-admission',exit_code:101,
+       provider_hint:'provider-reported-unix-stream-permission-denied',managed_repository:true}
      })});return;
     }
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
@@ -222,7 +231,11 @@ async function verify(){
    const budgetContext=dialog+' [data-review-context]:not([hidden])';
    await observe(page.waitForSelector(budgetContext,{visible:true}));
    assert.match(await page.$eval(budgetContext,node=>node.textContent),
-    /5\/5 review calls used\. The review budget is exhausted\. The last review stopped before calling the provider because the helper process exited\./);
+    /5\/5 review calls used\. The review budget is exhausted\. The latest review failed without an applicable opinion\./);
+   await observe(page.waitForFunction(()=>document.querySelector('.workbench-review')?.textContent.includes('Unix channel creation refusal (EPERM)')));
+   await page.click(dialog+' .task-detail-diagnostic summary');
+   assert.match(await page.$eval(dialog+' .workbench-review',node=>node.textContent),/Exit code 101\. Direct retry is blocked/);
+
    assert.equal(await page.$eval(button,node=>node.disabled),true);
    assert.deepEqual(writes,[]);
    console.log('PASS task detail explains exhausted review budget without enabling approval');

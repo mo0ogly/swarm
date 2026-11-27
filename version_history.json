@@ -7,8 +7,68 @@
     },
     "items": [
       {
+        "fr": "Les refus HTTP avant admission dans le moteur Rust sont journalisés avec leur statut et leur cause stable.",
+        "en": "HTTP refusals before admission to the Rust engine are logged with their status and stable cause."
+      },
+      {
+        "fr": "Les erreurs de la CLI Rust et les incidents observés par le serveur HTTP natif remontent dans le journal système Linux avec des codes stables. Un relais protège les arguments de la commande d’origine.",
+        "en": "Rust CLI failures and incidents observed by the native HTTP server reach the Linux system journal with stable codes. A relay protects the original command arguments."
+      },
+      {
+        "fr": "Les revues Rust remontent le début de l’exécution, la conservation du reçu et une synthèse corrélée avec la cause, la durée et la version du binaire.",
+        "en": "Rust reviews record the start of execution, receipt retention and a correlated summary with the cause, duration and binary version."
+      },
+      {
+        "fr": "Les journaux de mission corrèlent les phases des tentatives de revue Rust et indiquent les refus de taille et les pannes de journalisation.",
+        "en": "Mission logs correlate the phases of Rust review attempts and show size refusals and logging failures."
+      },
+      {
+        "fr": "La revue ciblée porte le texte complet des preuves opérateur dans le catalogue de citations, sans le répéter dans son contexte de prompt.",
+        "en": "Focused review carries complete operator evidence in the citation catalogue without repeating it inside the prompt context."
+      },
+      {
+        "fr": "La revue ciblée réutilise le texte du catalogue au lieu de le dupliquer dans le prompt.",
+        "en": "Focused review uses the catalogue text without duplicating it in the prompt."
+      },
+      {
+        "fr": "La revue gérée peut citer les observations opérateur liées au candidat et reprendre après un échec de protocole conservé.",
+        "en": "Managed review can cite candidate-bound operator observations and resume after a retained protocol failure."
+      },
+      {
+        "fr": "La revue gérée valide aussi un objet JSON entouré d’un seul bloc Markdown json et conserve la réponse originale.",
+        "en": "Managed review also validates a JSON object enclosed in a single Markdown json fence and retains the original response."
+      },
+      {
+        "fr": "Le vérificateur natif crée ses temporaires dans son espace I0 vérifié.",
+        "en": "The native reviewer creates temporary files in its verified I0 workspace."
+      },
+      {
+        "fr": "Le contrôle géré en lecture seule peut se limiter aux fichiers déclarés du candidat et en vérifier les octets.",
+        "en": "Read-only managed controls can use only the declared candidate files and verify their bytes."
+      },
+      {
+        "fr": "La resoumission d’un rapport géré vérifie la copie correspondant à la tentative d’origine, y compris après la première tentative.",
+        "en": "Resubmitting a managed report verifies the copy for the originating attempt, including attempts after the first."
+      },
+      {
+        "fr": "Conduite et la CLI Rust peuvent prévisualiser et enregistrer le modèle du vérificateur indépendant avec le catalogue existant. Les appels consommés et les avis précédents sont conservés.",
+        "en": "Conduite and the Rust CLI can preview and save the independent reviewer model from the existing catalogue. Consumed calls and previous opinions are preserved."
+      },
+      {
+        "fr": "Une revue gérée arrêtée par un échec terminal du processus peut être archivée pour reprendre le même candidat, avec le reçu et le débit conservés.",
+        "en": "A managed review stopped by a terminal process failure can be archived to resume the same candidate while preserving the receipt and charged call."
+      },
+      {
+        "fr": "Conduite indique la phase et le code de sortie de la dernière revue échouée, à partir du reçu vérifié et sans exposer la sortie brute.",
+        "en": "Conduite shows the phase and exit code of the latest failed review from a verified receipt without exposing the raw output."
+      },
+      {
         "fr": "La console des logs sépare le journal et la rotation en onglets. Les termes recherchés sont surlignés dans le tableau.",
         "en": "The log console has separate Log and Rotation tabs and highlights search terms in the table."
+      },
+      {
+        "fr": "Le prévol reviewer réserve au processus enfant la vérification du dossier avant exécution. Les dossiers volumineux ciblent les preuves pertinentes et les échecs avant autorisation sont clôturés.",
+        "en": "Reviewer preflight leaves the dossier check before execution to the helper. Large dossiers focus on relevant evidence and failures before authorization are closed."
       },
       {
         "fr": "La console des logs affiche les filtres amovibles, distingue l’absence d’archives et reprend la première page si l’instantané expire. Le démon Rust journalise son démarrage et les refus de lecture.",
@@ -57,6 +117,10 @@
       {
         "fr": "La reprise d’un worker terminé relit son journal en tenant compte de l’effacement des actions en direct sur sa fiche terminale.",
         "en": "Recovery reads the completed worker journal with the live actions cleared from the terminal record."
+      },
+      {
+        "fr": "Une tâche gérée pas encore démarrée peut recevoir sa première politique de validation, humaine ou automatique, avec ses contrôles. La revue indépendante et la publication restent requises.",
+        "en": "A managed task that has not started can receive its first validation policy, human or automatic, with its controls. Independent review and publication remain required."
       },
       {
         "fr": "Une première liste de contrôles peut être rattachée à une soumission gérée en validation humaine sans relancer son worker. La revue indépendante reste requise.",

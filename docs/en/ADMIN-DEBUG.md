@@ -50,6 +50,99 @@ If Monaco cannot load, the log remains readable as text. A read refusal remains
 visible, with its code when available. Close and reopen a project branch to
 retry a failed read. See the [French version](../architecture/ADMIN-DEBUG.md).
 
+### Review failure in Conduite
+
+A submitted task can read its current review incident under the Logs permission
+and the revision shown. The engine cross-checks the original receipt, execution
+row, result event and certificate. Task details report the last boundary reached,
+the exit code when known and the recovery limit for a managed repository.
+A read failure has its own message.
+
+The Unix message is a category derived from provider-reported text. Swarm returns
+a fixed code without copying captured streams, paths or prompts. Reading this
+projection grants neither retry nor approval permission.
+
+### Native Rust review phases
+
+Filter for `"phase":"summary"` to see the end-of-attempt event. It combines
+total elapsed time, the last observed phase, stable cause, known revision,
+preflight sizes and compiled version. Missing or null outcome fields mean the
+fact is unknown. Phase lines remain available during execution, and exact replay
+creates no summary. The `receipt` line confirms receipt retention or reports
+its failure. `process` also reports observed deadlines, interruption and the
+count of transport errors.
+
+In **Monitoring → Logs**, select the producer of the submitted task. Search for
+`review_attempt`, then paste its full digest into the text filter to follow one
+attempt. The type filter accepts `review-info`, `review-warn` and `review-error`.
+The native filtered `GET /api/v1/logs` applies the saved log page policy. With
+the Authority relay, this route and `GET /api/v1/agent-logs` require read access
+and the Logs view permission. Live Agents omits these rows. The relay application
+journal continues to use its own permissions and rotation.
+
+The engine emits these events when executing `task review`, including the
+shared mission entry point. It binds a verified producer attempt before context
+assembly. Read-only `review-preview` and `review-inputs` calls and replay of
+a retained outcome emit no new lines. A refusal before the producer is
+identified creates no mission journal entry. The writer uses the existing
+journal, timestamp and message cap. An event that cannot fit the cap is dropped
+as a whole. The result carries safe sink failures separately. For a refusal, its JSON
+diagnostic retains them with the original causes. The original operation
+supplies the business outcome.
+
+| Phase | Observable facts |
+| --- | --- |
+| `preflight` | Effective source, file and prompt limits, with sizes already observed. A size refusal can precede reservation. |
+| `reservation` | Created review ID, committed revision and call counts and limit, or the refusal code. |
+| `execution` | Process preparation begins after reservation, with the review ID and settings revision. |
+| `grant` and `process` | Helper registration, gate permission, grant delivery, channel state and safe refusals, including known identity and Biba codes. Grant delivery leaves provider execution undetermined. |
+| `reply` and `receipt` | Decode result, aggregate opinion, observed exit code, byte counts and truncation. Receipt retention failure has its own phase. |
+| `publication` | Recorded opinion, applicability and task state where known. |
+
+The correlation digest identifies the structured request intent in the
+producer’s scope. An attempt can have distinct results for a phase. The writer
+keeps one line per phase and outcome code for that digest. Elapsed times are
+monotonic, unmeasured counters stay unknown, and only recognized stable causes
+carry a recovery condition. The projection omits source text, prompts, replies,
+private error messages, paths, tokens and provider identifiers. These review
+boundaries execute no additional Bell–LaPadula control. Relay refusals use the
+existing relay diagnostics.
+
+The [managed native reviewer recipe](../../tools/verification/recipes/native-managed-reviewer.json)
+covers a successful review, size refusal, replay and CLI/HTTP filtering in an
+isolated root. The Authority policy test `exclusive_route_requires_view_permission`
+covers the missing-view refusal and the authorized counterpart.
+
+## Rust engine failures in the system journal
+
+On Linux with journald, the `swarm-rust` executable emits a structured
+event when a command fails, including before a mission is opened. The native
+HTTP observer emits the failures and degraded reads it receives. Events
+include stable codes, a command family, severity, status or exit code and
+elapsed time for commands. A flag indicates a known Work effect. IDs,
+arguments, requests, responses and private messages stay outside this projection.
+
+The relay receives only the filtered event on standard input. Its fixed command line protects the original command if journald captures arguments. Filter by SWARM_PROCESS_ID to find the original Rust process in the same boot session.
+
+```sh
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web
+```
+
+Access and retention follow the system journal configuration. If the
+datagram fails, the JSON reply retains the original failure and includes
+`application_log.code = application-journal-unavailable` when that response
+channel is available. The web observer adds the same field to its outcome
+event. Coverage is limited to the observed boundaries. Intermediate
+`Result` values, forced termination and panics are outside this increment.
+The relay application log and mission logs keep their own scopes.
+
+An HTTP pre-admission refusal is published under
+`SWARM_OPERATION=http-admission` with the response status and stable failure code.
+The first journal submission failure for these refusals appears under
+`refusal_application_log` in the normal shutdown summary. HTTP connection
+errors before header admission remain in the server summary.
+
 ## Application logs for the relay
 
 Open the dedicated console in **Administration → Accounts and access →

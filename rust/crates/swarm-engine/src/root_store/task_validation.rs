@@ -17,7 +17,7 @@ pub use candidate_preparation::TaskValidationCandidate;
 mod retirement;
 mod reconstruction;
 mod review_candidate;
-pub(super) use review_candidate::{acquire as acquire_review_candidate, acquire_using as acquire_claimed_review_candidate, ReviewCandidate};
+pub(super) use review_candidate::{acquire as acquire_review_candidate, acquire_using as acquire_claimed_review_candidate, acquire_final as acquire_publication_candidate, ReviewCandidate};
 mod review_evidence;
 pub(super) use review_evidence::{published_managed_candidate, recorded_managed_candidate, recorded_evidence, recorded_evidence_for_review_result, recorded_evidence_for_prior_review, ReceiptTiming};
 pub use review_evidence::NativeValidationEvidence;
@@ -37,7 +37,8 @@ pub use runtime::TaskValidationOutcome;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, os::unix::fs::MetadataExt, path::Path};
 
-/// Native request names an existing task and optimistic revision only. It cannot
+/// Native request names an existing task and optimistic revision. Version 2
+/// selects a read-only control over declared candidate inputs. It cannot
 /// supply commands, a producer, an actor or an automatic mission origin.
 #[derive(Clone, Default, Deserialize, Serialize)]
 #[serde(default)]
@@ -58,7 +59,7 @@ pub(super) fn decode(raw: &[u8]) -> Result<Request, E> {
     ];
     let r: Request = crate::work::decode_mode(raw, FIELDS, true)
         .map_err(|e| E::caused("task-validation-request-invalid", e))?;
-    if r.schema_version != 1
+    if !matches!(r.schema_version, 1 | 2)
         || r.expected_revision < 1
         || [&r.event_id, &r.task_id]
             .iter()
@@ -89,6 +90,8 @@ pub struct TaskValidationPreview {
     pub authority_revision: Option<crate::SettingCount>,
     pub policy_mode: String,
     pub control_count: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub declared_candidate_inputs: Option<usize>,
     pub source_sha256: String,
     pub artifacts: BTreeMap<String, String>,
     pub execution_authorized: bool,
@@ -252,6 +255,95 @@ pub(crate) fn attach_managed_submission_controls(
     Ok(())
 }
 
+/// Set the first controlled policy of an unstarted managed worker task.
+///
+/// The caller holds the Work writer and has already checked worker, control
+/// and review ownership. The task must be `todo`, never attempted, outside
+/// every review, recovery and gate state, in an open unheld scope and without
+/// an unreleased launch lock. Its contract digest must be fresh and the
+/// operator reason bounded. Its current policy must declare no control.
+/// The supplied policy may be `human` or `automatic`; it must declare at least
+/// one control, pass normalization and cover the task criteria. Only
+/// `validation_policy` changes, stamped with the operator and time.
+///
+/// State refusals use stable `managed-unstarted-policy-*` codes; shared checks
+/// keep their own codes (`contract-digest-stale`, `contract-reason-invalid`,
+/// `task-validation-mission-inactive`, `task-validation-policy-unauthorized`,
+/// normalization and `policy-*` coverage codes). Every refusal leaves the task
+/// intact. This starts no control, review or acceptance. Submitted tasks keep
+/// [`attach_managed_submission_controls`].
+pub(crate) fn attach_managed_unstarted_policy(
+    db: &rusqlite::Connection,
+    work: &mut crate::Work,
+    request: &crate::Request,
+    settings: &crate::EngineSettingsDocument,
+    authorized_at: String,
+    actor: String,
+) -> Result<(), E> {
+    let planning = work.planning.as_ref()
+        .filter(|planning| planning.repository.is_some())
+        .ok_or(E::Refused("managed-unstarted-policy-repository-required"))?;
+    super::require_planning_mission_active(db, &work.id)
+        .map_err(|error| E::caused("task-validation-mission-inactive", error))?;
+    if planning.paused || !planning.failure.is_empty() {
+        return Err(E::Refused("managed-unstarted-policy-planning-inactive"));
+    }
+    if crate::text::trim_space(&actor).is_empty() || crate::text::trim_space(&authorized_at).is_empty() {
+        return Err(E::Refused("task-validation-policy-unauthorized"));
+    }
+    let mut matches = work.tasks.iter().flatten().enumerate().filter(|(_, task)| task.id == request.id);
+    let (index, task) = matches.next().ok_or(E::Refused("managed-unstarted-policy-task-missing"))?;
+    if matches.next().is_some() || task.status != "todo" || task.plan_role != "worker"
+        || task.attempts.as_ref().is_some_and(|attempts| !attempts.is_empty())
+        || task.previous_reviews.as_ref().is_some_and(|reviews| !reviews.is_empty())
+        || task.planning_retry || task.independent_review.is_some()
+        || task.automatic_validation.is_some() || task.gate.is_some()
+        || task.manual_override.is_some() || task.revalidation.is_some()
+        || task.corrective_recovery.is_some() || task.recovered_result.is_some()
+        || task.review_coordination.is_some() || task.batch_review_resume.is_some()
+    {
+        return Err(E::Refused("managed-unstarted-policy-state-invalid"));
+    }
+    if !planning.scopes.iter().flatten().any(|scope|
+        scope.id == task.scope_id && scope.state != "closed" && scope.holder.is_empty())
+    {
+        return Err(E::Refused("managed-unstarted-policy-scope-unavailable"));
+    }
+    let locked: i64 = db.query_row(
+        "SELECT count(*) FROM main.preparation_launch_locks WHERE work_id=? AND task_id=? AND released=0",
+        (&work.id, &task.id), |row| row.get(0),
+    ).map_err(|error| E::caused("managed-unstarted-policy-launch-lock", error))?;
+    if locked != 0 {
+        return Err(E::Refused("managed-unstarted-policy-launch-locked"));
+    }
+    if task.validation_policy.as_ref()
+        .is_some_and(|policy| policy.controls.as_ref().is_some_and(|controls| !controls.is_empty()))
+    {
+        return Err(E::Refused("managed-unstarted-policy-first-policy-required"));
+    }
+    if request.expected_contract != crate::task_review_contract(task)
+        .map_err(|error| E::caused("managed-unstarted-policy-contract", error))?
+    {
+        return Err(E::Refused("contract-digest-stale"));
+    }
+    if crate::text::trim_space(&request.contract_revision_reason).len() < 16
+        || request.contract_revision_reason.len() > 2000 {
+        return Err(E::Refused("contract-reason-invalid"));
+    }
+    let supplied = request.validation_policy.as_ref()
+        .filter(|policy| matches!(policy.mode.as_str(), "human" | "automatic")
+            && policy.controls.as_ref().is_some_and(|controls| !controls.is_empty()))
+        .ok_or(E::Refused("managed-unstarted-policy-controls-required"))?;
+    let limits = settings.values.mutation_limits().map_err(|e| E::caused(e.reason(), e))?;
+    let mut policy = crate::normalize_validation_policy(supplied.clone(), &limits.policy)
+        .map_err(|e| E::caused(e.reason(), e))?;
+    crate::validation_policy_covers_task(&policy, task).map_err(|e| E::caused(e.reason(), e))?;
+    policy.authorized_at = authorized_at;
+    policy.actor = actor;
+    work.tasks.as_mut().ok_or(E::Refused("managed-unstarted-policy-task-missing"))?[index].validation_policy = Some(Box::new(policy));
+    Ok(())
+}
+
 /// Read the latest canonical submission without inventing a missing event.
 /// Event/request/revision coherence and explicit statement finalization are
 /// shared by validation and report relay. None means genuine absence only;
@@ -411,6 +503,7 @@ fn prepare_source(
         authority_revision: authority.as_ref().map(|v| crate::SettingCount(v.revision)),
         policy_mode: policy.mode.clone(),
         control_count: controls.len(),
+        declared_candidate_inputs: None,
         source_sha256: source,
         artifacts,
         execution_authorized: false,
@@ -499,6 +592,9 @@ impl RootStore {
             };
             return finished(result, session.close());
         }
+        if r.schema_version == 2 {
+            return Err(RootStoreError::Refused("task-validation-focused-managed-required"));
+        }
 
         let reservation = self
             .directory
@@ -527,13 +623,18 @@ mod tests {
     fn validation_request_cannot_supply_execution_authority() {
         let valid = serde_json::json!({"schema_version":1,"event_id":"check","expected_revision":4,"task_id":"task"});
         assert!(decode(&serde_json::to_vec(&valid).unwrap()).is_ok());
+        // Version 2 names the focused managed control and is a valid frame;
+        // any other version stays refused.
+        let focused = serde_json::json!({"schema_version":2,"event_id":"check","expected_revision":4,"task_id":"task"});
+        assert!(decode(&serde_json::to_vec(&focused).unwrap()).is_ok());
         for patch in [
             serde_json::json!({"actor":"operator"}),
             serde_json::json!({"origin":"automatic"}),
             serde_json::json!({"command":["python3"]}),
             serde_json::json!({"agent_id":"another"}),
             serde_json::json!({"expected_revision":0}),
-            serde_json::json!({"schema_version":2}),
+            serde_json::json!({"schema_version":0}),
+            serde_json::json!({"schema_version":3}),
             serde_json::json!({"task_id":"../outside"}),
         ] {
             let mut invalid = valid.clone();

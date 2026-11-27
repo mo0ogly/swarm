@@ -245,6 +245,7 @@ pub(super) fn serve<'a, F: Future<Output = ()>>(
     root: PathBuf,
     shutdown: F,
     observer: &'a mut swarm_web::NativeOutcomeObserver<'a>,
+    refusal_observer: &mut swarm_web::NativeRefusalObserver<'_>,
 ) -> Result<swarm_web::NativeServerReport, NativeServerError> {
     let mut store = match server.bound_mission_root() {
         Ok(store) => store,
@@ -323,11 +324,12 @@ pub(super) fn serve<'a, F: Future<Output = ()>>(
                 ))
             }
         };
-        let result = server.serve_until(
+        let result = server.serve_until_with_refusals(
             async {
                 tokio::select! {_=shutdown=>{},_=failure_rx=>{}}
             },
             observer,
+            refusal_observer,
         );
         let _finished = stop_tx.send(());
         let cleanup = match coordinator.join() {

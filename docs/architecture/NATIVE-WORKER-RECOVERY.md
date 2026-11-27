@@ -37,6 +37,43 @@ avant un nouveau candidat de validation.
 Le rattachement ne déclenche aucune exécution. Un conducteur de mission déjà
 autorisé peut sélectionner cette soumission pour un contrôle ultérieur.
 
+### Déclarer la politique d’une tâche gérée avant son démarrage
+
+La même requête `task update`, limitée à `validation_policy` et confirmée,
+s’applique aussi à une tâche worker gérée encore `todo`. Le moteur exige une
+mission active, une planification non suspendue, un périmètre ouvert sans
+détenteur, aucune tentative, revue, reprise, gate ou validation enregistrée,
+aucun contrôle ni reviewer actif sur la tâche et aucun verrou de lancement
+ouvert. Aucun agent ne doit être actif dans tout le Work : un worker en cours
+sur une autre tâche suffit à refuser la mise à jour. Déclarer donc ces
+politiques avant de démarrer le conducteur ou lorsque ses workers sont arrêtés.
+L’empreinte du contrat doit être à jour et le motif compter 16 à 2 000 octets.
+
+La politique actuelle ne doit déclarer aucun contrôle. La politique fournie
+peut être `human` ou `automatic` ; elle doit déclarer au moins un contrôle,
+passer la normalisation selon les limites Admin et couvrir les critères.
+En mode `automatic`, chaque critère doit être couvert et chaque vérification
+planifiée (`plan_checks`) doit avoir un contrôle de même identifiant ; sinon
+le refus est `policy-criterion-uncovered` ou `policy-plan-check-unauthorized`.
+Seule `validation_policy` change, avec la date et l’acteur de l’opération.
+Une seconde modification est refusée avec
+`managed-unstarted-policy-first-policy-required`. Les refus d’état portent un
+code `managed-unstarted-policy-*` ; les contrôles partagés gardent leurs codes
+(`contract-digest-stale`, `contract-reason-invalid`,
+`task-validation-mission-inactive`, normalisation et `policy-*`). Tous
+laissent le Work intact. L’opération ne lance ni contrôle, ni revue, ni
+worker, et n’accepte rien. En mode `automatic`, les contrôles réussis
+remplacent la gate humaine ; la revue indépendante et `task publish` restent
+exigés. Recette : `tests/rust_managed_unstarted_policy.py`.
+
+```mermaid
+flowchart LR
+    A["Tâche gérée todo, politique sans contrôle"] --> B["task update confirmé : politique seule"]
+    B --> C["Politique human ou automatic avec contrôles"]
+    C --> D["Exécution worker puis contrôles"]
+    D --> E["Revue indépendante puis task publish"]
+```
+
 ### Relire le journal d’un worker terminé
 
 Le journal original conserve le dernier instantané des actions en direct.

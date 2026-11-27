@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "native-reviewer-pregrant-recovery",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/failure.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/gate.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/guard.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/journal.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/process.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/publication.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/runtime.rs",
+    "rust/crates/swarm-engine/src/root_store/reviewer_native/store.rs",
+    "rust/crates/swarm-engine/src/root_store/review_recovery.rs",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "waited-helper-original-never-becomes-a-verdict",
+      "command": [
+        "cargo",
+        "+1.96.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "reviewer_waited_before_grant_original_is_recoverable_only_without_a_grant"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "reviewer_waited_before_grant_original_is_recoverable_only_without_a_grant ... ok",
+        "test result: ok. 1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

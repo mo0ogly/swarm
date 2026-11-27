@@ -9,6 +9,30 @@ review states are outside this projection.
 
 The native evidence below targets Linux; cross-platform equivalence is not established.
 
+
+The native reviewer helper sets `TMPDIR` to its own verified I0 workspace.
+The configured host temporary directory cannot become a writable area for the
+provider. Account configuration and network policy retain their existing paths
+and checks.
+
+## Read-only managed control with declared inputs
+
+An operator can use `schema_version: 2` with `task validation-preview` and
+`task validate` for a managed candidate with an existing checkpoint and one
+saved control with explicit inputs. Preview reports `declared_candidate_inputs`.
+The engine compares those regular files with the committed checkpoint and
+observes the retained report separately. It does not build a new candidate or
+walk the full worktree for this control.
+
+The private Linux helper grants read access to the exact verified input inodes
+inside the candidate. Directory listing, other candidate files and writes are
+denied. Stdout/stderr and the usual host read-only runtime are available as
+before. A missing, changed, redirected or undeclared dependency fails. Use
+request version 1 for controls with implicit inputs or mutable workspaces.
+A job binds its original mode in both its replay request and source digest.
+Review reuses the declared inputs from that job. Managed publication still
+performs its separate whole-candidate integrity and approval checks.
+
 ## Actual availability
 
 Previews, reviewer controller, context reader, publication and reconciliation
@@ -42,6 +66,34 @@ Both task previews accept `schema_version`, `event_id`, `expected_revision`,
 `task_id`. Caller-supplied actor or command assertions grant no authority. Public
 preview refuses an ongoing review; internal readback permits only the exact review
 attached to its normalized job.
+
+The parent verifies the dossier when it claims the review. Startup reuses
+the committed scheduling data. The parent registers the helper, then grants
+entry to private admission after checking its identity, Root, claim, funding,
+lease, settings and original expiry. The helper independently rebuilds and
+compares the current dossier, verifies the route and executable, and checks
+expiry again before provider exec. The original deadline remains in force.
+
+```mermaid
+sequenceDiagram
+    participant P as Parent engine
+    participant H as Registered helper
+    participant R as Provider
+    P->>P: Verify dossier and claim review
+    P->>H: Verify identity and allow private admission
+    H->>H: Recheck sources, route and expiry
+    alt Every check passes
+        H->>R: Execute within the authorized boundary
+    else Refusal
+        H-->>P: Return diagnostics for receipt-based closure
+    end
+```
+
+If a reaped helper fails before any grant, its original
+receipt can close exactly that claim as a non-verdict. The report, candidate
+and consumed quota are retained.
+The `native-reviewer-pregrant-recovery` recipe checks the accepted receipt
+shape and refusals with a previously admitted Cargo target.
 
 ## Native control source mapping
 
@@ -411,6 +463,20 @@ validation remain normally compiled. Web wiring and active decisions remain open
 two results/public contexts09, five normal start guards07, four stale10, eight
 publications11 and Clippy/Rustdoc12 passed on05. Normal06 SHA cc2e88 compiles255
 effective sources identical in05 (08), without fixture features or installation.
+
+
+## Archive a reviewer failure on a managed candidate
+
+`swarm task review-archive-failure REVIEW_ID --root ROOT --json` archives the
+current error of a submitted task when the original proves a waited process
+after grant. It accepts a nonzero exit without a reply or a known protocol
+failure at exit zero with a retained reply. An already recorded opinion, a
+retained reply currently decoded as favorable, a private admission refusal,
+unknown wait status or failed capture refuses. The
+archive event binds the original to the same Work and retains the receipt,
+producer attempt, controls, report and charged call. Replay verifies the event
+without mutation. A later call is a separate command subject to current quota,
+preflight and evidence. Archival grants no acceptance.
 
 ## Run and recover through the normal CLI
 
@@ -827,8 +893,62 @@ declares `inspection_only=true`, `native_invocation_supported=false`,
 it does not claim historical accepted-verdict verification. Truncated control
 output stays explicitly marked as such, never invented as complete evidence.
 
-Existing settings govern: `review_delivery_files` bounds the full presented Git
-inventory; `review_context_files` counts every material including attributed
+`task review-preview` returns a compact inventory (`managed_inventory`).
+It separates the candidate’s total tree entries from paths changed against its
+recorded parent. The list shows added, deleted, modified and type-changed paths.
+A rename appears as an addition and a deletion. The configured delivery file
+limit and over-limit indicator describe the full candidate inventory. When it
+exceeds the cap, the dossier includes added or changed files and declared
+control inputs, deduplicated. Deletions appear in the delta. Unchanged non-text
+control inputs retain their verified digest, path and control attribution.
+Their contents are unavailable for citation. Missing declared originals refuse.
+The existing count and byte limits apply to the selected files. The reviewer
+must return `unknown` if required evidence is unavailable. The engine still
+verifies the entire retained candidate and original control receipts. Dossiers
+that fit the file cap retain their historical representation. The focused
+dossier carries the attributed cohort receipt and control results in its
+review protocol without copying the validation receipt's full artifact digest
+table. Inspection grants
+no invocation or acceptance.
+
+A focused review acquisition verifies the Git identities and the binding
+to the original control receipt. It reopens only selected paths, declared
+inputs and related evidence. Other file digests describe the historical
+control preimage. Task publication requires reading and verifying the
+complete candidate. Full acquisitions reuse digests checked in the same pass.
+
+Each read of a published control opens its private receipt once. The engine
+compares its actual digest with the ledger and checks every step receipt.
+A later pass reads its originals again to confirm their current state.
+
+When Codex is the reviewer, preflight binds the local announcement of the
+selected model and effort. A cache rewrite that changes its timestamp or other
+models preserves that evidence. Withdrawal of the announcement, an unreadable
+cache and executable drift are still detected. Admission of an outstanding
+claim holding the old whole-cache digest can refuse after an upgrade. Use the
+recovery operation that matches the observed process state.
+Worker reservations retain their original whole-cache fingerprint.
+
+`task review-retire-unstarted REVIEW_ID` closes a claim with a confirmed
+departed local owner, no grant and no registered child. A private version 3
+original records the observation. The transaction archives the refusal,
+releases the task exclusion and retains consumption. Any subsequent start
+requires a fresh operation and admission. Started reviews retain their
+own wait evidence requirements. Live owners and uncertain observations refuse.
+
+In Dispatch, **Approve** uses native publication for a managed candidate
+whose policy requires human approval. The precheck is read-only. The protected
+write checks identity and revision, then records candidate publication and
+task acceptance together. Dispatch reads back the Work state.
+
+In `managed_inventory.control_inputs`, each declared control input carries
+its task, control and repository-relative path. A Git-tracked input includes
+its mode and its digest from the retained candidate, including unchanged paths.
+An input outside the Git inventory remains listed without a tracked digest.
+The list does not open the input files.
+
+Existing settings govern: `review_delivery_files` bounds the presented Git
+files; `review_context_files` counts every material including attributed
 duplicates; `review_source_bytes` counts UTF-8 source bytes, and
 `review_context_bytes` the final prompt including framing/escaping. Global delivery
 read limits also apply to sources. Zero explicitly means no additional bound;
@@ -886,6 +1006,24 @@ sequenceDiagram
 ```
 
 
+## Supplement managed review with operator observations
+
+A project operator can place a UTF-8 JSON document at
+`docs/swarm-review-evidence/{work_id}/{task_id}.json` in the project Root, outside
+the candidate checkout. Version 1 requires `work_id`, `task_id`, `attempt_id`,
+`candidate_commit`, `report_sha256` and `observations` alongside `schema_version`.
+Each observation declares a unique 1-based `criterion`, a `source` and a
+`detail`. The source is attributed operator material. The reviewer still
+decides whether it proves the criterion. Missing optional files leave existing
+reviews compatible. Invalid bindings, unsafe file types, duplicate observation
+indices and limits refuse. The retained bytes enter the normal catalogue and
+artifact freshness checks. The focused prompt gives the material index without
+a second copy of the text already carried by the protocol. In that prompt,
+operator observation text is reconstructed from catalogue spans. The retained
+protocol and public inputs keep the exact originals. They can be inspected with `review-inputs` even
+when the saved reviewer counter exactly equals its cap. Execution still needs
+an available call and authorized native admission.
+
 ## Check supplied cohort output
 
 `task review-check ID --root ROOT --input FILE --json` takes the four
@@ -901,6 +1039,13 @@ returning. A stale prompt digest, ordinary candidate, incomplete cohort, duplica
 indices, invalid citations, declared tool or missing terminal event refuses.
 Actual saved Admin reply/event/text limits apply; refusal preserves its cause
 and emits no partial CLI result.
+
+The managed decoder accepts bare JSON or one complete Markdown fence labeled
+`json`, with the opening and closing delimiters on their own lines and no
+surrounding prose. The full response still counts against saved limits and
+retains its original bytes and digest. The enclosed object undergoes the same
+canonical field, cohort, citation and verdict checks as bare JSON. An
+`unknown` criterion still prevents a favorable verdict.
 
 The result contains parsed opinion data and context/catalogue/response digests.
 `supplied_output_checked=true` describes supplied bytes only. `provider_started`,

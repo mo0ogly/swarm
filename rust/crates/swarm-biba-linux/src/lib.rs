@@ -32,7 +32,7 @@ fn close(file:impl IntoRawFd)->Result<(),Error>{let fd=file.into_raw_fd();
     if unsafe{libc::close(fd)}<0{Err(err("biba-close",io::Error::last_os_error()))}else{Ok(())}
 }
 /// Prepared inode-bound ruleset. Construction does not change this process.
-pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:File,private:File}
+pub struct Sandbox {rules:std::os::fd::OwnedFd,workspace:File,private:File,focused:bool}
 /// Return the observed kernel ABI, without enforcing or changing any privilege.
 pub fn available()->Result<i32,Error>{let abi=kernel::abi().map_err(|e|err("biba-landlock-unavailable",e))?;if abi<6{return Err(invalid("biba-landlock-abi6-required"))}Ok(abi)}
 /// Build read-only leaves covering the filesystem except the private Root.
@@ -74,17 +74,35 @@ impl Sandbox {
     /// A replaced/symlink/unsafe directory refuses; all owned FD close causes
     /// survive. This does not freeze writes by an outside unconfined same-UID actor.
     pub fn prepare_bound(root:&Path,workspace:&Path,expected:(u64,u64))->Result<Self,Error>{
+        Self::prepare_profile(root, workspace, expected, None)
+    }
+    /// Construct the ordinary I0 profile with access to just the verified
+    /// regular input descriptors in the private workspace. No private subtree
+    /// read, workspace write or directory listing is granted. The engine owns
+    /// source attribution and must retain the same workspace identity.
+    pub fn prepare_readonly_inputs(root:&Path,workspace:&Path,expected:(u64,u64),files:&[File])->Result<Self,Error>{
+        if files.is_empty() { return Err(invalid("biba-focused-inputs-required")); }
+        Self::prepare_profile(root, workspace, expected, Some(files))
+    }
+    /// Prepare the selected immutable ruleset before restricting this helper.
+    fn prepare_profile(root:&Path,workspace:&Path,expected:(u64,u64),files:Option<&[File]>)->Result<Self,Error>{
         available()?;
         let root=root.canonicalize().map_err(|e|err("biba-root",e))?;
         let path=workspace.canonicalize().map_err(|e|err("biba-workspace",e))?;
         if root.starts_with(&path){return Err(invalid("biba-workspace-overlaps-root"))}
         let private_path=root.join(".swarm");
         if private_path.starts_with(&path){return Err(invalid("biba-workspace-overlaps-private-root"))}
+        if files.is_some() && !path.starts_with(&private_path) {
+            return Err(invalid("biba-focused-workspace-not-private"));
+        }
         let workspace=open(&path)?;
         let checked=(||{
             let m=workspace.metadata().map_err(|e|err("biba-workspace-metadata",e))?;
             if !m.is_dir()||(m.dev(),m.ino())!=expected{return Err(invalid("biba-workspace-instance-changed"))}
-            check_tree(&PathBuf::from(format!("/proc/self/fd/{}",workspace.as_raw_fd())))
+            if files.is_none() {
+                check_tree(&PathBuf::from(format!("/proc/self/fd/{}",workspace.as_raw_fd())))?;
+            }
+            Ok(())
         })();
         if let Err(e)=checked{return finish(Err(e),close(workspace))}
         let private=match open(&private_path){Ok(f)=>f,Err(e)=>return finish(Err(e),close(workspace))};
@@ -99,10 +117,23 @@ impl Sandbox {
                 let added=kernel::add(&rules,&f,access).map_err(|e|err("biba-read-rule",e));
                 finish(added,close(f))?;
             }
-            kernel::add(&rules,&workspace,kernel::ALL).map_err(|e|err("biba-output-rule",e))
+            if let Some(files) = files {
+                for file in files {
+                    let metadata = file.metadata().map_err(|e|err("biba-focused-input-stat",e))?;
+                    let location = fs::read_link(format!("/proc/self/fd/{}", file.as_raw_fd()))
+                        .map_err(|e|err("biba-focused-input-path",e))?;
+                    if !metadata.is_file() || metadata.nlink() != 1 || !location.starts_with(&path) {
+                        return Err(invalid("biba-focused-input-outside-workspace"));
+                    }
+                    kernel::add(&rules,file,kernel::READ_FILE).map_err(|e|err("biba-focused-input-rule",e))?;
+                }
+                Ok(())
+            } else {
+                kernel::add(&rules,&workspace,kernel::ALL).map_err(|e|err("biba-output-rule",e))
+            }
         })();
         if let Err(e)=result{return finish(finish(finish(Err(e),close(rules)),close(workspace)),close(private))}
-        Ok(Self{rules,workspace,private})
+        Ok(Self{rules,workspace,private,focused:files.is_some()})
     }
     /// Enter the ruleset only in a single-threaded, unprivileged helper. All
     /// subsequent descendants inherit it. Failure after restriction remains an
@@ -119,7 +150,9 @@ impl Sandbox {
             let pinned=unsafe{libc::fcntl(self.workspace.as_raw_fd(),libc::F_DUPFD_CLOEXEC,3)};
             if pinned<0{return Err(err("biba-workspace-repin",io::Error::last_os_error()))}
             let walked=(||{
-                check_tree(&PathBuf::from(format!("/proc/self/fd/{}",pinned)))?;
+                if !self.focused {
+                    check_tree(&PathBuf::from(format!("/proc/self/fd/{}",pinned)))?;
+                }
                 // SAFETY: duplicate of the retained O_PATH descriptor.
                 if unsafe{libc::fchdir(pinned)}<0{return Err(err("biba-workspace-enter",io::Error::last_os_error()))}
                 Ok(())

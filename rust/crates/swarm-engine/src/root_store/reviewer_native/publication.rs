@@ -222,7 +222,12 @@ fn apply_candidate(ready: &mut Ready) -> Result<(), E> {
         .flatten()
         .find(|t| t.id == ready.receipt.job.task_id)
         .ok_or(E::Refused("review-publication-task-required"))?;
-    task.independent_review = Some(Box::new(ready.review.clone()));
+    if journal::no_grant_original(&ready.receipt) {
+        task.previous_reviews.get_or_insert_with(Vec::new).push(ready.review.clone());
+        task.independent_review = None;
+    } else {
+        task.independent_review = Some(Box::new(ready.review.clone()));
+    }
     if ready.review.state == "changes_requested" {
         task.status = "blocked".into();
         task.blocker = format!("Vérificateur indépendant : {}", ready.review.reason);
@@ -355,6 +360,26 @@ fn recorded_artifact(
     }
     Ok(())
 }
+
+/// Recognize an archived non-start through its terminal row, original and
+/// attributed public event. A failure receipt cannot authorize another call.
+pub(super) fn verified_unstarted(root: &RootStore, tx: &Transaction<'_>, work: &str, task: &str, id: &str) -> Result<bool, E> {
+    let Some(job) = store::job(tx, id).map_err(|e| E::Launch(Box::new(e)))? else {
+        return Ok(false);
+    };
+    if job.phase != Phase::Refused || job.work_id != work || job.task_id != task {
+        return Ok(false);
+    }
+    let (original, hash) = journal::read(root, id)?;
+    if !journal::no_grant_original(&original) {
+        return Ok(false);
+    }
+    if job.receipt_sha256.as_deref() != Some(&hash) || !same_origin(&job, &original.job) {
+        return Err(E::Refused("review-unstarted-original-changed"));
+    }
+    recorded_artifact(root, tx, &job, &original)?;
+    Ok(true)
+}
 /// Commit original result/Work/inbox/event/ledger atomically under the common
 /// saved storage retry policy. File publication may survive SQL rollback and is
 /// reused only byte-identically. Recheck current sources after artifact IO,
@@ -482,6 +507,7 @@ pub(super) enum Mode {
     Verdict,
     FailedOriginal,
     StaleOriginal,
+    Unstarted,
 }
 /// Share the exact atomic publication/replay path for explicit lifecycle modes.
 /// Mode selection cannot change the original outcome: a stale non-verdict
@@ -530,6 +556,7 @@ pub(super) fn record_mode(
                     Mode::Verdict => prepare_using(root, tx, settings, id, owner,source)?,
                     Mode::FailedOriginal => super::failure::prepare(root, tx, id, owner)?,
                     Mode::StaleOriginal => super::stale::prepare(root, tx, settings, id, owner)?,
+                    Mode::Unstarted => super::failure::prepare_unstarted(root, tx, id, owner)?,
                 };
                 let legacy_name = format!(
                     "native-review-public-{}.json",
@@ -562,7 +589,9 @@ pub(super) fn record_mode(
                 public_file(root, &name, &body)?;
                 ready.review.receipt = format!(".swarm/{name}");
                 ready.review.receipt_sha256 = sha;
-                quiescent(&job, owner)?;
+                if !matches!(mode, Mode::Unstarted) || job.child_pid.is_some() {
+                    quiescent(&job, owner)?;
+                }
                 match mode {
                     Mode::Verdict => {
                         guard::held_inputs(root, tx, settings.clone(), &job,source,true)?;
@@ -580,6 +609,12 @@ pub(super) fn record_mode(
                         let fresh = super::failure::prepare(root, tx, id, owner)?;
                         if fresh.hash != ready.hash || fresh.work != ready.work {
                             return Err(E::Refused("review-failure-publication-changed"));
+                        }
+                    }
+                    Mode::Unstarted => {
+                        let fresh = super::failure::prepare_unstarted(root, tx, id, owner)?;
+                        if fresh.hash != ready.hash || fresh.work != ready.work {
+                            return Err(E::Refused("review-unstarted-publication-changed"));
                         }
                     }
                 }
@@ -604,7 +639,7 @@ pub(super) fn record_mode(
                         let mut done = job.clone();
                         done.phase = match mode {
                             Mode::Verdict => Phase::Recorded,
-                            Mode::FailedOriginal | Mode::StaleOriginal => Phase::Refused,
+                            Mode::FailedOriginal | Mode::StaleOriginal | Mode::Unstarted => Phase::Refused,
                         };
                         done.receipt_sha256 = Some(ready.hash.clone());
                         done.published_revision = Some(ready.work.revision);

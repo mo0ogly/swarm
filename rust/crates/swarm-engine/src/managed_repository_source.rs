@@ -27,6 +27,24 @@ impl TrackedSource {
     pub(super) fn review_identity(&self) -> (&str, &str) {
         (&self.mode, &self.sha256)
     }
+
+    /// Compare one selected source with the retained bytes and executable
+    /// mode. Link targets are observed literally. A closed or changed path
+    /// fails and confers no evidence about unselected files.
+    pub(super) fn verify_review_bytes(&self, copy: &LocalDirectory, path: &str) -> Result<(), E> {
+        let (digest, executable) = at_parent(copy, path, |leaf| match self.mode.as_str() {
+            "100644" | "100755" => regular(leaf),
+            "120000" => {
+                let target = std::fs::read_link(leaf).map_err(|e| E::caused("managed-source-symlink", e))?;
+                Ok((hash(target.as_os_str().as_encoded_bytes()), false))
+            }
+            _ => Err(E::Refused("managed-source-tree-mode-unported")),
+        })?;
+        if digest != self.sha256 || executable != self.executable {
+            return Err(E::Refused("managed-candidate-raw-source-changed"));
+        }
+        Ok(())
+    }
 }
 
 /// Walk normal tree path components with owned no-follow directory descriptors.

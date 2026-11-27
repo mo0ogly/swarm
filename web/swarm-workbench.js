@@ -75,6 +75,10 @@
   const parts=[t('{used}/{limit} appels de revue utilisés.').replace('{used}',reviewer.calls).replace('{limit}',reviewer.max_calls)];
   if(reviewer.calls>=reviewer.max_calls)parts.push(t('Budget de revue épuisé.'));
   const previous=Array.isArray(task.previous_reviews)?task.previous_reviews.at(-1):null;
+  if(task.independent_review?.state==='error'){
+   parts.push(t('La dernière revue a échoué sans avis applicable.'));
+   return parts.join(' ');
+  }
   if(previous?.state==='error'){
    if(previous.reason==='native-review-owner-departed-before-grant')
     parts.push(t('La dernière revue s’est arrêtée avant l’appel : le processus propriétaire a quitté.'));
@@ -98,9 +102,40 @@
   const diagnostic=el('details',undefined,'task-detail-diagnostic');
   const codeLabel=el('code');
   diagnostic.append(el('summary',t('Diagnostic')),codeLabel);diagnostic.hidden=true;
+  const incident=el('p',undefined,'hint');incident.hidden=true;
+  diagnostic.append(incident);
   panel.append(button,status,reviewContext,diagnostic);taskDialogHeader.append(panel);
   const live=()=>taskDialog===dialog&&dialog.open&&panel.isConnected&&model?.work.id===work.id
    &&model.work.revision===work.revision&&selected===task.id;
+  /** Complete the visible rejection with verified facts for this same revision. */
+  async function readIncident(blocker){
+   const reviewBlockers=['native-scoped-submitted-review-required','publication-preview-original-required',
+    'publication-preview-current-opinion-required','managed-passed-opinion-required'];
+   if(task.independent_review?.state!=='error'||!reviewBlockers.includes(blocker))return;
+   const query=new URLSearchParams({work:work.id,task:task.id,review_revision:String(work.revision)});
+   try {
+    const data=await taskReview.read('/api/v1/agent-logs/task-actions?'+query,true);
+    if(!live())return;
+    if(data.work!==work.id||data.task!==task.id||data.revision!==work.revision)throw Error('task-review-incident-binding');
+    const value=data.incident;
+    if(!value)return;
+    if(value.review_id!==task.independent_review.id)throw Error('task-review-incident-binding');
+    const parts=[value.stage==='private-admission-refused'
+     ?t('L’auxiliaire a refusé l’admission avant exécution.')
+     :t('Le canal privé a été ouvert. La revue s’est arrêtée sans avis applicable.')];
+    if(value.provider_hint==='provider-reported-unix-stream-permission-denied')
+     status.textContent=t('Le fournisseur signale un refus de création de canal Unix (EPERM).');
+    if(Number.isInteger(value.exit_code))parts.push(t('Code de sortie {code}.').replace('{code}',value.exit_code));
+    if(value.managed_repository)parts.push(t('La relance directe est bloquée. Le reçu d’origine est conservé.'));
+    incident.textContent=parts.join(' ');incident.hidden=false;
+    codeLabel.textContent+=' · '+value.review_id;
+   } catch {
+    if(live()){
+     incident.textContent=t('La lecture du reçu de la dernière revue est indisponible.');
+     incident.hidden=false;
+    }
+   }
+  }
   const showError=error=>{
    if(!live())return;
    status.className='notice warn';
@@ -109,6 +144,7 @@
    reviewContext.textContent=independentReviewContext(code,work,task);
    reviewContext.hidden=!reviewContext.textContent;
    codeLabel.textContent=code;diagnostic.hidden=false;
+   void readIncident(code);
    if(document.activeElement===button)status.focus();
   };
   if(!Number.isSafeInteger(work.revision)||work.revision<1){
@@ -199,6 +235,15 @@
      truncated:page.rows.length===200};
    });
   };
+  if(taskReview&&task.independent_review?.state==='error'){
+   const incidentQuery=new URLSearchParams({work:work.id,task:task.id,review_revision:String(work.revision)});
+   add('review-incident',logs+'/'+t('Incident de revue')+'.json','json',async()=>{
+    const data=await taskReview.read('/api/v1/agent-logs/task-actions?'+incidentQuery,true);
+    if(data.work!==work.id||data.task!==task.id||data.revision!==work.revision||data.incident?.review_id!==task.independent_review.id)
+     throw Error('task-review-incident-binding');
+    return json(data.incident);
+   });
+  }
   const producer=task.automatic_validation?.producer_agent_id;
   if(taskReview&&typeof producer==='string'&&producer)addLog(producer);
   const hasOriginals=Boolean(taskReview&&task.status==='submitted'&&task.automatic_validation?.receipt);

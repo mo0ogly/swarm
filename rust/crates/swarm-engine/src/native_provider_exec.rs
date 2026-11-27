@@ -3,7 +3,7 @@
 #[path = "native_provider_biba.rs"]
 mod biba;
 pub(crate) use biba::{deny_internet, output_workspace, OutputRole};
-pub(crate) use biba::{prepare as prepare_boundary, enforce as enforce_boundary, close as close_boundary};
+pub(crate) use biba::{prepare as prepare_boundary, prepare_readonly_inputs as prepare_boundary_inputs, enforce as enforce_boundary, close as close_boundary};
 use crate::{root_store::finished as finish, AgentLaunchError, Provider, RootStoreError as E};
 use std::{
     collections::BTreeSet,
@@ -142,6 +142,22 @@ impl PreparedExec {
         self
     }
 
+    /// Set the reviewer's runtime temporary directory to its existing I0
+    /// workspace. Only this fixed engine variable replaces an ambient value.
+    /// The exec gate still rechecks the directory witness and poses the same
+    /// boundary. No directory is created and no credential path is changed.
+    pub(crate) fn with_workspace_tmpdir(mut self) -> Result<Self, E> {
+        let mut value = b"TMPDIR=".to_vec();
+        value.extend_from_slice(self.workspace.as_os_str().as_bytes());
+        let entry = match CString::new(value) {
+            Ok(entry) => entry,
+            Err(error) => return finish(Err(caused("agent-execution-workspace-tmpdir", error)), self.close()),
+        };
+        self.environment.retain(|entry| !entry.as_bytes().starts_with(b"TMPDIR="));
+        self.environment.push(entry);
+        Ok(self)
+    }
+
     /// Append engine-computed variables (LIVE-UX-03 telemetry exporter) after all
     /// gate/freshness checks. Names must be valid environment names and must not
     /// already be present: an inherited variable is never overridden
@@ -265,6 +281,20 @@ mod tests {
             let refused = fixture().add_environment(entries).err().unwrap();
             assert!(matches!(refused.code(), "agent-execution-environment-conflict" | "agent-execution-argument-invalid"), "{}", refused.code());
         }
+    }
+
+    /// The reviewer owns TMPDIR. Other environment names and the usual
+    /// duplicate-name refusal still apply.
+    #[test]
+    fn reviewer_tmpdir_uses_the_bound_workspace() {
+        let mut prepared =
+            PreparedExec::prepare(&provider(), &[], Path::new("/owned-fixture"), b"").unwrap();
+        prepared.environment.push(CString::new("TMPDIR=/unwritable-fixture").unwrap());
+        prepared.environment.push(CString::new("PATH=/fixture").unwrap());
+        let prepared = prepared.with_workspace_tmpdir().unwrap();
+        assert_eq!(prepared.environment.iter().map(|entry| entry.to_bytes()).collect::<Vec<_>>(),
+            [b"PATH=/fixture".as_slice(), b"TMPDIR=/owned-fixture".as_slice()]);
+        prepared.close().unwrap();
     }
 
     /// Leading arguments land right after the program name, before the

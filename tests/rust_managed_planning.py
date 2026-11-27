@@ -10,6 +10,7 @@ without a conductor or copy creation. Every failure keeps original output.
 """
 import argparse
 import json
+import os
 from pathlib import Path
 import traceback
 import rust_agent_model_route as fixture
@@ -49,7 +50,10 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
     agent authenticity, successful delivery, controls, review or acceptance.
     Optional source_entries supplies explicit committed fixture paths with bytes
     or ('symlink', literal_target), before any worker. It never patches a candidate
-    or SQL and refuses escaping source names. None preserves the original tree.
+    or SQL and refuses escaping source names. Regular entries are written
+    exclusively in the new private directory, then Git records the whole tree
+    before a planner or worker reads them. Automatic Git maintenance is disabled
+    on this fixture so the byte inventory has a stable source. None preserves the original tree.
     settings_values applies explicit fixture settings via public preview/apply
     before planning authorization. None preserves the native defaults.
     """
@@ -61,6 +65,9 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
         apply_policy(f, 'managed-explicit-settings', settings_values)
     fixture.publish(out/'fixture.json',dict(root=str(f.root),binary_sha256=qualified['sha256']))
     source=f.root/'source';source.mkdir(mode=0o700);repository.git(source,'init','--quiet')
+    # Keep loose-object maintenance from racing the fixture's byte inventory.
+    repository.git(source,'config','--local','maintenance.auto','false')
+    repository.git(source,'config','--local','gc.auto','0')
     checkout=Path(__file__).resolve().parents[1]
     name=repository.git(checkout,'config','user.name').decode().strip();email=repository.git(checkout,'config','user.email').decode().strip();assert name and email
     project=source/project_subdir
@@ -73,7 +80,9 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
         path=project/relative;path.parent.mkdir(parents=True,exist_ok=True)
         if isinstance(value,tuple):
             assert len(value)==2 and value[0]=='symlink';path.symlink_to(value[1])
-        else:fixture.publish(path,value)
+        else:
+            with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'wb') as stream:
+                stream.write(value)
         names.append(name)
     repository.git(source,'add','--',*[str((project/name).relative_to(source)) for name in names])
     repository.git(source,'-c','user.name='+name,'-c','user.email='+email,'-c','core.hooksPath=/dev/null','-c','commit.gpgsign=false','commit','--quiet','-m','Owned managed planning fixture')

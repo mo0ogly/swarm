@@ -55,6 +55,101 @@ Un refus de lecture reste visible dans la console avec son code quand celui-ci
 est fourni. Pour reprendre une lecture de projet en échec, refermez et rouvrez
 sa branche. Consultez la [version anglaise](../en/ADMIN-DEBUG.md).
 
+### Échec d’une revue dans Conduite
+
+La fiche d’une tâche soumise peut relire l’incident de sa revue courante avec
+les droits des journaux et la révision affichée. Le moteur rapproche le reçu
+avec la ligne d’exécution, l’événement et le certificat d’origine. La fiche
+affiche la frontière atteinte, le code de sortie quand il est connu et la limite
+de reprise sur un dépôt géré. Un échec de lecture garde son propre message.
+
+Le message Unix est une catégorie issue du texte rapporté par le fournisseur.
+Swarm renvoie un code fixe, sans recopier les captures, les chemins, ni les
+prompts. Cette lecture ne donne aucun droit de relance ni de validation.
+
+### Phases d’une revue native Rust
+
+Filtrez sur `"phase":"summary"` pour lire une synthèse de fin de tentative.
+Elle regroupe la durée totale, le dernier jalon observé, la cause stable,
+la révision connue, les tailles du prévol et la version compilée. Les champs
+d’issue absents ou nuls correspondent à des faits non établis. Les lignes
+d’étape restent disponibles pendant l’exécution et le rejeu exact ne crée pas
+de synthèse. La ligne `receipt` confirme la conservation du reçu ou en indique
+l’échec. `process` expose aussi les expirations, l’interruption et le nombre
+d’erreurs du transport observées.
+
+Dans **Suivi → Journaux**, ouvrez le journal de l’agent producteur de la tâche
+soumise. Cherchez `review_attempt`, puis copiez son empreinte complète dans le
+filtre de texte pour suivre une tentative. Le filtre de type reconnaît
+`review-info`, `review-warn` et `review-error`. La lecture native filtrée
+`GET /api/v1/logs` applique la politique de pagination enregistrée. Avec le
+relais Authority, cette lecture et `GET /api/v1/agent-logs` exigent les droits
+de lecture et de vue Journaux. Le flux Agents en direct omet ces lignes. Le
+journal applicatif du relais conserve ses propres droits et sa rotation.
+
+Le moteur produit les événements pour l’exécution de `task review`, y compris
+l’entrée de mission qui réutilise ce chemin. Il associe le prévol à une tentative
+productrice vérifiée avant l’assemblage. Les inspections `review-preview` et
+`review-inputs` et le rejeu d’un résultat conservé ne produisent aucune nouvelle
+ligne. Un refus avant l’identification du producteur ne crée aucune entrée dans
+un journal de mission. Les écritures utilisent le journal existant avec son
+horodatage et son plafond de message. Le moteur écarte un message structuré
+entier si le plafond ne permet pas de le conserver. Le résultat expose séparément le code sûr d’un
+défaut d’écriture. En cas de refus, il rejoint les causes de la réponse JSON.
+L’issue métier reste celle de l’opération d’origine.
+
+| Phase | Faits observables |
+| --- | --- |
+| `preflight` | Limites effectives de sources, de fichiers et du prompt, avec les tailles déjà observées. Le refus de taille peut précéder la réservation. |
+| `reservation` | Identifiant de revue créé, révision, consommation et plafond d’appels après l’engagement, ou code du refus. |
+| `execution` | Début de la préparation du processus après réservation, avec identifiant de revue et révision des réglages. |
+| `grant` et `process` | Enregistrement du helper, autorisation de porte, envoi du grant, état du canal et refus sûrs, dont les codes d’identité et Biba connus. L’envoi du grant laisse l’exécution du fournisseur indéterminée. |
+| `reply` et `receipt` | Issue du décodage, avis agrégé, code de sortie, compteurs et troncature observés. Un échec de conservation du reçu a sa propre phase. |
+| `publication` | Avis enregistré, applicabilité et état de la tâche lorsque le moteur les connaît. |
+
+La corrélation est l’empreinte de l’intention structurée, visible dans le
+périmètre du producteur. Une tentative peut avoir plusieurs issues distinctes
+pour une même phase. L’écriture garde une seule ligne par phase et code d’issue
+pour cette empreinte. La durée est mesurée avec l’horloge monotone, les compteurs
+absents restent indéterminés, et seuls les motifs canoniques connus ont une
+condition de reprise. La projection exclut le texte des sources, prompts,
+réponses, erreurs privées, chemins, jetons et identifiants fournisseur. Aucun
+contrôle Bell–LaPadula supplémentaire n’est exécuté dans ces frontières de
+revue. Les refus du relais restent soumis à son diagnostic existant.
+
+La [recette de revue native gérée](../../tools/verification/recipes/native-managed-reviewer.json)
+inclut le succès, le refus de taille, le rejeu et le filtrage CLI/HTTP dans une
+racine isolée. Le test de politique Authority
+`exclusive_route_requires_view_permission` couvre le refus de vue et sa
+contrepartie autorisée.
+
+## Erreurs du moteur Rust dans le journal système
+
+Sous Linux avec journald, la CLI `swarm-rust` publie un événement structuré
+lorsqu’une commande échoue, y compris avant l’ouverture d’une mission.
+L’observateur HTTP natif publie les échecs et les lectures dégradées qu’il reçoit.
+Le journal contient des codes stables, la famille de commande, le niveau, le
+statut ou le code de sortie et, pour une commande, sa durée. Un indicateur
+signale qu’un effet Work est connu. Les identifiants, arguments, requêtes,
+réponses et messages privés restent hors de cette projection.
+
+Le relais reçoit uniquement l’événement filtré sur son entrée standard. Sa ligne de commande fixe protège la commande d’origine lorsque journald capture les arguments. Filtrez par SWARM_PROCESS_ID pour retrouver le processus Rust d’origine pendant le même démarrage.
+
+```sh
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web
+```
+
+L’accès et la conservation suivent la configuration du journal système.
+Si le datagramme est refusé, la réponse JSON garde son erreur d’origine
+et indique `application_log.code = application-journal-unavailable` quand
+ce canal de réponse est disponible. L’observateur web ajoute le même champ
+à l’événement de sortie. Ces événements couvrent les frontières observées,
+pas tous les `Result` intermédiaires, les arrêts forcés ou les paniques.
+Le journal applicatif du relais et les journaux de mission restent distincts.
+
+Un refus avant admission HTTP est publié sous SWARM_OPERATION=http-admission avec le statut envoyé et la cause stable. Le premier échec de journalisation de ces refus figure sous refusal_application_log dans le résumé de sortie normale. Les erreurs de connexion HTTP avant réception des en-têtes restent dans le résumé du serveur.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

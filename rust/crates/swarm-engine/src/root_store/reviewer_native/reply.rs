@@ -6,8 +6,7 @@ use crate::managed_review_protocol::ManagedReviewProtocol;
 /// bytes/facts and grant no acceptance or authenticated provider identity.
 pub(super) struct Output {
     pub transport: crate::ProviderResponse,
-    /// Test-only aggregate observation; no production publication authority.
-    #[cfg(test)]
+    /// Syntactic aggregate of decoded criteria, without publication authority.
     pub state:crate::ReviewReplyState,
 }
 /// Select the exact source-domain decoder once, without ordinary fallback for a
@@ -31,7 +30,7 @@ impl<'a> Stream<'a> {
     pub fn feed(&mut self,raw:&[u8])->Result<(),E>{match self{Self::Ordinary(s)=>s.feed(raw),Self::Managed(s)=>s.feed(raw)}}
     /// Finish exactly once; validate the entire selected domain before retaining
     /// transport for journaling. Publication independently redecodes the original.
-    pub fn finish(&mut self)->Result<Output,E>{match self{Self::Ordinary(s)=>s.finish().map(|o|Output{transport:o.transport,#[cfg(test)]state:o.review.state}),Self::Managed(s)=>s.finish().map(|o|Output{transport:o.transport,#[cfg(test)]state:o.review.state})}}
+    pub fn finish(&mut self)->Result<Output,E>{match self{Self::Ordinary(s)=>s.finish().map(|o|Output{transport:o.transport,state:o.review.state}),Self::Managed(s)=>s.finish().map(|o|Output{transport:o.transport,state:o.review.state})}}
     /// Preserve exact bounded rejected original; success transfers those bytes.
     pub fn retained_reply(&self)->Option<&[u8]>{match self{Self::Ordinary(s)=>s.retained_reply(),Self::Managed(s)=>s.retained_reply()}}
     /// Test-only observation of original unverified shared transport quality.

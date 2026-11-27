@@ -103,6 +103,23 @@ n’est créé par cette action. Quotas, consommations, résultats acceptés, tr
 et avis précédents sont conservés ; une nouvelle sélection ne constitue pas
 une reprise ni une validation.
 
+### Sélection native du vérificateur indépendant (Linux)
+
+Sur le moteur Rust, ce parcours configure le vérificateur indépendant. Mettre
+la planification en pause et attendre la clôture des revues actives. Prévisualiser
+le fournisseur et le niveau depuis le catalogue, puis confirmer. En CLI, utiliser
+la révision et le `provider_digest` renvoyés par l’aperçu lors de `role-model apply`.
+L’empreinte du catalogue de modèles `model_policy_hash` doit correspondre au
+choix en cours. La route du fournisseur et les preuves précédentes sont conservées
+dans les résultats d’origine. Le changement ne lance aucune revue et n’ajoute
+aucun appel. Relire l’état si la révision, la politique ou le fournisseur a changé.
+Le parcours natif des modèles d’orchestrateur reste distinct.
+
+Après un refus de contrôle avant exécution, la resoumission du rapport géré
+existant vérifie la copie de la tentative enregistrée. La resoumission
+réutilise le producteur et le rapport vérifiés. Elle n’ouvre aucune nouvelle
+tentative de worker. Le contrôle et la revue restent des opérations séparées.
+
 ## Profils réutilisables dans le candidat Rust — lot188
 
 L’admission conserve le niveau demandé dans le profil de la tâche et, pour un

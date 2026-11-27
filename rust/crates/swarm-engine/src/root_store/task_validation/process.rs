@@ -144,7 +144,8 @@ fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<sup
     // Frozen engine-read operator policy under this gate's open store; the exec
     // point poses the additive kernel refusal before the validated command.
     let internet_denied = store.provider_internet_denied_snapshot()?;
-    biba::Prepared::prepare(&store.root, &workspace, command, &environment, internet_denied)
+    let files = managed.as_ref().expect("validated managed workspace").focused_files(&store.root)?;
+    biba::Prepared::prepare(&store.root, &workspace, command, &environment, internet_denied, files.as_deref())
 }
 /// Private CLI helper only. Actual Unix peer credentials and parent-death signal
 /// precede the one-byte grant; committed permission and fresh source precede

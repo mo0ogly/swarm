@@ -77,7 +77,7 @@ pub(super) fn build(
         .map_err(|e| E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-protocol",e))))
 }
 
-/// Project only report/document materials to implementation quote sources.
+/// Project reports, documents and bound operator evidence to quote sources.
 /// Engine control/cohort metadata stays fully available as attributed receipt
 /// and public material data, without being relabeled as code/report evidence.
 /// These material kinds are an evidence-role invariant, never operator policy.
@@ -85,7 +85,7 @@ pub(super) fn build(
 /// hashes/complete bytes are checked by the caller; checked length conversion
 /// refuses representation overflow. No IO, mutation or provenance is inferred.
 fn source_materials(materials: &[ReviewInputSource]) -> Result<Vec<ReviewSource>, E> {
-    materials.iter().filter(|source| matches!(source.kind.as_str(), "report" | "document")).map(|source| {
+    materials.iter().filter(|source| matches!(source.kind.as_str(), "report" | "document" | "operator_evidence")).map(|source| {
         Ok(ReviewSource {
             path: source.name.clone(), git_blob: String::new(), sha256: source.sha256.clone(),
             bytes: i64::try_from(source.content.len()).map_err(|_| E::Refused("review-source-count-overflow"))?,
