@@ -122,6 +122,8 @@ include stable codes, a command family, severity, status or exit code and
 elapsed time for commands. A flag indicates a known Work effect. IDs,
 arguments, requests, responses and private messages stay outside this projection.
 
+The relay receives only the filtered event on standard input. Its fixed command line protects the original command if journald captures arguments. Filter by SWARM_PROCESS_ID to find the original Rust process in the same boot session.
+
 ```sh
 journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
 journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web

@@ -1,11 +1,15 @@
 //! Safe boundary records for the Linux application journal.
 use serde::Serialize;
-use std::{io, path::PathBuf, time::Instant};
+use std::{io, time::Instant};
+
+#[cfg(target_os = "linux")]
+const HELPER_ARGUMENT: &str = "--swarm-internal-journal-datagram";
 
 /// The native system journal is an OS transport. Swarm creates no alternate
 /// file and inherits journal retention and visibility from systemd.
 pub(super) struct Journal {
-    socket: PathBuf,
+    #[cfg(all(test, target_os = "linux"))]
+    fixture_socket: Option<std::path::PathBuf>,
 }
 
 /// Secondary diagnostic when a record could not be submitted. No transport
@@ -66,7 +70,8 @@ impl Journal {
         #[cfg(target_os = "linux")]
         {
             Some(Self {
-                socket: PathBuf::from("/run/systemd/journal/socket"),
+                #[cfg(test)]
+                fixture_socket: None,
             })
         }
         #[cfg(not(target_os = "linux"))]
@@ -147,27 +152,110 @@ impl Journal {
     /// breaks by construction. Send once, nonblocking, and report absence or
     /// congestion separately. Successful send does not establish retention.
     fn send(&self, priority: u8, event: Event) -> Result<(), Unavailable> {
-        #[cfg(unix)]
+        #[cfg(target_os = "linux")]
         {
-            use std::os::unix::net::UnixDatagram;
             let payload = serde_json::to_string(&event).map_err(io::Error::other)?;
             let record = format!(
-                "SYSLOG_IDENTIFIER=swarm-rust\nPRIORITY={priority}\nSWARM_COMPONENT={}\nSWARM_OPERATION={}\nMESSAGE={payload}\n",
-                event.component, event.operation
+                "SYSLOG_IDENTIFIER=swarm-rust\nPRIORITY={priority}\nSWARM_COMPONENT={}\nSWARM_OPERATION={}\nSWARM_PROCESS_ID={}\nMESSAGE={payload}\n",
+                event.component,
+                event.operation,
+                std::process::id()
             );
-            let socket = UnixDatagram::unbound()?;
-            socket.set_nonblocking(true)?;
-            let sent = socket.send_to(record.as_bytes(), &self.socket)?;
-            if sent != record.len() {
-                return Err(io::Error::from(io::ErrorKind::WriteZero).into());
+            #[cfg(test)]
+            if let Some(path) = &self.fixture_socket {
+                return send_datagram(path, record.as_bytes()).map_err(Unavailable::from);
             }
-            Ok(())
+            forward(record.as_bytes())
         }
-        #[cfg(not(unix))]
+        #[cfg(not(target_os = "linux"))]
         {
-            let _ = (priority, event, &self.socket);
+            let _ = (priority, event);
             Err(io::Error::from(io::ErrorKind::Unsupported).into())
         }
+    }
+}
+
+/// Queue the framed event once. A full queue, absent socket or short write
+/// returns the original transport error.
+#[cfg(target_os = "linux")]
+fn send_datagram(path: &std::path::Path, record: &[u8]) -> io::Result<()> {
+    let socket = std::os::unix::net::UnixDatagram::unbound()?;
+    socket.set_nonblocking(true)?;
+    if socket.send_to(record, path)? != record.len() {
+        return Err(io::Error::from(io::ErrorKind::WriteZero));
+    }
+    Ok(())
+}
+
+/// Run a local child with a fixed argument and pass only the classified event
+/// via stdin. Journald can capture the sender's argv, so the process that
+/// handled the original input must not send the datagram. The child makes a
+/// single nonblocking send and reports only the transport errno, if available.
+#[cfg(target_os = "linux")]
+fn forward(record: &[u8]) -> Result<(), Unavailable> {
+    use std::{
+        io::Write,
+        process::{Command, Stdio},
+    };
+    let mut child = Command::new("/proc/self/exe")
+        .arg(HELPER_ARGUMENT)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()?;
+    let written = child
+        .stdin
+        .take()
+        .ok_or_else(|| io::Error::other("journal input pipe missing"))
+        .and_then(|mut input| input.write_all(record));
+    let result = child.wait_with_output()?;
+    written?;
+    if result.status.success() {
+        return Ok(());
+    }
+    let errno = result
+        .stdout
+        .as_slice()
+        .try_into()
+        .ok()
+        .map(i32::from_ne_bytes);
+    Err(Unavailable {
+        code: "application-journal-unavailable",
+        errno: errno.filter(|code| *code != 0),
+    })
+}
+
+/// Handle the exact private child invocation. It does not open a Root or use
+/// command arguments as data. The invoking UID already has access to the
+/// system journal socket. A nonzero result signals a relay or transport error.
+pub(super) fn helper(args: &[std::ffi::OsString]) -> Option<u8> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::io::{Read, Write};
+        if args.len() != 1 || args[0] != HELPER_ARGUMENT {
+            return None;
+        }
+        let mut record = Vec::new();
+        let result = io::stdin().lock().read_to_end(&mut record).and_then(|_| {
+            send_datagram(std::path::Path::new("/run/systemd/journal/socket"), &record)
+        });
+        Some(match result {
+            Ok(()) => 0,
+            Err(error) => {
+                match io::stdout()
+                    .lock()
+                    .write_all(&error.raw_os_error().unwrap_or(0).to_ne_bytes())
+                {
+                    Ok(()) => 1,
+                    Err(_) => 2,
+                }
+            }
+        })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = args;
+        None
     }
 }
 
@@ -186,7 +274,7 @@ mod tests {
         let sink = UnixDatagram::bind(&path).unwrap();
         sink.set_nonblocking(true).unwrap();
         let journal = Journal {
-            socket: path.clone(),
+            fixture_socket: Some(path.clone()),
         };
         let command = [
             "task".into(),

@@ -2064,6 +2064,11 @@ pub fn run_os_detailed(
     run_os_using(args, environment_language, out, err, None)
 }
 
+/// Handle the process journal relay. It does not parse commands or open a Root.
+pub fn application_journal_helper(args: &[std::ffi::OsString]) -> Option<u8> {
+    application_journal::helper(args)
+}
+
 /// Process entry point for the real CLI. On Linux, publish terminal failures
 /// to the system journal independently of the caller's protocol streams.
 pub fn run_os_with_application_journal(

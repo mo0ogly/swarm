@@ -7,8 +7,8 @@
     },
     "items": [
       {
-        "fr": "Les erreurs de la CLI Rust et les incidents observés par le serveur HTTP natif remontent dans le journal système Linux avec des codes stables.",
-        "en": "Rust CLI failures and incidents observed by the native HTTP server reach the Linux system journal with stable codes."
+        "fr": "Les erreurs de la CLI Rust et les incidents observés par le serveur HTTP natif remontent dans le journal système Linux avec des codes stables. Un relais protège les arguments de la commande d’origine.",
+        "en": "Rust CLI failures and incidents observed by the native HTTP server reach the Linux system journal with stable codes. A relay protects the original command arguments."
       },
       {
         "fr": "Les revues Rust remontent le début de l’exécution, la conservation du reçu et une synthèse corrélée avec la cause, la durée et la version du binaire.",

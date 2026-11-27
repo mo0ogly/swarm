@@ -133,6 +133,8 @@ statut ou le code de sortie et, pour une commande, sa durée. Un indicateur
 signale qu’un effet Work est connu. Les identifiants, arguments, requêtes,
 réponses et messages privés restent hors de cette projection.
 
+Le relais reçoit uniquement l’événement filtré sur son entrée standard. Sa ligne de commande fixe protège la commande d’origine lorsque journald capture les arguments. Filtrez par SWARM_PROCESS_ID pour retrouver le processus Rust d’origine pendant le même démarrage.
+
 ```sh
 journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
 journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web
