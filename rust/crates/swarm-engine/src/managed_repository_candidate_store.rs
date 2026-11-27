@@ -608,7 +608,10 @@ mod tests {
         };
         let raw = crate::encode_model(&launch).unwrap();
         let workspace =
-            super::super::prepare_worker(&root, &work, &launch, &raw, &settings, None).unwrap();
+            super::super::prepare_worker(
+                &root, &work, &launch, &raw, &settings,
+                &rusqlite::Connection::open_in_memory().unwrap(), None,
+            ).unwrap();
         let agent = Agent {
             id: "agent".into(),
             work_id: "work".into(),

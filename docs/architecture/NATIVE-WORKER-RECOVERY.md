@@ -505,3 +505,26 @@ Le témoin d'alias de racine utilise uniquement une identité synthétique local
 ### Catalogue anglais de la lecture historique
 
 Les cinq libellés de lecture historique et de vérification du statut actuel sont définis dans `locales/en.json`, puis générés dans `web/i18n-en.js` par `node scripts/i18n/build.cjs`. Le catalogue source est également embarqué par le lecteur Rust `work_view.rs` : un fichier web modifié seul ne met pas à jour cette traduction côté moteur. `node scripts/i18n/build.cjs --check` et `node tests/i18n_test.cjs` contrôlent les octets générés et la parité. Ils ne prouvent ni un rebuild installé, ni la validité des preuves de la mission lue.
+
+### Reprise manuelle d’un worker en dépôt géré
+
+Une tâche bloquée par un échec natif peut reprendre dans le même périmètre. Quand
+son plafond est absent, l’opérateur utilise `task update` avec la révision
+courante, `id`, `max_attempts`, `confirm_contract_revision: true` et
+`contract_revision_reason`. Il demande exactement une tentative de plus que le
+nombre consommé, dans la limite de la politique moteur. Le moteur exige le reçu
+natif original, un signal de fin en attente et un périmètre ouvert sans bail.
+Cette opération conserve les tentatives, les budgets et une éventuelle borne
+positive déjà enregistrée.
+
+Le détenteur du bail courant lie ensuite `planning decide` et son opération
+`retry` au signal de fin. `agent prepare` revalide cette décision et prépare
+une copie distincte de l’ordinal précédent à partir du commit candidat géré.
+`agent run` vérifie l’attribution de la copie et les preuves au départ effectif.
+La reprise gérée suit le parcours opérateur manuel. L’aperçu générique des
+lancements gérés conserve son refus. Une nouvelle tentative ne vaut ni validation
+ni acceptation.
+
+Les refus connus de budget ou d’occupation précèdent la création de la copie.
+Un refus plus tardif peut conserver la copie attribuée. Reprendre avec le même
+identifiant d’événement et les mêmes paramètres après vérification du refus.

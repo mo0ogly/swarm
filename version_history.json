@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Une tentative native en échec peut reprendre dans une mission gérée avec un plafond explicite, une décision sous bail et une nouvelle copie de travail attribuée.",
+        "en": "A failed native attempt can be retried in a managed mission with an explicit attempt ceiling, a leased decision and a new attributed working copy."
+      },
+      {
         "fr": "Le détail de tâche compte les pièces par dossier, filtre par chemin ou type et affiche le texte reçu pendant la préparation de Monaco.",
         "en": "Task details count files by folder, filter by path or type, and show received text while Monaco loads."
       },

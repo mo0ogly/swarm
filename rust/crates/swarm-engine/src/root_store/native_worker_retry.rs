@@ -130,6 +130,50 @@ impl RootStore {
         }
         Ok(observed)
     }
+    /// Initialize a missing managed-worker cap to exactly one more attempt.
+    /// The caller holds the revision-checked Work writer, verifies operator
+    /// confirmation and checks ownership. Validate the current repository and
+    /// original pending native failure before changing only the supplied task.
+    /// Existing positive caps, held tasks and acknowledged signals refuse.
+    pub(crate) fn initialize_managed_worker_retry_capacity(
+        root: &std::path::Path,
+        work: &mut Work,
+        request: &crate::Request,
+        settings: &crate::EngineSettingsDocument,
+        max_attempts: i64,
+    ) -> Result<(), E> {
+        let planning = work.planning.as_deref().filter(|p| p.repository.is_some())
+            .ok_or(E::Refused("managed-worker-retry-repository-required"))?;
+        if planning.paused || !planning.failure.is_empty() {
+            return Err(E::Refused("managed-worker-retry-planning-inactive"));
+        }
+        let tasks = work.tasks.as_deref().unwrap_or_default();
+        let index = tasks.iter().position(|task| task.id == request.id)
+            .ok_or(E::Refused("managed-worker-retry-task-missing"))?;
+        let task = &tasks[index];
+        if !planning.scopes.iter().flatten().any(|scope| scope.id == task.scope_id
+            && scope.state != "closed" && scope.holder.is_empty())
+        {
+            return Err(E::Refused("managed-worker-retry-scope-unavailable"));
+        }
+        let allowed = task.attempts.as_ref().and_then(|attempts| attempts.len().checked_add(1))
+            .and_then(|count| i64::try_from(count).ok());
+        if task.plan_max_attempts != 0 || task.planning_retry || task.launch_held
+            || request.max_attempts <= 1 || request.max_attempts > max_attempts
+            || allowed != Some(request.max_attempts)
+        {
+            return Err(E::Refused("managed-worker-retry-capacity-invalid"));
+        }
+        let input = Self::failed_worker_retry_input(root, work, &request.id)?;
+        if !planning.inbox.iter().flatten().any(|event| event.id == input.event && event.decision.is_empty()) {
+            return Err(E::Refused("managed-worker-retry-event-not-pending"));
+        }
+        crate::managed_repository::observe(root, work, settings)
+            .map_err(|e| E::Launch(Box::new(e)))?;
+        work.tasks.as_mut().unwrap()[index].plan_max_attempts = request.max_attempts;
+        Ok(())
+    }
+
     /// Require an actual failed/interrupted native attempt before same-task
     /// correction. A persisted retry signal additionally needs its exact current
     /// canonical decision/acknowledgement. No attempt/reserve/reset/acceptance.

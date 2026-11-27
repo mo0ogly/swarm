@@ -269,6 +269,9 @@ fn retry_task(root: &Path, w: &mut Work, op: &PlanningOperation, r: &PlanningReq
     if task.scope_id != r.scope {
         return Err(E::Refused("planning-operation-task-outside-scope"));
     }
+    if task.independent_review.is_some() && w.planning.as_ref().is_some_and(|p| p.repository.is_some()) {
+        return Err(E::Refused("planning-managed-worker-retry-native-failure-required"));
+    }
     if tasks.next().is_some() || task.plan_role != "worker" || task.status != "blocked"
         || task.launch_held || task.planning_retry || task.next == op.next || task.plan_max_attempts <= 0
         || task.attempts.as_ref().map_or(0, Vec::len) as u128 >= task.plan_max_attempts as u128 {
@@ -621,7 +624,8 @@ fn current_native_review_input(
 /// settings/Work reservations, replay before invocation, final fence and commit.
 /// Managed repositories admit only acknowledgement, delegation and new tasks
 /// after original copy/commit observation; future-task instruction additions also
-/// preserve that repository observation. Other managed operations still refuse.
+/// preserve that repository observation, as does retry of a failed native worker.
+/// Retry retains the same task, original end event and explicit attempt cap.
 /// Holder equality is a concurrency fence, not authenticated agent authority.
 pub(crate) fn decide(
     root: &Path,
@@ -644,7 +648,7 @@ pub(crate) fn decide(
         .as_deref()
         .ok_or(E::Refused("planning-not-enabled"))?;
     if p.repository.is_some() {
-        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task"|"revise-instructions")) {
+        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task"|"revise-instructions"|"retry")) {
             return Err(E::Refused("planning-decision-managed-operation-unported"));
         }
         #[cfg(target_os="linux")]
