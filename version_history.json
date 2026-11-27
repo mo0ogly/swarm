@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le détail de tâche compte les pièces par dossier, filtre par chemin ou type et affiche le texte reçu pendant la préparation de Monaco.",
+        "en": "Task details count files by folder, filter by path or type, and show received text while Monaco loads."
+      },
+      {
         "fr": "La console des logs sépare le journal et la rotation en onglets. Les termes recherchés sont surlignés dans le tableau.",
         "en": "The log console has separate Log and Rotation tabs and highlights search terms in the table."
       },

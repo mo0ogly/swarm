@@ -206,12 +206,16 @@
 .workbench-review .task-detail-approve:disabled {background:var(--wattson-champ);color:var(--wattson-texte-discret);opacity:1;border-color:var(--wattson-ligne)}
 .task-detail-diagnostic code {overflow-wrap:anywhere}
 .task-detail-files {flex:1;min-height:0;overflow:auto;padding:12px clamp(12px,2.3vw,28px) 16px}
-.task-detail-files .swarm-files {min-height:100%;display:grid}
+.task-detail-files .swarm-files {height:100%;display:grid}
 .task-detail-file-layout {display:grid;grid-template-columns:minmax(12rem,26%) minmax(0,1fr);gap:12px;min-height:min(55dvh,38rem)}
 .task-detail-file-nav {display:contents}
 .task-detail-mobile-files {display:none}
 .task-detail-file-tree,.task-detail-file-viewer {min-width:0;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-champ)}
-.task-detail-file-tree {display:block;padding:12px;overflow:auto}
+.task-detail-file-tree {display:flex;flex-direction:column;gap:8px;min-height:0;padding:12px}
+.task-detail-file-tree-heading {display:flex;align-items:center;justify-content:space-between;gap:8px}
+.task-detail-file-tree>.task-detail-file-list {overflow:auto;min-height:0}
+.task-detail-file-count {flex:none;margin-inline-start:auto;padding:2px 7px;border-radius:1rem;background:var(--wattson-carte);color:var(--wattson-texte-discret);font-size:.78rem;font-variant-numeric:tabular-nums}
+.swarm-files-dir-name {min-width:0;overflow-wrap:anywhere}
 .task-detail-file-viewer {display:flex;flex-direction:column;overflow:hidden}
 .task-detail-file-toolbar {display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px;border-bottom:1px solid var(--wattson-ligne)}
 .task-detail-file-toolbar strong {flex:1 1 12rem;overflow-wrap:anywhere}
@@ -226,7 +230,7 @@
 .task-detail-file-type[data-kind=document] {background:var(--wattson-alerte-fond);color:var(--wattson-alerte-encre)}
 .task-detail-file-editor,.task-detail-file-plain {flex:1;min-height:18rem;margin:0}
 .task-detail-file-plain {padding:12px;white-space:pre-wrap;overflow:auto;overflow-wrap:anywhere}
-.task-detail-file-status {padding:0 10px;overflow-wrap:anywhere}
+.task-detail-file-status {margin:0;padding:0 10px;overflow-wrap:anywhere}
 .task-detail-file-retry {align-self:start;margin:0 12px 12px}
 .task-detail-group-state {padding:0 8px 8px}
 .task-detail-group-state p {margin:4px 0}
@@ -240,16 +244,17 @@
   .workbench-review {flex:initial;display:flex;align-items:center;flex-wrap:wrap;gap:8px;justify-items:start;text-align:start}
   .workbench-review p {flex:1 1 12rem;margin:0}
   .workbench-review .task-detail-approve {min-width:0}
+  .task-detail-files .swarm-files {height:auto;min-height:100%}
   .task-detail-file-layout {grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:8px}
   .task-detail-file-nav {display:flex;flex-direction:column;gap:8px;min-width:0}
-  .task-detail-mobile-files {display:block;align-self:start;min-height:44px}
+  .task-detail-mobile-files {display:flex;align-items:center;gap:8px;align-self:start;min-height:44px}
   .task-detail-mobile-files[aria-expanded=false]+.task-detail-file-tree {display:none}
   .task-detail-mobile-files[aria-expanded=true]+.task-detail-file-tree {max-height:min(35dvh,15rem)}
   .task-detail-file-editor,.task-detail-file-plain {min-height:16rem}
 }
 .task-detail-files [hidden] {display:none!important}
-.task-detail-file-tree h2 {font-size:1rem;margin:0 0 8px}
-.swarm-files-search {width:100%;min-height:44px;box-sizing:border-box}
+.task-detail-file-tree h2 {font-size:1rem;margin:0}
+.swarm-files-search {flex:none;width:100%;min-height:44px;box-sizing:border-box}
 .swarm-files-path {flex:1 1 12rem;min-width:0;overflow-wrap:anywhere}
 .swarm-files-dir-toggle {display:flex;gap:8px;align-items:center;min-height:44px;width:100%;text-align:left}
 .swarm-files-dir-toggle[aria-expanded=true] .swarm-files-caret {transform:rotate(90deg)}

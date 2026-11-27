@@ -17,10 +17,11 @@ async function verify(){
   const errors=[],writes=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('request',request=>{if(request.method()==='POST')writes.push(new URL(request.url()).pathname)});
-  let held,heldCatalog,linkedReads=0,catalogReads=0,listReads=0,reportReads=0,supportReads=0;
+  let held,heldCatalog,heldEditor,linkedReads=0,catalogReads=0,listReads=0,reportReads=0,supportReads=0;
   let reviewBudgetBlocked=false;
-  let catalogRequested;
+  let catalogRequested,editorRequested;
   const initialCatalog=new Promise(resolve=>{catalogRequested=resolve});
+  const firstEditor=new Promise(resolve=>{editorRequested=resolve});
   let failInterception;
   const interceptionFailure=new Promise((_,reject)=>{failInterception=reject});
   interceptionFailure.catch(()=>{});
@@ -55,6 +56,7 @@ async function verify(){
       failure:{reason:'native-scoped-submitted-review-required'},
      })});return;
     }
+    if(cfg.eligible&&!heldEditor&&uri.pathname==='/lib/monaco/editor.js'){heldEditor=request;editorRequested();return;}
     if(uri.pathname==='/api/v1/agent-logs/task-review-files'){
      const file=uri.searchParams.get('file');
      const timed=Boolean(file&&cfg.eligible);
@@ -134,10 +136,27 @@ async function verify(){
    assert.equal(await page.$eval(tree,node=>getComputedStyle(node).display),'none');
    await page.click(dialog+' .task-detail-file-retry');
   }
+  if(cfg.eligible){
+   const plain=dialog+' .task-detail-file-plain';
+   // The inventory responds before the held editor bundle. Text is already
+   // readable and the file count includes both authorized originals.
+   await observe(firstEditor);
+   const preview=await page.$eval(plain,node=>({visible:!node.hidden,text:node.textContent}));
+   assert.equal(preview.visible,true);
+   assert.match(preview.text,/Readable result review-task/);
+   assert.equal(await page.$eval(dialog+' .swarm-files-find',node=>node.disabled),true);
+   assert.equal(await page.$eval(dialog+' [data-directory="Livrables"] .task-detail-file-count',node=>node.textContent),'2');
+   assert.equal(await page.$(dialog+' .monaco-editor'),null);
+   await page.focus(plain);
+   await heldEditor.continue();
+   console.log('PASS the received report is readable while Monaco loads');
+  }
   await observe(page.waitForSelector(dialog+' .monaco-editor'));
   await page.waitForFunction(()=>[...document.querySelectorAll('.monaco-editor .view-lines')].some(node=>node.textContent.includes('review-task')));
   assert.equal(reportReads,0,'the first visible report must reuse the inventory response');
   assert.equal(listReads,cfg.eligible?1:2,'one inventory read per attempt');
+  if(cfg.eligible)assert.equal(await page.$eval(dialog+' .task-detail-file-editor',node=>node.contains(document.activeElement)),true);
+  else assert.match(await page.$eval(mobileFiles,node=>node.textContent),/^Files\d+$/);
   const find=await page.$(dialog+' .task-detail-file-toolbar [data-task-file-find]');
   assert(find,'visible search command');
   await find.click();
@@ -147,6 +166,12 @@ async function verify(){
   await page.keyboard.press('Escape');
   if(!cfg.eligible)await page.click(mobileFiles);
   const filter=await page.$(dialog+' input[type=search]');
+  await filter.type('markdown');
+  assert.equal(await page.$$eval(dialog+' .task-detail-file-item:not([hidden])',rows=>rows.length),2);
+  await filter.focus();
+  await page.keyboard.press('Control+A');
+  await page.keyboard.press('Backspace');
+  console.log('PASS the file tree filters by displayed type and shows counts');
   await filter.type('no-such-file-fixture');
   assert.equal(await page.$$eval(dialog+' .task-detail-file-item:not([hidden])',rows=>rows.length),0);
   await filter.click({clickCount:3});
