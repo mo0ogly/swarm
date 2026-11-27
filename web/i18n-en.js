@@ -7365,5 +7365,13 @@ globalThis.SwarmEnglish = {
   "Archives à retirer lors de la prochaine rotation · {n}": "Archives to remove at next rotation · {n}",
   "Archive du {date}": "Archive from {date}",
   "Rotation et rétention": "Rotation and retention",
-  "Le démon ouvre une archive avant une écriture qui dépasserait le seuil. Une rétention réduite s’applique à la prochaine rotation.": "The daemon archives the active file before a write would exceed the threshold. A lower retention count applies on the next rotation."
+  "Le démon ouvre une archive avant une écriture qui dépasserait le seuil. Une rétention réduite s’applique à la prochaine rotation.": "The daemon archives the active file before a write would exceed the threshold. A lower retention count applies on the next rotation.",
+  "Le fournisseur signale un refus de création de canal Unix (EPERM).": "The provider reports a refused Unix channel creation (EPERM).",
+  "La relance directe est bloquée. Le reçu d’origine est conservé.": "Direct retry is blocked. The original receipt is kept.",
+  "Code de sortie {code}.": "Exit code {code}.",
+  "Incident de revue": "Review incident",
+  "La dernière revue a échoué sans avis applicable.": "The latest review failed without an applicable opinion.",
+  "La lecture du reçu de la dernière revue est indisponible.": "The latest review receipt cannot be read.",
+  "Le canal privé a été ouvert. La revue s’est arrêtée sans avis applicable.": "The private channel was opened. The review stopped without an applicable opinion.",
+  "L’auxiliaire a refusé l’admission avant exécution.": "The helper refused admission before execution."
 };
