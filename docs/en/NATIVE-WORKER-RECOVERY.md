@@ -35,6 +35,38 @@ preparing another validation candidate.
 Attachment starts no execution. An already authorized mission driver may
 select the submission for a later control.
 
+### Declare a managed task's policy before it starts
+
+The same confirmed, `validation_policy`-only `task update` request also
+applies to a managed worker task that is still `todo`. The engine requires an
+active mission, unpaused planning, an open unheld scope, no attempt, review,
+recovery, gate or recorded validation, no active worker, control or reviewer,
+and no open launch lock. The contract digest must be current and the reason
+must be 16 to 2,000 bytes long.
+
+The current policy must declare no control. The supplied policy may be
+`human` or `automatic`; it must declare at least one control, pass
+normalization under the Admin limits and cover the criteria.
+In `automatic` mode every criterion must be covered and every planned check
+(`plan_checks`) needs a control with the same identifier; otherwise the
+refusal is `policy-criterion-uncovered` or `policy-plan-check-unauthorized`. Only
+`validation_policy` changes, stamped with the operation's time and actor.
+A second change is refused with
+`managed-unstarted-policy-first-policy-required`. Other refusals carry a
+`managed-unstarted-policy-*` code or the shared contract code and leave the
+Work intact. The operation starts no control, review or worker and accepts
+nothing. In `automatic` mode, successful controls replace the human gate;
+independent review and `task publish` are still required. Recipe:
+`tests/rust_managed_unstarted_policy.py`.
+
+```mermaid
+flowchart LR
+    A["Managed todo task, policy without controls"] --> B["Confirmed task update: policy only"]
+    B --> C["human or automatic policy with controls"]
+    C --> D["Worker execution then controls"]
+    D --> E["Independent review then task publish"]
+```
+
 ### Read a completed worker's journal
 
 The original journal retains the last live action snapshot. Worker settlement

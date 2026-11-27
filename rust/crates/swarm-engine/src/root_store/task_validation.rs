@@ -255,6 +255,92 @@ pub(crate) fn attach_managed_submission_controls(
     Ok(())
 }
 
+/// Set the first controlled policy of an unstarted managed worker task.
+///
+/// The caller holds the Work writer and has already checked worker, control
+/// and review ownership. The task must be `todo`, never attempted, outside
+/// every review, recovery and gate state, in an open unheld scope and without
+/// an unreleased launch lock. Its contract digest must be fresh and the
+/// operator reason bounded. Its current policy must declare no control.
+/// The supplied policy may be `human` or `automatic`; it must declare at least
+/// one control, pass normalization and cover the task criteria. Only
+/// `validation_policy` changes, stamped with the operator and time.
+///
+/// Refusals use stable `managed-unstarted-policy-*` or shared contract codes
+/// and leave the task intact. This starts no control, review or acceptance.
+/// Submitted tasks keep [`attach_managed_submission_controls`].
+pub(crate) fn attach_managed_unstarted_policy(
+    db: &rusqlite::Connection,
+    work: &mut crate::Work,
+    request: &crate::Request,
+    settings: &crate::EngineSettingsDocument,
+    authorized_at: String,
+    actor: String,
+) -> Result<(), E> {
+    let planning = work.planning.as_ref()
+        .filter(|planning| planning.repository.is_some())
+        .ok_or(E::Refused("managed-unstarted-policy-repository-required"))?;
+    super::require_planning_mission_active(db, &work.id)
+        .map_err(|error| E::caused("task-validation-mission-inactive", error))?;
+    if planning.paused || !planning.failure.is_empty() {
+        return Err(E::Refused("managed-unstarted-policy-planning-inactive"));
+    }
+    if crate::text::trim_space(&actor).is_empty() || crate::text::trim_space(&authorized_at).is_empty() {
+        return Err(E::Refused("task-validation-policy-unauthorized"));
+    }
+    let mut matches = work.tasks.iter().flatten().enumerate().filter(|(_, task)| task.id == request.id);
+    let (index, task) = matches.next().ok_or(E::Refused("managed-unstarted-policy-task-missing"))?;
+    if matches.next().is_some() || task.status != "todo" || task.plan_role != "worker"
+        || task.attempts.as_ref().is_some_and(|attempts| !attempts.is_empty())
+        || task.previous_reviews.as_ref().is_some_and(|reviews| !reviews.is_empty())
+        || task.planning_retry || task.independent_review.is_some()
+        || task.automatic_validation.is_some() || task.gate.is_some()
+        || task.manual_override.is_some() || task.revalidation.is_some()
+        || task.corrective_recovery.is_some() || task.recovered_result.is_some()
+        || task.review_coordination.is_some() || task.batch_review_resume.is_some()
+    {
+        return Err(E::Refused("managed-unstarted-policy-state-invalid"));
+    }
+    if !planning.scopes.iter().flatten().any(|scope|
+        scope.id == task.scope_id && scope.state != "closed" && scope.holder.is_empty())
+    {
+        return Err(E::Refused("managed-unstarted-policy-scope-unavailable"));
+    }
+    let locked: i64 = db.query_row(
+        "SELECT count(*) FROM main.preparation_launch_locks WHERE work_id=? AND task_id=? AND released=0",
+        (&work.id, &task.id), |row| row.get(0),
+    ).map_err(|error| E::caused("managed-unstarted-policy-launch-lock", error))?;
+    if locked != 0 {
+        return Err(E::Refused("managed-unstarted-policy-launch-locked"));
+    }
+    if task.validation_policy.as_ref()
+        .is_some_and(|policy| policy.controls.as_ref().is_some_and(|controls| !controls.is_empty()))
+    {
+        return Err(E::Refused("managed-unstarted-policy-first-policy-required"));
+    }
+    if request.expected_contract != crate::task_review_contract(task)
+        .map_err(|error| E::caused("managed-unstarted-policy-contract", error))?
+    {
+        return Err(E::Refused("contract-digest-stale"));
+    }
+    if crate::text::trim_space(&request.contract_revision_reason).len() < 16
+        || request.contract_revision_reason.len() > 2000 {
+        return Err(E::Refused("contract-reason-invalid"));
+    }
+    let supplied = request.validation_policy.as_ref()
+        .filter(|policy| matches!(policy.mode.as_str(), "human" | "automatic")
+            && policy.controls.as_ref().is_some_and(|controls| !controls.is_empty()))
+        .ok_or(E::Refused("managed-unstarted-policy-controls-required"))?;
+    let limits = settings.values.mutation_limits().map_err(|e| E::caused(e.reason(), e))?;
+    let mut policy = crate::normalize_validation_policy(supplied.clone(), &limits.policy)
+        .map_err(|e| E::caused(e.reason(), e))?;
+    crate::validation_policy_covers_task(&policy, task).map_err(|e| E::caused(e.reason(), e))?;
+    policy.authorized_at = authorized_at;
+    policy.actor = actor;
+    work.tasks.as_mut().ok_or(E::Refused("managed-unstarted-policy-task-missing"))?[index].validation_policy = Some(Box::new(policy));
+    Ok(())
+}
+
 /// Read the latest canonical submission without inventing a missing event.
 /// Event/request/revision coherence and explicit statement finalization are
 /// shared by validation and report relay. None means genuine absence only;

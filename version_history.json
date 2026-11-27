@@ -119,6 +119,10 @@
         "en": "Recovery reads the completed worker journal with the live actions cleared from the terminal record."
       },
       {
+        "fr": "Une tâche gérée pas encore démarrée peut recevoir sa première politique de validation, humaine ou automatique, avec ses contrôles. La revue indépendante et la publication restent requises.",
+        "en": "A managed task that has not started can receive its first validation policy, human or automatic, with its controls. Independent review and publication remain required."
+      },
+      {
         "fr": "Une première liste de contrôles peut être rattachée à une soumission gérée en validation humaine sans relancer son worker. La revue indépendante reste requise.",
         "en": "A first set of controls can be attached to an existing managed submission in human validation mode without rerunning its worker. Independent review remains required."
       },

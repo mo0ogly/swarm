@@ -1273,9 +1273,19 @@ fn apply<E: WorkEnvironment>(
                         crate::AgentLaunchError::Refused("task-report-settings-required")))?;
                     let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
                     let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
-                    crate::root_store::attach_managed_submission_controls(
-                        tx, root, &mut candidate, r, settings, at, actor,
-                    ).map_err(WorkEngineError::TaskReport)?;
+                    // A never-started task has no submission to verify; every
+                    // other status keeps the submission path and its refusals.
+                    let unstarted = candidate.tasks.iter().flatten()
+                        .any(|task| task.id == r.id && task.status == "todo");
+                    if unstarted {
+                        crate::root_store::attach_managed_unstarted_policy(
+                            tx, &mut candidate, r, settings, at, actor,
+                        ).map_err(WorkEngineError::TaskReport)?;
+                    } else {
+                        crate::root_store::attach_managed_submission_controls(
+                            tx, root, &mut candidate, r, settings, at, actor,
+                        ).map_err(WorkEngineError::TaskReport)?;
+                    }
                 }
                 #[cfg(not(target_os = "linux"))]
                 return Err(WorkEngineError::Lifecycle(crate::TaskLifecycleError::HierarchyNotPorted));
