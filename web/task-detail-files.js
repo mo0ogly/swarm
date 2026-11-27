@@ -88,14 +88,19 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
  search.setAttribute('aria-label',tr('Filtrer les fichiers'));
  search.addEventListener('input',()=>applyFilter(search.value));
 
+ const count=el('span',undefined,'task-detail-file-count');
+ const treeHeader=el('div',undefined,'task-detail-file-tree-heading');
+ treeHeader.append(title,count);
  const treeStatus=el('p',undefined,'task-detail-file-status');treeStatus.setAttribute('role','status');
  const treeList=el('ul','','task-detail-file-list');
  const tree=el('nav','','task-detail-file-tree');
  tree.id=titleId+'-tree';
  tree.setAttribute('aria-label',tr('Arborescence des fichiers de la tâche'));
- tree.append(title,search,treeStatus,treeList);
+ tree.append(treeHeader,search,treeStatus,treeList);
  const compact=matchMedia('(max-width:760px)');
  const filesToggle=el('button',tr('Fichiers'),'task-detail-mobile-files');
+ const mobileCount=el('span',undefined,'task-detail-file-count');
+ filesToggle.append(mobileCount);
  filesToggle.type='button';
  filesToggle.setAttribute('aria-controls',tree.id);
  filesToggle.setAttribute('aria-expanded','false');
@@ -174,6 +179,9 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
      ||new Set(items.map(item=>item.id)).size!==items.length)throw Error('task-files-list-invalid');
   files=items;
   treeHasFiles=items.length>0;
+  const fileCount=items.length.toLocaleString(document.documentElement.lang||undefined);
+  count.textContent=fileCount;
+  mobileCount.textContent=fileCount;
   renderTree(files);
   applyFilter(search.value);
   if(!currentId){
@@ -207,12 +215,9 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
  /** Rebuild the current tree while preserving disclosed paths and keyboard
   * focus on a surviving file or folder during an asynchronous refresh. */
  function renderTree(files){
-  const rootNode={dirs:new Map(),files:[]};
-  const groupNode=()=>({dirs:new Map(),files:[]});
-  for(const label of groupOrder){
-   const group=groups.get(label);
-   if(group&&group.state!=='ready')rootNode.dirs.set(label,groupNode());
-  }
+  const groupNode=()=>({dirs:new Map(),files:[],count:0});
+  const rootNode=groupNode();
+  for(const label of groups.keys())rootNode.dirs.set(label,groupNode());
   for(const file of files){
    const segments=file.path.split('/').filter(Boolean);
    const name=segments[segments.length-1]||file.path;
@@ -221,6 +226,7 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
     let child=node.dirs.get(segment);
     if(!child)node.dirs.set(segment,child=groupNode());
     node=child;
+    node.count++;
    }
    node.files.push({file,name});
   }
@@ -247,16 +253,19 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
    toggle.setAttribute('aria-expanded',String(open));
    const caret=el('span','▸','swarm-files-caret');
    caret.setAttribute('aria-hidden','true');
-   toggle.append(caret,el('span',name,'swarm-files-dir-name'));
+   const badge=el('span',child.count.toLocaleString(document.documentElement.lang||undefined),'task-detail-file-count');
+   toggle.append(caret,el('span',name,'swarm-files-dir-name'),badge);
    const children=el('ul','','task-detail-file-list');
    children.hidden=!open;
    fillGroup(child,children,segments);
    const state=parent.length===0?groups.get(name):null;
-   if(state&&state.state!=='ready'){
+   if(state&&(state.state!=='ready'||child.count===0)){
     const row=el('li',undefined,'task-detail-group-state');
     const status=el('p');status.setAttribute('role','status');
     const failed=state.state==='error';
-    setStatus(status,failed?readFailure(state.error,'Lecture indisponible'):tr('Chargement…'),failed);
+    const message=failed?readFailure(state.error,'Lecture indisponible')
+     :tr(state.state==='loading'?'Chargement…':'Aucun fichier enregistré dans ce dossier.');
+    setStatus(status,message,failed);
     row.append(status);
     if(failed){
      status.title=diagnostic(state.error).trim();
@@ -305,7 +314,9 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   const query=raw.trim().toLowerCase();
   let visible=0;
   for(const li of treeList.querySelectorAll('.task-detail-file-item')){
-   const match=!query||li.firstElementChild.dataset.path.toLowerCase().includes(query);
+   const button=li.firstElementChild;
+   const match=!query||button.dataset.path.toLowerCase().includes(query)
+    ||button.firstElementChild.textContent.toLowerCase().includes(query);
    li.hidden=!match;
    if(match)visible++;
   }
@@ -409,7 +420,14 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
   }));
  }
 
+ /** Display verified text during the first editor load. Replace it only
+  * for the same open selection and retain a readable fallback on failure. */
  async function show(result,kind,ticketValue){
+  if(!editor){
+   pre.textContent=result.text;
+   pre.hidden=false;
+   setStatus(viewerStatus,tr('Recherche et coloration en préparation…'));
+  }
   const language=result.language||KIND_LANG[kind]||'plaintext';
   try{
    monaco=await monacoBundle();
@@ -428,8 +446,11 @@ function mount(host,{read,initialFiles=[],sources=[],groupOrder=[],technical,pre
    model?.dispose();
    model=replacement;
    decorateLog(kind);
+   const transferFocus=document.activeElement===pre;
    pre.hidden=true;
+   pre.textContent='';
    editorHost.hidden=false;
+   if(transferFocus)editor.focus();
    setStatus(viewerStatus,'');
    find.disabled=false;
    find.title=tr('Rechercher dans le fichier');

@@ -405,7 +405,9 @@ de modification de la mission. Le détail confirme l’état après l’avoir re
 depuis le moteur. Si la révision change ou si l’enregistrement est incertain,
 actualisez la mission avant de reprendre.
 
-La fenêtre ouvre le **Rapport remis** dans Monaco dès qu’il est disponible.
+La fenêtre affiche le texte du **Rapport remis** dès réception. Monaco ajoute
+ensuite la recherche et la coloration. Un délai de lecture peut précéder la
+réception du contenu vérifié.
 Un lien vers une mission ouvre d’abord cette mission. Le sélecteur se complète
 ensuite avec les autres missions.
 Le rapport et l’inventaire arrivent dans la même lecture. Si le rapport
@@ -418,6 +420,9 @@ Pour un original géré, le même reçu de validation est décodé une fois par
 lecture. Son empreinte, les preuves associées et les octets du fichier restent vérifiés.
 Le moteur réutilise la vérification des contrôles de ce reçu pendant la lecture.
 Chaque nouvelle lecture vérifie de nouveau les preuves enregistrées.
+Le compteur indique les pièces recensées. Chaque dossier indique son propre
+total et affiche son état pendant l’inventaire ou en cas d’échec. Le filtre
+cherche dans les chemins et dans les types affichés, par exemple `JSON`.
 Sur téléphone, **Fichiers** déplie l’arborescence. Le choix d’une pièce la
 referme et ramène au lecteur. **Détails techniques** regroupe les JSON de la
 tâche. Monaco offre une recherche en lecture seule. Les originaux Word,

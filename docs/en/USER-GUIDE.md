@@ -297,7 +297,9 @@ permission to modify the mission. The details confirm the state after reading
 it back from the engine. If the revision changes or recording is uncertain,
 refresh the mission before proceeding.
 
-The window opens **Report handed off** in Monaco as soon as it is available.
+The window shows **Report handed off** as text as soon as it arrives. Monaco
+then adds search and syntax highlighting. The checked read may take time
+before the content arrives.
 A mission link opens that mission first. The selector fills in the other
 missions afterwards.
 The report and the file list arrive in one read. If the report cannot be read,
@@ -310,6 +312,9 @@ For a managed original, the same validation receipt is decoded once per read.
 Its digest, supporting evidence and the selected file's bytes are still checked.
 The engine reuses the receipt's verified control mapping within the read and
 checks the recorded evidence again on the next request.
+The counter shows the number of files found so far. Each folder shows its
+own count and reports loading or read failures. The filter matches paths
+and displayed file types, such as `JSON`.
 On phones, **Files** expands the tree. Selecting a file closes the tree and
 returns to the viewer. **Technical details** groups the task JSON files. Monaco
 provides read-only search. Available Word, OpenDocument and PDF originals can
