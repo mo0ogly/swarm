@@ -123,6 +123,29 @@ racine isolée. Le test de politique Authority
 `exclusive_route_requires_view_permission` couvre le refus de vue et sa
 contrepartie autorisée.
 
+## Erreurs du moteur Rust dans le journal système
+
+Sous Linux avec journald, la CLI `swarm-rust` publie un événement structuré
+lorsqu’une commande échoue, y compris avant l’ouverture d’une mission.
+L’observateur HTTP natif publie les échecs et les lectures dégradées qu’il reçoit.
+Le journal contient des codes stables, la famille de commande, le niveau, le
+statut ou le code de sortie et, pour une commande, sa durée. Un indicateur
+signale qu’un effet Work est connu. Les identifiants, arguments, requêtes,
+réponses et messages privés restent hors de cette projection.
+
+```sh
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web
+```
+
+L’accès et la conservation suivent la configuration du journal système.
+Si le datagramme est refusé, la réponse JSON garde son erreur d’origine
+et indique `application_log.code = application-journal-unavailable` quand
+ce canal de réponse est disponible. L’observateur web ajoute le même champ
+à l’événement de sortie. Ces événements couvrent les frontières observées,
+pas tous les `Result` intermédiaires, les arrêts forcés ou les paniques.
+Le journal applicatif du relais et les journaux de mission restent distincts.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

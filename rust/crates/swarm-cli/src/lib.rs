@@ -731,6 +731,7 @@ mod planning_graph;
 mod mission_worker_entry;
 #[cfg(target_os = "linux")]
 mod costs;
+mod application_journal;
 /// Dispatch validated native operations. Context/workflow observations share
 /// strict read-only arguments and checked serialization/close/write/flush; paired
 /// primary/release failures keep both causes. Planning-report decodes bounded
@@ -742,7 +743,11 @@ mod costs;
 /// still requires its live gate capability. Help/read handlers do not launch.
 /// The separate private mission-worker entry only establishes a process session
 /// before reusing that Agent route; recognition of its name grants no permission.
-fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+fn execute(
+    a: &Arguments, out: &mut dyn Write, journal: Option<&application_journal::Journal>,
+) -> Result<u8, CliError> {
+    #[cfg(not(target_os = "linux"))]
+    let _ = journal;
     // Saved v51 temporary directory: exported as TMPDIR before any thread or
     // child starts, so nothing this command (or `web`) spawns falls back to /tmp.
     // A broken setting refuses the command instead of silently using /tmp.
@@ -783,7 +788,7 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos[0]=="project-profile"{return project_profile::execute(a,out);}
     #[cfg(target_os = "linux")]
     if a.pos[0] == "web" {
-        return native_web::execute(a, out);
+        return native_web::execute(a, out, journal);
     }
     #[cfg(target_os = "linux")]
     if a.pos[0] == "web-ticket" {
@@ -1758,14 +1763,29 @@ pub fn run_detailed(
     out: &mut dyn Write,
     err: &mut dyn Write,
 ) -> RunOutcome {
+    run_detailed_using(args, environment_language, out, err, None)
+}
+
+/// Execute and report through explicit sinks. Embedders retain the original
+/// stream-only contract. A process caller may additionally supply the host
+/// journal without redirecting stdout or stderr.
+fn run_detailed_using(
+    args: &[String],
+    environment_language: &str,
+    out: &mut dyn Write,
+    err: &mut dyn Write,
+    journal: Option<&application_journal::Journal>,
+) -> RunOutcome {
+    let started = std::time::Instant::now();
     let parsed = parse(args, environment_language);
     let json_mode = parsed.as_ref().is_ok_and(|a| a.json);
     let english = parsed.as_ref().is_ok_and(|a| a.language == "en");
     let result = match parsed.as_ref() {
-        Ok(a) => execute(a, out),
+        Ok(a) => execute(a, out, journal),
         Err(_) => Ok(0),
     };
     let code = result.as_ref().copied().unwrap_or(0);
+    let operation=application_journal::operation(parsed.as_ref().ok().and_then(|a|a.pos.first()).map(String::as_str));
     let error = match (parsed.as_ref(), result) {
         (Err(_), _) => parsed.err(),
         (_, Err(e)) => Some(e),
@@ -1778,7 +1798,7 @@ pub fn run_detailed(
             diagnostic_error: None,
         };
     };
-    report(error, json_mode, english, err)
+    report_using(error, json_mode, english, err, journal, operation, started)
 }
 /// Project only classified codes, operation names and numeric OS causes. Raw
 /// error Display/SQL/paths/context never enter this diagnostic. Compound cleanup
@@ -1915,7 +1935,19 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
 /// omitted rather than asserted rolled back; output failures retain the original
 /// diagnostic and secondary writer error in RunOutcome. This writes/flushes only
 /// the supplied error sink, performs no Root IO/retry and grants no acceptance.
+#[cfg(test)]
 fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) -> RunOutcome {
+    report_using(error, json_mode, english, err, None, "command", std::time::Instant::now())
+}
+
+/// Report one failure through the existing response stream and an optional
+/// out-of-band journal. A journal failure is secondary and never changes
+/// the original error, known recorded effect, or process status.
+fn report_using(
+    error: CliError, json_mode: bool, english: bool, err: &mut dyn Write,
+    journal: Option<&application_journal::Journal>, operation: &'static str,
+    started: std::time::Instant,
+) -> RunOutcome {
     // A Root apply may return Err after known publication, before the command's
     // local applied flag. Normalize that typed marker even through a second close.
     let error = if !matches!(&error, CliError::ConfigurationStatePreserved { .. })
@@ -1942,8 +1974,15 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
     let message = if english && matches!(&error, CliError::Unsupported) {
         "Command is not yet ported in this Rust development binary.".into()
     } else { error.message() };
+    let code=if error.typed_causes().iter().any(|e|e.is::<swarm_engine::TrustError>()){match error.code(){"authorization_required"=>4,"revision_conflict"|"event_conflict"|"idempotency_conflict"=>3,_=>2}}else{match error.code(){"preparation-event-conflict"|"preparation-revision-conflict"|"preparation-work-revision-conflict"=>3,"preparation-write-disabled"=>4,"preparation-method-unavailable"=>5,_=>2}};
+    let application_log=journal.and_then(|sink|sink.command_failure(
+        operation, error.code(), code, started, error.recorded_work().is_some(),
+    ).err());
     let bytes = if as_json {
         let mut document = serde_json::json!({"schema_version":1,"error":message,"failure":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});
+        if let Some(unavailable) = application_log {
+            document["application_log"] = serde_json::json!(unavailable);
+        }
         if let Some(publication)=error.trust_publication(){document["trust_publication"]=serde_json::json!(publication);document["trust_state_may_be_recorded"]=serde_json::json!(true);}
         let auxiliary=error.auxiliary_effects();
         if !auxiliary.is_empty(){document["auxiliary_effects"]=serde_json::json!(auxiliary);}
@@ -1963,8 +2002,9 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
         Ok(if plain {
             format!("{message}\n")
         } else {
+            let log_note = if application_log.is_some() { " [application-journal-unavailable]" } else { "" };
             format!(
-                "{} {message}\n",
+                "{} {message}{log_note}\n",
                 if english { "Error:" } else { "Erreur :" }
             )
         }
@@ -1974,7 +2014,6 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
         Ok(bytes) => err.write_all(&bytes).and_then(|()| err.flush()).err(),
         Err(e) => Some(e),
     };
-    let code=if error.typed_causes().iter().any(|e|e.is::<swarm_engine::TrustError>()){match error.code(){"authorization_required"=>4,"revision_conflict"|"event_conflict"|"idempotency_conflict"=>3,_=>2}}else{match error.code(){"preparation-event-conflict"|"preparation-revision-conflict"|"preparation-work-revision-conflict"=>3,"preparation-write-disabled"=>4,"preparation-method-unavailable"=>5,_=>2}};
     RunOutcome {
         code,
         error: Some(error),
@@ -2022,13 +2061,34 @@ pub fn run_os_detailed(
     out: &mut dyn Write,
     err: &mut dyn Write,
 ) -> RunOutcome {
+    run_os_using(args, environment_language, out, err, None)
+}
+
+/// Process entry point for the real CLI. On Linux, publish terminal failures
+/// to the system journal independently of the caller's protocol streams.
+pub fn run_os_with_application_journal(
+    args: &[std::ffi::OsString],
+    environment_language: &str,
+    out: &mut dyn Write,
+    err: &mut dyn Write,
+) -> RunOutcome {
+    run_os_using(args, environment_language, out, err, application_journal::Journal::system().as_ref())
+}
+
+/// Apply the same parser and command runner to both process and embedded calls.
+/// Invalid OS bytes are reported without rendering those bytes.
+fn run_os_using(
+    args: &[std::ffi::OsString], environment_language: &str, out: &mut dyn Write,
+    err: &mut dyn Write, journal: Option<&application_journal::Journal>,
+) -> RunOutcome {
+    let started = std::time::Instant::now();
     let converted = args
         .iter()
         .map(|a| a.to_str().map(String::from))
         .collect::<Option<Vec<_>>>();
     match converted {
-        Some(args) => run_detailed(&args, environment_language, out, err),
-        None => report(CliError::ArgumentEncoding, false, false, err),
+        Some(args) => run_detailed_using(&args, environment_language, out, err, journal),
+        None => report_using(CliError::ArgumentEncoding, false, false, err, journal, "command", started),
     }
 }
 

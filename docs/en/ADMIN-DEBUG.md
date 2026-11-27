@@ -113,6 +113,28 @@ covers a successful review, size refusal, replay and CLI/HTTP filtering in an
 isolated root. The Authority policy test `exclusive_route_requires_view_permission`
 covers the missing-view refusal and the authorized counterpart.
 
+## Rust engine failures in the system journal
+
+On Linux with journald, the `swarm-rust` executable emits a structured
+event when a command fails, including before a mission is opened. The native
+HTTP observer emits the failures and degraded reads it receives. Events
+include stable codes, a command family, severity, status or exit code and
+elapsed time for commands. A flag indicates a known Work effect. IDs,
+arguments, requests, responses and private messages stay outside this projection.
+
+```sh
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-cli
+journalctl SYSLOG_IDENTIFIER=swarm-rust SWARM_COMPONENT=swarm-web
+```
+
+Access and retention follow the system journal configuration. If the
+datagram fails, the JSON reply retains the original failure and includes
+`application_log.code = application-journal-unavailable` when that response
+channel is available. The web observer adds the same field to its outcome
+event. Coverage is limited to the observed boundaries. Intermediate
+`Result` values, forced termination and panics are outside this increment.
+The relay application log and mission logs keep their own scopes.
+
 ## Application logs for the relay
 
 Open the dedicated console in **Administration → Accounts and access →
