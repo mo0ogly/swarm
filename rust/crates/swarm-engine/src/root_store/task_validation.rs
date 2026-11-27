@@ -266,9 +266,12 @@ pub(crate) fn attach_managed_submission_controls(
 /// one control, pass normalization and cover the task criteria. Only
 /// `validation_policy` changes, stamped with the operator and time.
 ///
-/// Refusals use stable `managed-unstarted-policy-*` or shared contract codes
-/// and leave the task intact. This starts no control, review or acceptance.
-/// Submitted tasks keep [`attach_managed_submission_controls`].
+/// State refusals use stable `managed-unstarted-policy-*` codes; shared checks
+/// keep their own codes (`contract-digest-stale`, `contract-reason-invalid`,
+/// `task-validation-mission-inactive`, `task-validation-policy-unauthorized`,
+/// normalization and `policy-*` coverage codes). Every refusal leaves the task
+/// intact. This starts no control, review or acceptance. Submitted tasks keep
+/// [`attach_managed_submission_controls`].
 pub(crate) fn attach_managed_unstarted_policy(
     db: &rusqlite::Connection,
     work: &mut crate::Work,
@@ -620,13 +623,18 @@ mod tests {
     fn validation_request_cannot_supply_execution_authority() {
         let valid = serde_json::json!({"schema_version":1,"event_id":"check","expected_revision":4,"task_id":"task"});
         assert!(decode(&serde_json::to_vec(&valid).unwrap()).is_ok());
+        // Version 2 names the focused managed control and is a valid frame;
+        // any other version stays refused.
+        let focused = serde_json::json!({"schema_version":2,"event_id":"check","expected_revision":4,"task_id":"task"});
+        assert!(decode(&serde_json::to_vec(&focused).unwrap()).is_ok());
         for patch in [
             serde_json::json!({"actor":"operator"}),
             serde_json::json!({"origin":"automatic"}),
             serde_json::json!({"command":["python3"]}),
             serde_json::json!({"agent_id":"another"}),
             serde_json::json!({"expected_revision":0}),
-            serde_json::json!({"schema_version":2}),
+            serde_json::json!({"schema_version":0}),
+            serde_json::json!({"schema_version":3}),
             serde_json::json!({"task_id":"../outside"}),
         ] {
             let mut invalid = valid.clone();

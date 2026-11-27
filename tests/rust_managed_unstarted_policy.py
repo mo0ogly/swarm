@@ -112,7 +112,8 @@ def run(binary, previous, profile, projection_probe, output):
         code, old = f.call(operation, request)
     finally:
         f.binary = candidate_binary
-    assert code != 0 and causes(old), old
+    # The previous binary only had the submission path, which refuses a todo task.
+    assert code != 0 and "managed-submission-controls-state-invalid" in causes(old), old
     assert show() == fresh
     print("PASS unstarted-policy-previous-binary-refuses", flush=True)
 
@@ -137,6 +138,9 @@ def run(binary, previous, profile, projection_probe, output):
     assert {k: v for k, v in after.items() if k != "validation_policy"} == {
         k: v for k, v in task.items() if k != "validation_policy"}
     assert next(t for t in saved["tasks"] if t["id"] == "task-2") == other
+    # Outside tasks only revision bookkeeping may move; planning stays as it was.
+    assert saved["planning"] == fresh["planning"], "planning changed"
+    assert len(saved["tasks"]) == len(fresh["tasks"])
     assert after["status"] == "todo" and not after.get("attempts")
     assert not after.get("automatic_validation") and not after.get("independent_review")
     assert f.ok(operation, request)["work"] == saved

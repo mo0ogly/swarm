@@ -40,9 +40,12 @@ select the submission for a later control.
 The same confirmed, `validation_policy`-only `task update` request also
 applies to a managed worker task that is still `todo`. The engine requires an
 active mission, unpaused planning, an open unheld scope, no attempt, review,
-recovery, gate or recorded validation, no active worker, control or reviewer,
-and no open launch lock. The contract digest must be current and the reason
-must be 16 to 2,000 bytes long.
+recovery, gate or recorded validation, no active control or reviewer on the
+task, and no open launch lock. No agent may be active anywhere in the Work: a
+worker running on another task is enough to refuse the update. Declare these
+policies before starting the mission driver or while its workers are stopped.
+The contract digest must be current and the reason must be 16 to 2,000 bytes
+long.
 
 The current policy must declare no control. The supplied policy may be
 `human` or `automatic`; it must declare at least one control, pass
@@ -52,9 +55,11 @@ In `automatic` mode every criterion must be covered and every planned check
 refusal is `policy-criterion-uncovered` or `policy-plan-check-unauthorized`. Only
 `validation_policy` changes, stamped with the operation's time and actor.
 A second change is refused with
-`managed-unstarted-policy-first-policy-required`. Other refusals carry a
-`managed-unstarted-policy-*` code or the shared contract code and leave the
-Work intact. The operation starts no control, review or worker and accepts
+`managed-unstarted-policy-first-policy-required`. State refusals carry a
+`managed-unstarted-policy-*` code; shared checks keep their own codes
+(`contract-digest-stale`, `contract-reason-invalid`,
+`task-validation-mission-inactive`, normalization and `policy-*`). All of
+them leave the Work intact. The operation starts no control, review or worker and accepts
 nothing. In `automatic` mode, successful controls replace the human gate;
 independent review and `task publish` are still required. Recipe:
 `tests/rust_managed_unstarted_policy.py`.

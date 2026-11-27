@@ -1268,15 +1268,20 @@ fn apply<E: WorkEnvironment>(
             {
                 #[cfg(target_os = "linux")]
                 {
-                    require_native_task_idle(tx, &candidate.id, &r.id, "managed-submission-controls-worker-active")?;
-                    let settings = planning_settings.ok_or(WorkEngineError::TaskReport(
-                        crate::AgentLaunchError::Refused("task-report-settings-required")))?;
-                    let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
-                    let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
                     // A never-started task has no submission to verify; every
                     // other status keeps the submission path and its refusals.
                     let unstarted = candidate.tasks.iter().flatten()
                         .any(|task| task.id == r.id && task.status == "todo");
+                    let worker_refusal = if unstarted {
+                        "managed-unstarted-policy-worker-active"
+                    } else {
+                        "managed-submission-controls-worker-active"
+                    };
+                    require_native_task_idle(tx, &candidate.id, &r.id, worker_refusal)?;
+                    let settings = planning_settings.ok_or(WorkEngineError::TaskReport(
+                        crate::AgentLaunchError::Refused("task-report-settings-required")))?;
+                    let at = environment.timestamp().map_err(WorkEngineError::Runtime)?;
+                    let actor = environment.operator().map_err(WorkEngineError::Runtime)?;
                     if unstarted {
                         crate::root_store::attach_managed_unstarted_policy(
                             tx, &mut candidate, r, settings, at, actor,
