@@ -560,6 +560,9 @@
      charts.append(chartBlock(tr('Actions par vue'),(r.views||[]).map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.actions})),tr('Vue')));
      const activity=r.activity;
      if(activity){
+      for(const [label,value] of [['Sessions',r.total],['Comptes observés',r.accounts.length],['Réseaux observés',Object.keys(activity.networks).length]]){
+       kpiBar.append(node('span',tr(label)+' · '+value))
+      }
       charts.append(chartBlock(tr('Actions par heure (UTC)'),activity.hours.map(h=>({label:String(h.hour),value:h.actions})),tr('Heure UTC')));
       charts.append(chartBlock(tr('Consultations par heure (UTC)'),activity.hours.map(h=>({label:String(h.hour),value:h.consultations})),tr('Heure UTC')));
       charts.append(chartBlock(tr('Événements par réseau du pair TCP'),Object.entries(activity.networks).map(([label,value])=>({label,value})),tr('Réseau du pair TCP')));
@@ -567,7 +570,7 @@
      }
      const recent=table(['Date','Événement','Compte','Requête','Résultat','Pair TCP','Groupes observés']);
      for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));cell(row,e.peer_ip||'—');cell(row,e.groups?.join(', ')||'—');recent.tb.append(row)}
-     panel.replaceChildren(chainNote(r.chain_valid),help('Les indicateurs, les graphiques et les dernières connexions suivent le même périmètre que le tableau Connexions.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
+     panel.replaceChildren(chainNote(r.chain_valid),help(enhanced?'Les indicateurs, les graphiques et les dernières connexions suivent le même périmètre que le tableau Connexions.':'Ce démon filtre le tableau de bord par date.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4',enhanced?'20 dernières connexions':'20 derniers événements'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
    async function actionsView(){
     try{const r=await call('GET',enhanced?'/audit/actions'+qs():'/audit');
