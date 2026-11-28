@@ -472,7 +472,7 @@
    const noAdminLabel=node('label','Sans administration','engine-settings-field');noAdminLabel.append(noAdmin,document.createTextNode(' '+tr('seulement les comptes sans droit d’administration')));filters.append(noAdminLabel);
    const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
    const tabs=node('div',undefined,'toolbar authority-tabs');tabs.setAttribute('role','tablist');const panel=node('div');panel.setAttribute('role','tabpanel');panel.tabIndex=-1;
-   const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],purge:['Purge',purgeView]};let current='connections';
+   const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],...(me.administer?{purge:['Purge',purgeView]}:{})};let current='connections';
    for(const [k,[label]] of Object.entries(tabsMap)){const b=button(label);b.setAttribute('role','tab');b.dataset.auditTab=k;b.addEventListener('click',()=>show(k));tabs.append(b)}
    function show(k){
     current=k;
@@ -514,7 +514,12 @@
      nav.append(node('span',tr('Page')+' '+page+' / '+pages+' — '+total+' '+tr('sessions'),'authority-pages'));
      const sortable=(label,key)=>{const b=button(label+(sort===key?(dir==='desc'?' ↓':' ↑'):''));b.className='authority-sort';b.addEventListener('click',()=>connections(1,key,sort===key&&dir==='desc'?'asc':'desc'));return b};
      const sorts=toolbar(sortable(tr('Trier : activité'),'last_at'),sortable(tr('ouverture'),'first_at'),sortable(tr('compte'),'subject'),sortable(tr('actions'),'actions'),sortable(tr('refus'),'refusals'));
-     const exportBar=toolbar(button('Exporter CSV',()=>location.assign(base+'/audit/sessions'+qs({format:'csv',sort,dir}))),button('Exporter JSON',()=>location.assign(base+'/audit/sessions'+qs({format:'json',sort,dir}))));
+     const exportButtons=['csv','json'].map(format=>{
+      const control=button(format==='csv'?'Exporter CSV':'Exporter JSON');
+      control.addEventListener('click',()=>location.assign(base+'/audit/sessions'+qs({format,sort,dir})));
+      return control
+     });
+     const exportBar=toolbar(...exportButtons);
      panel.replaceChildren(chainNote(r.chain_valid),help('Chaque ligne est une session (une connexion et ses requêtes). « Moyens » distingue le navigateur de la clé API ; « Vues » liste les droits de menu employés (none = pages moteur sans menu). Les filtres s’appliquent côté serveur : période, compte, vue, moyen, statut, sans administration, recherche.'),sorts,wrap,nav,exportBar)}catch(e){fail(e)}
    }
    async function detail(x){
@@ -543,7 +548,7 @@
      panel.replaceChildren(chainNote(r.chain_valid),help('Quatre indicateurs, six graphiques construits localement (aucune ressource externe) avec tableau alternatif repliable, puis les 20 dernières lignes de la période. La période suit les filtres en haut de section.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
    async function actionsView(){
-    try{const r=await call('GET','/audit'+qs());const entries=(r.entries||[]).filter(e=>e.event==='intent'&&e.at>=(day(from.value)||0)&&e.at<(day(to.value)!==null?day(to.value)+86400:Number.MAX_SAFE_INTEGER));const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
+    try{const r=await call('GET','/audit/actions'+qs());const entries=r.entries;const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
      for(const e of entries){const row=node('tr');cell(row,when(e.at));cell(row,e.subject||'—');cell(row,e.detail||e.action||'—');cell(row,e.method+' '+e.path);cell(row,e.status==null?'—':String(e.status));tb.append(row)}
      panel.replaceChildren(chainNote(r.chain_valid),help('Chaque mutation d’administration est décrite en clair (création de compte, changement de mot de passe, application de politique…) à partir du chemin demandé — jamais du corps, qui peut contenir un secret.'),entries.length?wrap:node('p','Aucune action d’administration sur la période.'))}catch(e){fail(e)}
    }

@@ -494,12 +494,17 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
     let via = format!("session:{}", crate::sessions::token_id(&token));
+    let mut request_id = [0; 16];
+    if getrandom::fill(&mut request_id).is_err() {
+        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
+    }
+    let reference = format!("admin:{:032x}", u128::from_be_bytes(request_id));
     let detail = audit::admin_detail(&method, &path);
-    if let Err(r) = intent(&front, &meta, &subject, &via, None, &method, &path, action, detail.as_deref()) {
+    if let Err(r) = intent(&front, &meta, &subject, &via, Some(&reference), &method, &path, action, detail.as_deref()) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &meta, &subject, &via, None, &method, &path, action, response.status());
+    outcome(&front, &meta, &subject, &via, Some(&reference), &method, &path, action, response.status());
     Ok(response)
 }
 

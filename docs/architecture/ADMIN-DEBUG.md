@@ -55,6 +55,17 @@ Un refus de lecture reste visible dans la console avec son code quand celui-ci
 est fourni. Pour reprendre une lecture de projet en échec, refermez et rouvrez
 sa branche. Consultez la [version anglaise](../en/ADMIN-DEBUG.md).
 
+## Journal d’accès
+
+**Connexions**, les exports et le **Tableau de bord** partagent les filtres
+de période et de session. Le tableau de bord compte aussi les connexions
+refusées sans session quand elles satisfont les critères applicables. Les
+dernières connexions listent les ouvertures réussies. **Actions d’administration**
+présente le résultat corrélé aux intentions de l’administration Authority. Un
+résultat historique sans corrélation reste inconnu. Pour purger, il faut le
+droit d’audit et celui de gestion des comptes. La lecture seule ne permet pas
+la purge.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

@@ -662,106 +662,129 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             *live = candidate;
             ok(json!({"applied": true, "revision": revision(&*live)}))
         }
-        (Method::GET, ["audit", "sessions"]) | (Method::GET, ["audit", "dashboard"]) => {
+        (Method::GET, ["audit", kind @ ("sessions" | "dashboard" | "actions")]) => {
             let (from, to) = (q_i64(&query, "from").unwrap_or(0), q_i64(&query, "to").unwrap_or(i64::MAX));
             let q = |key: &str| query.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_str()).filter(|v| !v.is_empty());
             let subject = q("subject");
-            match front.audit.read() {
-                Ok((entries, chain_valid)) if segments[1] == "sessions" => {
-                    // ADM-06: filters, sort, server-side pagination, export.
-                    let mut rows = crate::audit::sessions(&entries, from, to, subject);
-                    if let Some(client) = q("client") {
-                        rows.retain(|r| r.clients.iter().any(|c| c == client));
-                    }
-                    if let Some(view) = q("view") {
-                        rows.retain(|r| r.views.iter().any(|v| v == view));
-                    }
-                    // "Without administration": keep only sessions whose
-                    // account has no `administer` decision on POST …/accounts
-                    // under the live policy (needs the accounts list; blocking).
-                    if q("no_admin") == Some("1") {
-                        let admins: std::collections::BTreeSet<String> = match {
-                            let f = Arc::clone(&front);
-                            blocking(move || f.accounts.list(&Context::new())).await
-                        } {
-                            Some(Ok(list)) => list
-                                .iter()
-                                .filter(|a| {
-                                    let Ok(p) = front.policy.read() else { return false };
-                                    let s = Subject { roles: &a.roles, integrity: a.integrity, attributes: &a.attributes };
-                                    policy::decide(&p, &s, "POST", "/api/v1/authority/accounts").allowed
-                                })
-                                .map(|a| a.subject.clone())
-                                .collect(),
-                            _ => return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
-                        };
-                        rows.retain(|r| r.subject.as_deref().is_none_or(|s| !admins.contains(s)));
-                    }
-                    if let Some(status) = q("status") {
-                        match status {
-                            "active" => rows.retain(|r| !r.signed_out),
-                            "signed_out" => rows.retain(|r| r.signed_out),
-                            "refused" => rows.retain(|r| r.refusals > 0),
-                            _ => return refuse(StatusCode::BAD_REQUEST, "authority-request-invalid"),
-                        }
-                    }
-                    if let Some(needle) = q("q") {
-                        let n = needle.to_lowercase();
-                        rows.retain(|r| r.subject.as_deref().is_some_and(|s| s.to_lowercase().contains(&n)) || r.credential.to_lowercase().contains(&n));
-                    }
-                    // Sort: `sort` in {last_at, first_at, subject, actions,
-                    // refusals}, `dir` in {asc, desc} (desc default for the
-                    // time and count keys, asc for subject).
-                    let key = q("sort").unwrap_or("last_at");
-                    let desc = q("dir").map(|d| d == "desc").unwrap_or(key != "subject");
-                    let cmp = |a: &crate::audit::SessionSummary, b: &crate::audit::SessionSummary| match key {
-                        "first_at" => a.first_at.cmp(&b.first_at),
-                        "subject" => a.subject.as_deref().unwrap_or("").cmp(b.subject.as_deref().unwrap_or("")),
-                        "actions" => a.actions.cmp(&b.actions),
-                        "refusals" => a.refusals.cmp(&b.refusals),
-                        _ => a.last_at.cmp(&b.last_at),
-                    };
-                    rows.sort_by(|a, b| if desc { cmp(b, a) } else { cmp(a, b) });
-                    let total = rows.len();
-                    let rows = if q("format").is_some() {
-                        rows // export: no pagination
-                    } else {
-                        let page = q_i64(&query, "page").unwrap_or(1).max(1) as usize;
-                        let per = q_i64(&query, "per_page").unwrap_or(50).clamp(1, 200) as usize;
-                        rows.chunks(per).nth(page - 1).unwrap_or_default().to_vec()
-                    };
-                    if q("format") == Some("csv") {
-                        let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views\n");
-                        for r in &rows {
-                            let esc = |s: &str| if s.contains(',') || s.contains('"') { format!("\"{}\"", s.replace('"', "\"\"")) } else { s.to_owned() };
-                            csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{}\n",
-                                esc(&r.credential), esc(r.subject.as_deref().unwrap_or("")), r.first_at, r.last_at,
-                                r.consultations, r.actions, r.refusals, r.signed_out,
-                                esc(&r.clients.join(" ")), esc(&r.views.join(" "))));
-                        }
-                        let mut rep = full(StatusCode::OK, "text/csv; charset=utf-8", csv);
-                        rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.csv\""));
-                        return rep;
-                    }
-                    if q("format") == Some("json") {
-                        let mut rep = ok(json!({"sessions": rows, "total": total}));
-                        rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.json\""));
-                        return rep;
-                    }
-                    ok(json!({"sessions": rows, "total": total, "chain_valid": chain_valid}))
-                }
-                Ok((entries, chain_valid)) => {
-                    // ADM-07: dashboard — KPIs, per-view usage, last 20 lines.
-                    let (days, accounts) = crate::audit::dashboard(&entries, from, to);
-                    let k = crate::audit::kpis(&entries, from, to);
-                    let views = crate::audit::view_usage(&entries, from, to);
-                    let mut recent: Vec<&crate::audit::Entry> = entries.iter().filter(|e| e.at >= from && e.at < to && e.event != crate::audit::PURGE_ANCHOR).collect();
-                    recent.sort_by_key(|e| std::cmp::Reverse(e.at));
-                    let recent: Vec<_> = recent.into_iter().take(20).cloned().collect();
-                    ok(json!({"days": days, "accounts": accounts, "kpis": k, "views": views, "recent": recent, "chain_valid": chain_valid}))
-                }
-                Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            let (entries, chain_valid) = match front.audit.read() {
+                Ok(data) => data,
+                Err(code) => return refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
+            };
+            // Session filters select a cohort for the list, exports and aggregates.
+            let mut rows = crate::audit::sessions(&entries, from, to, subject);
+            let mut admins = std::collections::BTreeSet::<String>::new();
+            if let Some(client) = q("client") {
+                rows.retain(|r| r.clients.iter().any(|c| c == client));
             }
+            if let Some(view) = q("view") {
+                rows.retain(|r| r.views.iter().any(|v| v == view));
+            }
+            // "Without administration": keep only sessions whose
+            // account has no `administer` decision on POST …/accounts
+            // under the live policy (needs the accounts list; blocking).
+            if q("no_admin") == Some("1") {
+                admins = match {
+                    let f = Arc::clone(&front);
+                    blocking(move || f.accounts.list(&Context::new())).await
+                } {
+                    Some(Ok(list)) => {
+                        let Ok(p) = front.policy.read() else { return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state") };
+                        list.iter()
+                        .filter(|a| {
+                            let s = Subject { roles: &a.roles, integrity: a.integrity, attributes: &a.attributes };
+                            policy::decide(&p, &s, "POST", "/api/v1/authority/accounts").allowed
+                        })
+                        .map(|a| a.subject.clone())
+                        .collect()
+                    },
+                    _ => return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state"),
+                };
+                rows.retain(|r| r.subject.as_deref().is_none_or(|s| !admins.contains(s)));
+            }
+            if let Some(status) = q("status") {
+                match status {
+                    "active" => rows.retain(|r| !r.signed_out),
+                    "signed_out" => rows.retain(|r| r.signed_out),
+                    "refused" => rows.retain(|r| r.refusals > 0),
+                    _ => return refuse(StatusCode::BAD_REQUEST, "authority-request-invalid"),
+                }
+            }
+            if let Some(needle) = q("q") {
+                let n = needle.to_lowercase();
+                rows.retain(|r| r.subject.as_deref().is_some_and(|s| s.to_lowercase().contains(&n)) || r.credential.to_lowercase().contains(&n));
+            }
+            if *kind != "sessions" {
+                let credentials: std::collections::BTreeSet<_> =
+                    rows.iter().map(|row| row.credential.as_str()).collect();
+                let needle = q("q").map(str::to_lowercase);
+                let scoped: Vec<_> = entries.iter().filter(|entry| {
+                    if entry.at < from || entry.at >= to { return false; }
+                    if let Some(credential) = entry.credential.as_deref() {
+                        return credentials.contains(credential);
+                    }
+                    // A refused sign-in has no session yet. It can match
+                    // event-level filters, but never a view or session state.
+                    entry.event == "sign-in-refused"
+                        && q("view").is_none()
+                        && q("status").is_none_or(|status| status == "refused")
+                        && subject.is_none_or(|s| entry.subject.as_deref() == Some(s))
+                        && entry.subject.as_deref().is_none_or(|s| !admins.contains(s))
+                        && q("client").is_none_or(|c| entry.client.as_deref() == Some(c))
+                        && needle.as_ref().is_none_or(|n| entry.subject.as_deref().is_some_and(|s| s.to_lowercase().contains(n)))
+                }).cloned().collect();
+                if *kind == "actions" {
+                    let actions = crate::audit::administrative_actions(&scoped, &entries);
+                    return ok(json!({"entries": actions, "chain_valid": chain_valid}));
+                }
+                let (days, accounts) = crate::audit::dashboard(&scoped, from, to);
+                let k = crate::audit::kpis(&scoped, from, to);
+                let views = crate::audit::view_usage(&scoped, from, to);
+                let mut recent: Vec<_> = scoped.iter().filter(|e| e.event == "sign-in").collect();
+                recent.sort_by_key(|e| std::cmp::Reverse((e.at, e.seq)));
+                recent.truncate(20);
+                return ok(json!({"days": days, "accounts": accounts, "kpis": k, "views": views,
+                    "recent": recent, "total": rows.len(), "chain_valid": chain_valid}));
+            }
+            // Sort: `sort` in {last_at, first_at, subject, actions,
+            // refusals}, `dir` in {asc, desc} (desc default for the
+            // time and count keys, asc for subject).
+            let key = q("sort").unwrap_or("last_at");
+            let desc = q("dir").map(|d| d == "desc").unwrap_or(key != "subject");
+            let cmp = |a: &crate::audit::SessionSummary, b: &crate::audit::SessionSummary| match key {
+                "first_at" => a.first_at.cmp(&b.first_at),
+                "subject" => a.subject.as_deref().unwrap_or("").cmp(b.subject.as_deref().unwrap_or("")),
+                "actions" => a.actions.cmp(&b.actions),
+                "refusals" => a.refusals.cmp(&b.refusals),
+                _ => a.last_at.cmp(&b.last_at),
+            };
+            rows.sort_by(|a, b| if desc { cmp(b, a) } else { cmp(a, b) });
+            let total = rows.len();
+            let rows = if q("format").is_some() {
+                rows // export: no pagination
+            } else {
+                let page = q_i64(&query, "page").unwrap_or(1).max(1) as usize;
+                let per = q_i64(&query, "per_page").unwrap_or(50).clamp(1, 200) as usize;
+                rows.chunks(per).nth(page - 1).unwrap_or_default().to_vec()
+            };
+            if q("format") == Some("csv") {
+                let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views\n");
+                for r in &rows {
+                    let esc = |s: &str| if s.contains(',') || s.contains('"') { format!("\"{}\"", s.replace('"', "\"\"")) } else { s.to_owned() };
+                    csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{}\n",
+                        esc(&r.credential), esc(r.subject.as_deref().unwrap_or("")), r.first_at, r.last_at,
+                        r.consultations, r.actions, r.refusals, r.signed_out,
+                        esc(&r.clients.join(" ")), esc(&r.views.join(" "))));
+                }
+                let mut rep = full(StatusCode::OK, "text/csv; charset=utf-8", csv);
+                rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.csv\""));
+                return rep;
+            }
+            if q("format") == Some("json") {
+                let mut rep = ok(json!({"sessions": rows, "total": total}));
+                rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.json\""));
+                return rep;
+            }
+            ok(json!({"sessions": rows, "total": total, "chain_valid": chain_valid}))
         }
         (Method::GET, ["audit", "sessions", credential]) => match front.audit.read() {
             Ok((entries, _)) => {
@@ -771,6 +794,17 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             Err(code) => refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
         },
         (Method::POST, ["audit", "purge"]) => {
+            // Reading the audit does not grant deletion. Use the existing
+            // accounts-management authorization in addition to audit.read.
+            {
+                let Ok(policy) = front.policy.read() else {
+                    return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state");
+                };
+                let subject = Subject { roles: &caller.roles, integrity: caller.integrity, attributes: &caller.attributes };
+                if !policy::holds(&policy, &subject, "accounts.manage") {
+                    return refuse(StatusCode::FORBIDDEN, "authority-policy-denied");
+                }
+            }
             let input: PurgeIn = match decode(&body) { Ok(i) => i, Err(r) => return r };
             if input.older_than_days < 1 {
                 return refuse(StatusCode::BAD_REQUEST, "authority-purge-days-invalid");

@@ -169,6 +169,25 @@ pub fn admin_detail(method: &str, path: &str) -> Option<String> {
     Some(d)
 }
 
+/// Project only daemon administration intents in scope with their matching
+/// recorded outcome. Legacy intents without a correlation keep an unknown
+/// result. An outcome may land outside the selected intent time window.
+pub(crate) fn administrative_actions(scoped: &[Entry], all: &[Entry]) -> Vec<Entry> {
+    let outcomes: std::collections::BTreeMap<_, _> = all.iter()
+        .filter(|entry| entry.event == "outcome")
+        .filter_map(|entry| Some((entry.reference.as_deref()?, entry)))
+        .collect();
+    scoped.iter().filter(|entry| entry.event == "intent" && entry.action.as_deref() == Some("administer")
+        && entry.path.as_deref().is_some_and(|path| crate::policy::under(path, crate::policy::AUTHORITY_PREFIX)))
+        .rev().cloned().map(|mut entry| {
+            if let Some(outcome) = entry.reference.as_deref().and_then(|reference| outcomes.get(reference)) {
+                entry.status = outcome.status;
+                entry.duration_ms = outcome.duration_ms;
+            }
+            entry
+        }).collect()
+}
+
 const GENESIS: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
 fn digest(line: &[u8]) -> String {

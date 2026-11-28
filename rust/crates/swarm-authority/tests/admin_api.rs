@@ -268,6 +268,9 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert_eq!(c.post("/api/v1/authority/accounts", &ana, dan).status, 200, "custom role assignable now");
     let dan_cookie = c.login("dan", "dan pass").cookie();
     assert_eq!(c.get("/api/v1/authority/audit", &dan_cookie).status, 200, "auditor reads the audit");
+    let cannot_purge = c.post("/api/v1/authority/audit/purge", &dan_cookie, json!({"older_than_days":1}));
+    assert_eq!(cannot_purge.status, 403, "an audit reader cannot purge");
+
     assert_eq!(c.get("/api/v1/authority/accounts", &dan_cookie).status, 403, "but does not manage accounts");
     // A role still held by an account cannot be deleted.
     let mut without = after["policy"].clone();
@@ -436,6 +439,16 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let exported = c.get("/api/v1/authority/audit/sessions?format=json", &fresh).json();
     assert_eq!(exported["sessions"].as_array().unwrap().len() as u64, total, "JSON export not paginated either");
     let dash = c.get("/api/v1/authority/audit/dashboard", &fresh).json();
+    let empty = c.get("/api/v1/authority/audit/dashboard?subject=absent-fixture", &fresh).json();
+    assert_eq!(empty["kpis"]["sign_ins"], 0, "dashboard follows the session subject filter");
+    assert_eq!(empty["recent"], json!([]));
+    let recent_logins = dash["recent"].as_array().unwrap();
+    assert!(recent_logins.iter().all(|e| e["event"] == "sign-in"));
+    let administrative = c.get("/api/v1/authority/audit/actions?subject=ana", &fresh).json();
+    assert!(administrative["entries"].as_array().unwrap().iter().any(|e|
+        e["event"] == "intent" && e["action"] == "administer" && e["status"] == 200),
+        "an administration outcome is joined to its intent");
+
     assert!(!dash["days"].as_array().unwrap().is_empty() && dash["accounts"].as_array().unwrap().iter().any(|a| a["subject"] == "ana"));
     // ADM-07: KPIs, per-view usage, 20 most recent lines.
     assert!(dash["kpis"]["sign_ins"].as_u64().unwrap() >= 3, "sign-in KPI");

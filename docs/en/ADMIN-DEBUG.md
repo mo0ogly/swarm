@@ -117,3 +117,13 @@ runs targeted tests and the authenticated UI with the distribution engine and
 release authority daemon. It retains both binary digests and the assertion report.
 
 [Logging code rule](../../.claude/rules/structured-logging.md).
+
+## Access audit
+
+**Connections**, exports and the **Dashboard** share period and session
+filters. The dashboard also counts refused sign-ins without a session when
+they match the applicable filters. Recent connections lists successful
+sign-ins. **Administration actions** shows the recorded outcome matched to
+each Authority administration intent. Historical entries without correlation
+display an unknown result. Purging requires both audit access and account
+management. Audit readers cannot purge.
