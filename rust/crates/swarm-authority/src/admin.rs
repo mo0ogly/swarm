@@ -670,6 +670,13 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 Ok(data) => data,
                 Err(code) => return refuse(StatusCode::INTERNAL_SERVER_ERROR, code),
             };
+            // This filter excludes events on administrative resources. It
+            // differs from no_admin, which selects by current account rights.
+            let entries: Vec<_> = if q("analysis_only") == Some("1") {
+                entries.into_iter().filter(|e| e.view.as_deref() != Some("view.authority")
+                    && e.path.as_deref().is_none_or(|path| !policy::under(path, policy::AUTHORITY_PREFIX)))
+                    .collect()
+            } else { entries };
             // Session filters select a cohort for the list, exports and aggregates.
             let mut rows = crate::audit::sessions(&entries, from, to, subject);
             let mut admins = std::collections::BTreeSet::<String>::new();
@@ -808,7 +815,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                     return refuse(StatusCode::INTERNAL_SERVER_ERROR, "authority-state");
                 };
                 let subject = Subject { roles: &caller.roles, integrity: caller.integrity, attributes: &caller.attributes };
-                if !policy::holds(&policy, &subject, "accounts.manage") {
+                if !policy::holds(&policy, &subject, "accounts.manage") || !policy::holds(&policy, &subject, "audit.read") {
                     return refuse(StatusCode::FORBIDDEN, "authority-policy-denied");
                 }
             }

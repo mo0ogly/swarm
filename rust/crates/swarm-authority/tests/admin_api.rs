@@ -152,6 +152,9 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let me = me.json();
     assert_eq!((me["account"]["subject"].as_str(), me["administer"].as_bool()), (Some("ana"), Some(true)));
     assert!(me["account"].get("credential").is_none(), "no verifier material exposed");
+    assert_eq!(c.get("/api/v1/authority//audit/sessions", &ana).status, 400);
+    assert_eq!(c.post("/api/v1/authority//audit/purge", &ana, json!({"older_than_days":1})).status, 400);
+
     let ana_session = me["session"].as_str().unwrap().to_owned();
 
     // Accounts: create (witness), duplicate and invalid refusals, Origin required.
@@ -283,6 +286,12 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     // group roles seen by sessions, `/me` and policy decisions.
     assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["root"],"members":[]}))), "account-role-unknown");
     assert_eq!(c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["operator"],"members":["dan"]})).status, 200, "create with roles and members");
+    let grouped_login = c.login("dan", "dan pass").cookie();
+    assert_eq!(c.get("/api/v1/authority/me", &grouped_login).status, 200);
+    let recent = c.get("/api/v1/authority/audit/dashboard?subject=dan", &ana).json();
+    assert!(recent["recent"].as_array().unwrap().iter().any(|entry|
+        entry["event"] == "sign-in" && entry["groups"] == json!(["ops"])));
+
     assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":[],"members":[]}))), "group-exists");
     let dan_me = c.get("/api/v1/authority/me", &dan_cookie).json();
     assert!(dan_me["account"]["roles"].as_array().unwrap().iter().any(|r| r == "operator"), "dan sees the group role");

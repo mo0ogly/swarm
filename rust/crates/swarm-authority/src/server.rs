@@ -494,6 +494,11 @@ fn authorize(front: &Front, view: &AccountView, method: &str, path: &str) -> Res
 /// signed-in account; everything else needs the `administer` decision.
 async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
+    // Authorization and dispatch must see the same resource. Empty internal
+    // segments would be discarded by the administration router.
+    if path.contains("//") {
+        return Ok(full(StatusCode::BAD_REQUEST, "application/json", r#"{"error":"authority-request-invalid"}"#));
+    }
     let mut meta = Meta::from(&req, "browser");
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
     meta.groups = Some(view.audit_groups.clone());

@@ -82,6 +82,8 @@ de transport après une intention donne un résultat 502 dans l’audit. Les
 entrées peuvent manquer si le niveau ou la rétention les a écartées. Les
 diagnostics n’ajoutent ni IP, ni en-tête, ni contenu de requête.
 
+Le filtre hors ressources d’administration exclut les événements dans la vue ou l’API d’administration. Le filtre sans administration porte sur les droits actuels du compte. Un refus de préparation après une intention, comme HTTP 413 pour un corps trop volumineux, conserve son résultat et son identifiant.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la
