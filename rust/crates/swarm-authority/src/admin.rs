@@ -388,7 +388,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                     (held.contains(&"accounts.manage"), held, views)
                 })
                 .unwrap_or((false, Vec::new(), Vec::new()));
-            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer, "permissions": permissions, "views": views}))
+            ok(json!({"account": caller, "session": crate::sessions::token_id(&token), "administer": administer, "permissions": permissions, "views": views, "audit_version": 2}))
         }
         (Method::POST, ["me", "password"]) => {
             let input: OwnPasswordIn = match decode(&body) { Ok(i) => i, Err(r) => return r };

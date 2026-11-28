@@ -537,6 +537,16 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
         assert!(trace.iter().any(|row| row["phase"] == phase), "{phase} shares the audit tracking ID");
     }
     assert!(!log.to_string().contains("swarm-secret-marker"));
+    let limited = c.post("/api/v1/mission", &fresh, json!({"value":"x".repeat(1_048_576)}));
+    assert_eq!(limited.status, 413);
+    let timeline = c.get("/api/v1/authority/audit", &fresh).json();
+    let rejection = timeline["entries"].as_array().unwrap().iter().rev()
+        .find(|row| row["event"] == "outcome" && row["path"] == "/api/v1/mission").unwrap();
+    assert_eq!(rejection["status"], 413);
+    let matched = c.get(&format!("/api/v1/authority/log?q={}",rejection["request_id"].as_str().unwrap()), &fresh).json();
+    assert!(matched["lines"].as_array().unwrap().iter().any(|line|
+        line.as_str().is_some_and(|s| s.contains("authority-body-too-large"))));
+
 
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");

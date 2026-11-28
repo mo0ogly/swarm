@@ -613,18 +613,45 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
             return Ok(r);
         }
     }
+    // Every return after the intent has an observable, correlated result.
+    // For a read consultation, only the observed HTTP result is recorded.
+    let reject = |response: Response<Body>, phase, code| {
+        let status = response.status();
+        if let Some((subject, method, path, action)) = &audited {
+            outcome(&front, &meta, subject, &via, Some(&reference), method, path, action, status);
+        } else if consultation {
+            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(status.as_u16()));
+        }
+        let level = if status.is_server_error() { "critical" } else { "warn" };
+        relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, phase, Some(status), Some(code));
+        response
+    };
     let (parts, body) = req.into_parts();
-    let body = match read_body(&front, body).await { Ok(b) => b, Err(r) => return Ok(r) };
-    // EP-06 witness: heads after the intent line, so a write's own intent is
-    // covered. A head read failure refuses (no unwitnessed assertion).
+    let body = match read_body(&front, body).await {
+        Ok(body) => body,
+        Err(response) => {
+            let code = if response.status() == StatusCode::PAYLOAD_TOO_LARGE {
+                "authority-body-too-large"
+            } else { "authority-body-refused" };
+            return Ok(reject(response, "relay-body", code));
+        }
+    };
+    // EP-06: the heads are read after the request's own intent.
     let f = Arc::clone(&front);
     let witness = match tokio::task::spawn_blocking(move || f.accounts.head(&Context::new())).await {
         Ok(Ok(head)) => match front.audit.tail() {
             Ok((audit_seq, audit_digest)) => assertion::Witness { journal_seq: head.sequence, journal_digest: head.digest, audit_seq, audit_digest },
-            Err(code) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code)),
+            Err(code) => return Ok(reject(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code), "relay-witness", code)),
         },
-        Ok(Err(e)) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "application/json", serde_json::json!({"error": e.code()}).to_string())),
-        Err(_) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-state")),
+        Ok(Err(error)) => {
+            let code = error.code();
+            let response = full(StatusCode::SERVICE_UNAVAILABLE, "application/json", serde_json::json!({"error": code}).to_string());
+            return Ok(reject(response, "relay-witness", code));
+        }
+        Err(_) => {
+            let code = "authority-state";
+            return Ok(reject(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code), "relay-witness", code));
+        }
     };
     let claims = assertion::Claims {
         v: 2,
@@ -639,7 +666,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         witness,
     };
     let Ok(signed) = assertion::sign(&front.signer, &claims) else {
-        return Ok(full(StatusCode::INTERNAL_SERVER_ERROR, "text/plain; charset=utf-8", "authority-sign"));
+        let code = "authority-sign";
+        return Ok(reject(full(StatusCode::INTERNAL_SERVER_ERROR, "text/plain; charset=utf-8", code), "relay-sign", code));
     };
     let mut out = Request::builder().method(parts.method).uri(path);
     for (name, value) in parts.headers.iter() {
@@ -653,34 +681,24 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         .body(Full::new(body))
     {
         Ok(r) => r,
-        Err(_) => return Ok(full(StatusCode::BAD_REQUEST, "text/plain; charset=utf-8", "authority-relay-request")),
-    };
-    // Consultations (page views) are recorded even when the engine is
-    // unreachable: the visit happened, whatever the engine's answer.
-    let note_transport_failure = || {
-        if let Some((subject, method, path, action)) = &audited {
-            outcome(&front, &meta, subject, &via, Some(&reference), method, path, action, StatusCode::BAD_GATEWAY);
-        } else if consultation {
-            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(502));
+        Err(_) => {
+            let code = "authority-relay-request";
+            return Ok(reject(full(StatusCode::BAD_REQUEST, "text/plain; charset=utf-8", code), "relay-request", code));
         }
     };
     relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "relay", None, None);
     let stream = match tokio::net::TcpStream::connect(front.engine).await {
         Ok(s) => s,
         Err(_) => {
-            note_transport_failure();
-            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
-                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
-            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"));
+            let code = "authority-engine-unavailable";
+            return Ok(reject(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", code), "engine-transport", code));
         }
     };
     let (mut sender, conn) = match hyper::client::conn::http1::handshake(hyper_util::rt::TokioIo::new(stream)).await {
         Ok(v) => v,
         Err(_) => {
-            note_transport_failure();
-            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
-                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-handshake"));
-            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake"));
+            let code = "authority-engine-handshake";
+            return Ok(reject(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", code), "engine-transport", code));
         }
     };
     tokio::spawn(conn);

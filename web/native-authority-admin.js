@@ -458,6 +458,7 @@
   // daemon log, filterable administration actions tab. Shown with the
   // audit.read permission.
   function buildAudit(){
+   const enhanced=me.audit_version===2;
    const host=group('Journal d’accès','Connexions, consultations de pages, actions (intention puis résultat) et refus, avec le compte, la session, la durée et le moyen d’accès. La chaîne d’empreintes révèle une modification du fichier, sans l’empêcher.');
    const eventLabels={'sign-in':'connexion acceptée','sign-in-refused':'connexion refusée','sign-out':'déconnexion','intent':'intention','outcome':'résultat de la requête','consultation':'consultation','refused':'refus d’accès','reset-requested':'mot de passe oublié','purge-anchor':'purge du journal'};
    const clientLabels={browser:'navigateur','api-key':'clé API'};
@@ -467,7 +468,7 @@
    for(const [v,label] of [['','—'],['browser','navigateur'],['api-key','clé API']]){const o=node('option');o.value=v;o.textContent=tr(label);clientFilter.append(o)}
    for(const [v,label] of [['','—'],['active','active'],['signed_out','déconnectée'],['refused','refusée']]){const o=node('option');o.value=v;o.textContent=tr(label);statusFilter.append(o)}
    const filters=node('div',undefined,'engine-settings-fields');
-   field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);field(filters,'Réseau du pair TCP',network);field(filters,'Recherche',q);
+   field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);if(enhanced)field(filters,'Réseau du pair TCP',network);field(filters,'Recherche',q);
    field(filters,'Vue (view.*)',viewFilter);field(filters,'Moyen d’accès',clientFilter);field(filters,'Statut',statusFilter);
    const noAdminLabel=node('label','Sans administration','engine-settings-field');noAdminLabel.append(noAdmin,document.createTextNode(' '+tr('seulement les comptes sans droit d’administration')));filters.append(noAdminLabel);
    const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(network.value.trim())p.set('network',network.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
@@ -549,7 +550,7 @@
      charts.append(chartBlock(tr('Actions par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.actions})),tr('Jour')));
      charts.append(chartBlock(tr('Consultations par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.consultations})),tr('Jour')));
      charts.append(chartBlock(tr('Refus par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.refusals})),tr('Jour')));
-     charts.append(chartBlock((r.views||[]).map(v=>v.view==='none'?tr('pages moteur'):v.view),r.views.map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.consultations})),tr('Vue')));
+     charts.append(chartBlock(tr('Consultations par vue'),(r.views||[]).map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.consultations})),tr('Vue')));
      charts.append(chartBlock(tr('Actions par vue'),(r.views||[]).map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.actions})),tr('Vue')));
      const activity=r.activity;
      if(activity){
@@ -563,7 +564,9 @@
      panel.replaceChildren(chainNote(r.chain_valid),help('Les indicateurs, les graphiques et les dernières connexions suivent le même périmètre que le tableau Connexions.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
    async function actionsView(){
-    try{const r=await call('GET','/audit/actions'+qs());const entries=r.entries;const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
+    try{const r=await call('GET',enhanced?'/audit/actions'+qs():'/audit');
+     const entries=enhanced?r.entries:r.entries.filter(e=>e.event==='intent'&&e.action==='administer'
+      &&e.path?.startsWith(base+'/')&&e.at>=(day(from.value)??0)&&e.at<(day(to.value)==null?Number.MAX_SAFE_INTEGER:day(to.value)+86400));const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
      for(const e of entries){const row=node('tr');cell(row,when(e.at));cell(row,e.subject||'—');cell(row,e.detail||e.action||'—');cell(row,e.method+' '+e.path);cell(row,e.status==null?'—':String(e.status));tb.append(row)}
      panel.replaceChildren(chainNote(r.chain_valid),help('Chaque mutation d’administration est décrite en clair (création de compte, changement de mot de passe, application de politique…) à partir du chemin demandé — jamais du corps, qui peut contenir un secret.'),entries.length?wrap:node('p','Aucune action d’administration sur la période.'))}catch(e){fail(e)}
    }
