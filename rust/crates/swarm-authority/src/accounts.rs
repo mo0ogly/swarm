@@ -57,6 +57,9 @@ pub struct AccountView {
     pub subject: String,
     pub display_name: String,
     pub roles: Vec<String>,
+    /// Group keys for the audit snapshot, kept out of account API responses.
+    #[serde(skip)]
+    pub(crate) audit_groups: Vec<String>,
     pub integrity: i64,
     pub attributes: BTreeMap<String, String>,
     pub generation: i64,
@@ -544,6 +547,7 @@ fn view(b: &AccountBody) -> AccountView {
         subject: b.subject.clone(),
         display_name: b.display_name.clone(),
         roles: b.roles.clone(),
+        audit_groups: Vec::new(),
         integrity: b.integrity,
         attributes: b.attributes.clone(),
         generation: b.generation,
@@ -567,5 +571,7 @@ pub fn effective_roles(own: &[String], subject: &str, groups: &BTreeMap<String, 
 fn effective_view(b: &AccountBody, groups: &BTreeMap<String, GroupBody>) -> AccountView {
     let mut v = view(b);
     v.roles = effective_roles(&b.roles, &b.subject, groups);
+    v.audit_groups = groups.values().filter(|group| group.members.contains(&b.subject))
+        .map(|group| group.key.clone()).collect();
     v
 }

@@ -409,6 +409,13 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     // ADM-06: enrichment columns, filters, sort, pagination, export.
     let carol = carol_row.as_object().unwrap();
     assert_eq!(carol["clients"][0], "browser", "access means recorded");
+    assert_eq!(carol["peer_ips"], json!(["127.0.0.1"]));
+    assert_eq!(carol["networks"], json!(["127.0.0.0/24"]));
+    assert!(carol["groups"].is_array());
+    let filtered_network = c.get("/api/v1/authority/audit/dashboard?network=198.51.100.0%2F24", &fresh).json();
+    assert_eq!(filtered_network["total"], 0);
+    assert_eq!(filtered_network["activity"]["networks"], json!({}));
+
     assert!(carol["views"].as_array().unwrap().iter().any(|v| v == "view.authority"), "views touched by the session");
     assert_eq!(c.get("/api/v1/authority/audit/sessions?client=api-key", &fresh).json()["sessions"].as_array().unwrap().len(), 0, "no key used in this run");
     assert_eq!(c.get("/api/v1/authority/audit/sessions?view=view.authority", &fresh).json()["sessions"].as_array().unwrap().iter().all(|r| r["views"].as_array().unwrap().iter().any(|v| v == "view.authority")), true);
@@ -514,6 +521,23 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
         && row["level"] == "critical" && row["code"] == "authority-engine-unavailable"));
     assert!(!entries.to_string().contains("swarm-secret-marker"));
     assert!(!entries.to_string().contains(&fresh));
+    let write = c.post("/api/v1/mission?opaque=swarm-secret-marker", &fresh, json!({}));
+    assert_eq!(write.status, 502);
+    let timeline = c.get("/api/v1/authority/audit", &fresh).json();
+    let outcome = timeline["entries"].as_array().unwrap().iter().rev()
+        .find(|row| row["event"] == "outcome" && row["path"] == "/api/v1/mission").unwrap();
+    assert_eq!(outcome["status"], 502, "transport loss has a recorded outcome");
+    let id = outcome["request_id"].as_str().unwrap();
+    let query = format!("/api/v1/authority/log?q={id}");
+    let log = c.get(&query, &fresh).json();
+    let trace: Vec<Value> = log["lines"].as_array().unwrap().iter()
+        .map(|line| serde_json::from_str(line.as_str().unwrap()).unwrap()).collect();
+    assert!(trace.iter().all(|row| row["request_id"] == id));
+    for phase in ["identity", "access-policy", "relay", "engine-transport"] {
+        assert!(trace.iter().any(|row| row["phase"] == phase), "{phase} shares the audit tracking ID");
+    }
+    assert!(!log.to_string().contains("swarm-secret-marker"));
+
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");
     fs::set_permissions(&log, fs::Permissions::from_mode(0o400)).unwrap();

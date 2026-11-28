@@ -127,3 +127,17 @@ sign-ins. **Administration actions** shows the recorded outcome matched to
 each Authority administration intent. Historical entries without correlation
 display an unknown result. Purging requires both audit access and account
 management. Audit readers cannot purge.
+
+Groups reflect the authenticated account at the time of the event. The IP
+address is the immediate TCP peer, which may be a proxy. The daemon does not
+trust forwarded headers as provenance. Networks use /24 for IPv4 and /64 for
+IPv6. The network filter applies to sessions and aggregates. Hourly activity
+uses UTC. The ratio reports action intents and page views in the same scope.
+Older records keep absent values.
+
+The session detail can search **Application logs** by tracking ID for a
+relayed request if the account can open that console. At **Debug**, diagnostic
+entries show identity, policy and relay stages and the observed outcome.
+A transport failure after a recorded intent produces a 502 audit outcome.
+The level and retention may exclude entries. Application diagnostics do not
+add peer IPs, headers or request content.

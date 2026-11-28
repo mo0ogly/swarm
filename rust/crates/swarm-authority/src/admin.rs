@@ -679,6 +679,9 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
             if let Some(view) = q("view") {
                 rows.retain(|r| r.views.iter().any(|v| v == view));
             }
+            if let Some(network) = q("network") {
+                rows.retain(|r| r.networks.iter().any(|n| n == network));
+            }
             // "Without administration": keep only sessions whose
             // account has no `administer` decision on POST …/accounts
             // under the live policy (needs the accounts list; blocking).
@@ -726,6 +729,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                     // event-level filters, but never a view or session state.
                     entry.event == "sign-in-refused"
                         && q("view").is_none()
+                        && q("network").is_none_or(|network| entry.peer_ip.is_some_and(|ip| crate::audit::peer_network(ip) == network))
                         && q("status").is_none_or(|status| status == "refused")
                         && subject.is_none_or(|s| entry.subject.as_deref() == Some(s))
                         && entry.subject.as_deref().is_none_or(|s| !admins.contains(s))
@@ -743,7 +747,7 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 recent.sort_by_key(|e| std::cmp::Reverse((e.at, e.seq)));
                 recent.truncate(20);
                 return ok(json!({"days": days, "accounts": accounts, "kpis": k, "views": views,
-                    "recent": recent, "total": rows.len(), "chain_valid": chain_valid}));
+                    "recent": recent, "total": rows.len(), "activity": crate::audit::activity(&scoped), "chain_valid": chain_valid}));
             }
             // Sort: `sort` in {last_at, first_at, subject, actions,
             // refusals}, `dir` in {asc, desc} (desc default for the
@@ -767,13 +771,16 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 rows.chunks(per).nth(page - 1).unwrap_or_default().to_vec()
             };
             if q("format") == Some("csv") {
-                let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views\n");
+                let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views,groups,peer_ips,networks,launched_views\n");
                 for r in &rows {
                     let esc = |s: &str| if s.contains(',') || s.contains('"') { format!("\"{}\"", s.replace('"', "\"\"")) } else { s.to_owned() };
-                    csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{}\n",
+                    csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
                         esc(&r.credential), esc(r.subject.as_deref().unwrap_or("")), r.first_at, r.last_at,
                         r.consultations, r.actions, r.refusals, r.signed_out,
-                        esc(&r.clients.join(" ")), esc(&r.views.join(" "))));
+                        esc(&r.clients.join(" ")), esc(&r.views.join(" ")),
+                        esc(&r.groups.join(" ")),
+                        esc(&r.peer_ips.iter().map(ToString::to_string).collect::<Vec<_>>().join(" ")),
+                        esc(&r.networks.join(" ")), r.launched_views));
                 }
                 let mut rep = full(StatusCode::OK, "text/csv; charset=utf-8", csv);
                 rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.csv\""));

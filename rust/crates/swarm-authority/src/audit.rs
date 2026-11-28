@@ -76,6 +76,16 @@ pub struct Entry {
     /// Absent on old lines.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<String>,
+    /// Address of the TCP peer when observed by the daemon, never read
+    /// from client-forwarded headers. A reverse proxy may be this peer.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub peer_ip: Option<std::net::IpAddr>,
+    /// Stable group keys at authentication time. Older records have no snapshot.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub groups: Option<Vec<String>>,
+    /// Daemon-generated correlation across audit and application diagnostics.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<String>,
     /// SHA-256 (hex) of the previous line; 64 zeros for the first line.
     pub prev: String,
 }
@@ -97,6 +107,9 @@ pub struct Event<'a> {
     pub client: Option<&'a str>,
     pub user_agent: Option<&'a str>,
     pub detail: Option<&'a str>,
+    pub peer_ip: Option<std::net::IpAddr>,
+    pub groups: Option<&'a [String]>,
+    pub request_id: Option<&'a str>,
 }
 
 struct Tail {
@@ -271,6 +284,9 @@ impl Audit {
             client: ev.client.map(str::to_owned),
             user_agent: ev.user_agent.map(str::to_owned),
             detail: ev.detail.map(str::to_owned),
+            peer_ip: ev.peer_ip,
+            groups: ev.groups.map(<[String]>::to_vec),
+            request_id: ev.request_id.map(str::to_owned),
             prev: tail.prev.clone(),
         };
         let line = serde_json::to_vec(&entry).map_err(|_| "authority-audit-state")?;
@@ -341,6 +357,7 @@ impl Audit {
             client: None,
             user_agent: None,
             detail: None,
+            peer_ip: None, groups: None, request_id: None,
             prev: String::new(),
         };
         let mut out = serde_json::to_vec(&anchor).map_err(|_| "authority-audit-state")?;
@@ -396,6 +413,10 @@ pub struct SessionSummary {
     /// Distinct `view.*` keys touched (consulted or acted on), sorted;
     /// `none` (engine pages without an exclusive view) is included.
     pub views: Vec<String>,
+    pub groups: Vec<String>,
+    pub peer_ips: Vec<std::net::IpAddr>,
+    pub networks: Vec<String>,
+    pub launched_views: usize,
 }
 
 /// Group `entries` with `at` in `[from, to)` (and `subject` when given) by
@@ -403,16 +424,16 @@ pub struct SessionSummary {
 /// sign-ins, anchors) are not sessions. The `clients` and `views` columns
 /// back the connections-page filters (ADM-06).
 pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) -> Vec<SessionSummary> {
-    let mut by: std::collections::BTreeMap<String, (SessionSummary, std::collections::BTreeSet<String>, std::collections::BTreeSet<String>)> = Default::default();
+    let mut by: std::collections::BTreeMap<String, (SessionSummary, std::collections::BTreeSet<String>, std::collections::BTreeSet<String>, std::collections::BTreeSet<String>)> = Default::default();
     for e in entries.iter().filter(|e| e.at >= from && e.at < to && subject.is_none_or(|s| e.subject.as_deref() == Some(s))) {
         let Some(c) = &e.credential else { continue };
         if !(c.starts_with("session:") || c.starts_with("key:")) {
             continue;
         }
-        let (s, clients, views) = by.entry(c.clone()).or_insert_with(|| (SessionSummary {
+        let (s, clients, views, launch) = by.entry(c.clone()).or_insert_with(|| (SessionSummary {
             credential: c.clone(), subject: e.subject.clone(), first_at: e.at, last_at: e.at,
-            consultations: 0, actions: 0, refusals: 0, signed_out: false, clients: Vec::new(), views: Vec::new(),
-        }, Default::default(), Default::default()));
+            consultations: 0, actions: 0, refusals: 0, signed_out: false, clients: Vec::new(), views: Vec::new(), groups: Vec::new(), peer_ips: Vec::new(), networks: Vec::new(), launched_views: 0,
+        }, Default::default(), Default::default(), Default::default()));
         s.first_at = s.first_at.min(e.at);
         s.last_at = s.last_at.max(e.at);
         match e.event.as_str() {
@@ -427,11 +448,21 @@ pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) ->
         }
         if let Some(v) = &e.view {
             views.insert(v.clone());
+            if e.event == "intent" && v != "none" { launch.insert(v.clone()); }
         }
+        if let Some(ip) = e.peer_ip {
+            s.peer_ips.push(ip);
+            s.networks.push(peer_network(ip));
+        }
+        if let Some(groups) = &e.groups { s.groups.extend(groups.iter().cloned()); }
     }
     let mut out: Vec<SessionSummary> = by
         .into_values()
-        .map(|(mut s, clients, views)| {
+        .map(|(mut s, clients, views, launch)| {
+            s.groups.sort_unstable(); s.groups.dedup();
+            s.peer_ips.sort_unstable(); s.peer_ips.dedup();
+            s.networks.sort_unstable(); s.networks.dedup();
+            s.launched_views = launch.len();
             s.clients = clients.into_iter().collect();
             s.views = views.into_iter().collect();
             s
@@ -439,6 +470,41 @@ pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) ->
         .collect();
     out.sort_by_key(|s| std::cmp::Reverse(s.first_at));
     out
+}
+
+/// Derive the displayed network from an observed TCP peer. IPv4 uses /24
+/// and IPv6 uses /64. The address is not taken from application headers.
+pub(crate) fn peer_network(ip: std::net::IpAddr) -> String {
+    match ip {
+        std::net::IpAddr::V4(addr) => {
+            let [a, b, c, _] = addr.octets();
+            format!("{a}.{b}.{c}.0/24")
+        }
+        std::net::IpAddr::V6(addr) => {
+            let [a, b, c, d, ..] = addr.segments();
+            format!("{}/64", std::net::Ipv6Addr::new(a,b,c,d,0,0,0,0))
+        }
+    }
+}
+
+/// Counts for the dashboard with the same selected events as its other aggregates.
+/// Counts launch intents once, separately from consultations and results.
+pub(crate) fn activity(entries: &[Entry]) -> serde_json::Value {
+    let mut hours = [(0usize, 0usize); 24];
+    let mut networks = std::collections::BTreeMap::<String, usize>::new();
+    let mut actions = 0;
+    let mut consultations = 0;
+    for entry in entries {
+        let hour = (entry.at.rem_euclid(86_400)/3600) as usize;
+        if entry.event == "intent" { hours[hour].0 += 1; actions += 1; }
+        if entry.event == "consultation" { hours[hour].1 += 1; consultations += 1; }
+        if let Some(ip) = entry.peer_ip { *networks.entry(peer_network(ip)).or_default() += 1; }
+    }
+    serde_json::json!({
+        "hours":hours.iter().enumerate().map(|(hour,(a,c))| serde_json::json!({"hour":hour,"actions":a,"consultations":c})).collect::<Vec<_>>(),
+        "networks":networks,
+        "ratio":{"actions":actions,"consultations":consultations}
+    })
 }
 
 /// Activity of one UTC day.

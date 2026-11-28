@@ -66,6 +66,22 @@ résultat historique sans corrélation reste inconnu. Pour purger, il faut le
 droit d’audit et celui de gestion des comptes. La lecture seule ne permet pas
 la purge.
 
+Les groupes proviennent du compte authentifié au moment de l’événement.
+L’adresse est celle du pair TCP immédiat, qui peut être un proxy. Le démon
+n’interprète pas les en-têtes transmis comme preuve de provenance. Les réseaux
+utilisent /24 en IPv4 et /64 en IPv6. Le filtre réseau s’applique aux sessions
+comme aux agrégats. L’activité horaire est en UTC. Le ratio donne les intentions
+d’action et les consultations comptées sur le même périmètre. Les anciennes
+lignes sans ces informations les laissent absentes.
+
+Dans le détail d’une session, l’identifiant de suivi d’une requête relayée
+permet de rechercher ses diagnostics dans **Logs applicatifs** si le compte
+peut ouvrir cette console. Les diagnostics à **Debug** montrent les étapes
+d’identité, d’habilitation et de relais, puis l’issue observable. Un échec
+de transport après une intention donne un résultat 502 dans l’audit. Les
+entrées peuvent manquer si le niveau ou la rétention les a écartées. Les
+diagnostics n’ajoutent ni IP, ni en-tête, ni contenu de requête.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la

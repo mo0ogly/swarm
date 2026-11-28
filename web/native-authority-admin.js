@@ -462,15 +462,15 @@
    const eventLabels={'sign-in':'connexion acceptée','sign-in-refused':'connexion refusée','sign-out':'déconnexion','intent':'intention','outcome':'résultat de la requête','consultation':'consultation','refused':'refus d’accès','reset-requested':'mot de passe oublié','purge-anchor':'purge du journal'};
    const clientLabels={browser:'navigateur','api-key':'clé API'};
    const day=d=>d?Math.floor(new Date(d+'T00:00:00Z').getTime()/1000):null;
-   const from=input('date'),to=input('date'),who=input('text'),viewFilter=input('text'),clientFilter=document.createElement('select'),noAdmin=input('checkbox'),statusFilter=document.createElement('select'),q=input('text');
+   const from=input('date'),to=input('date'),who=input('text'),network=input('text'),viewFilter=input('text'),clientFilter=document.createElement('select'),noAdmin=input('checkbox'),statusFilter=document.createElement('select'),q=input('text');
    who.placeholder=q.placeholder=tr('tous');noAdmin.checked=false;
    for(const [v,label] of [['','—'],['browser','navigateur'],['api-key','clé API']]){const o=node('option');o.value=v;o.textContent=tr(label);clientFilter.append(o)}
    for(const [v,label] of [['','—'],['active','active'],['signed_out','déconnectée'],['refused','refusée']]){const o=node('option');o.value=v;o.textContent=tr(label);statusFilter.append(o)}
    const filters=node('div',undefined,'engine-settings-fields');
-   field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);field(filters,'Recherche',q);
+   field(filters,'Du (inclus)',from);field(filters,'Au (inclus)',to);field(filters,'Compte',who);field(filters,'Réseau du pair TCP',network);field(filters,'Recherche',q);
    field(filters,'Vue (view.*)',viewFilter);field(filters,'Moyen d’accès',clientFilter);field(filters,'Statut',statusFilter);
    const noAdminLabel=node('label','Sans administration','engine-settings-field');noAdminLabel.append(noAdmin,document.createTextNode(' '+tr('seulement les comptes sans droit d’administration')));filters.append(noAdminLabel);
-   const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
+   const qs=extra=>{const p=new URLSearchParams();const f=day(from.value),t=day(to.value);if(f!=null)p.set('from',f);if(t!=null)p.set('to',t+86400);if(who.value.trim())p.set('subject',who.value.trim());if(network.value.trim())p.set('network',network.value.trim());if(q.value.trim())p.set('q',q.value.trim());if(viewFilter.value.trim())p.set('view',viewFilter.value.trim());if(clientFilter.value)p.set('client',clientFilter.value);if(statusFilter.value)p.set('status',statusFilter.value);if(noAdmin.checked)p.set('no_admin','1');if(extra)for(const [k,v] of Object.entries(extra))p.set(k,v);return '?'+p.toString()};
    const tabs=node('div',undefined,'toolbar authority-tabs');tabs.setAttribute('role','tablist');const panel=node('div');panel.setAttribute('role','tabpanel');panel.tabIndex=-1;
    const tabsMap={connections:['Connexions',connections],dashboard:['Tableau de bord',dashboardView],actions:['Actions d’administration',actionsView],...(me.administer?{purge:['Purge',purgeView]}:{})};let current='connections';
    for(const [k,[label]] of Object.entries(tabsMap)){const b=button(label);b.setAttribute('role','tab');b.dataset.auditTab=k;b.addEventListener('click',()=>show(k));tabs.append(b)}
@@ -503,10 +503,11 @@
     return box;
    }
    async function connections(page=1,sort='last_at',dir='desc'){
-    try{const r=await call('GET','/audit/sessions'+qs({page,per_page:50,sort,dir}));const {wrap,tb}=table(['Compte','Session','Ouverture','Dernière activité','Moyens','Vues','Consultations','Actions','Refus','Statut','Détail']);
+    try{const r=await call('GET','/audit/sessions'+qs({page,per_page:50,sort,dir}));const {wrap,tb}=table(['Compte','Session','Ouverture','Dernière activité','Groupes observés','Pair TCP','Réseau du pair TCP','Moyens','Vues','Consultations','Actions','Vues actionnées','Refus','Statut','Détail']);
      for(const x of r.sessions){const row=node('tr');cell(row,x.subject||'—');cell(row,x.credential+(x.signed_out?' ('+tr('déconnectée')+')':''));cell(row,when(x.first_at));cell(row,when(x.last_at));
+      for(const values of [x.groups,x.peer_ips,x.networks])cell(row,values?.join(', ')||'—');
       cell(row,(x.clients||[]).map(c=>tr(clientLabels[c]||c)).join(', ')||'—');cell(row,(x.views||[]).join(', ')||'—');
-      cell(row,String(x.consultations));cell(row,String(x.actions));cell(row,String(x.refusals));cell(row,x.signed_out?tr('déconnectée'):tr('active'));
+      cell(row,String(x.consultations));cell(row,String(x.actions));cell(row,x.launched_views==null?'—':String(x.launched_views));cell(row,String(x.refusals));cell(row,x.signed_out?tr('déconnectée'):tr('active'));
       const open=button('Voir');open.dataset.auditSession=x.credential;open.addEventListener('click',()=>detail(x));cell(row,'').append(open);tb.append(row)}
      const total=r.total!=null?r.total:r.sessions.length,pages=Math.max(1,Math.ceil(total/50));
      const nav=toolbar(),first=button('«'),prev=button('‹'),next=button('›'),last=button('»');
@@ -523,10 +524,17 @@
      panel.replaceChildren(chainNote(r.chain_valid),help('Chaque ligne est une session (une connexion et ses requêtes). « Moyens » distingue le navigateur de la clé API ; « Vues » liste les droits de menu employés (none = pages moteur sans menu). Les filtres s’appliquent côté serveur : période, compte, vue, moyen, statut, sans administration, recherche.'),sorts,wrap,nav,exportBar)}catch(e){fail(e)}
    }
    async function detail(x){
-    try{const r=await call('GET','/audit/sessions/'+x.credential) /* [a-z0-9:] only, path-safe */;const {wrap,tb}=table(['N°','Date','Événement','Requête','Vue','Moyen','Résultat','Durée','Détail']);
+    try{const r=await call('GET','/audit/sessions/'+x.credential) /* [a-z0-9:] only, path-safe */;const {wrap,tb}=table(['N°','Date','Événement','Requête','Vue','Moyen','Résultat','Durée','Détail','Pair TCP','Groupes observés','Identifiant de suivi']);
      for(const e of [...r.entries].reverse()){const row=node('tr');cell(row,String(e.seq));cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));
       cell(row,e.method?e.method+' '+e.path+(e.action?' ('+e.action+')':''):'—');cell(row,e.view||'—');cell(row,e.client?tr(clientLabels[e.client]||e.client):'—');
-      cell(row,e.status==null?'—':String(e.status));cell(row,e.duration_ms!=null?e.duration_ms+' ms':'—');cell(row,e.detail||'—');tb.append(row)}
+      cell(row,e.status==null?'—':String(e.status));cell(row,e.duration_ms!=null?e.duration_ms+' ms':'—');cell(row,e.detail||'—');cell(row,e.peer_ip||'—');cell(row,e.groups?.join(', ')||'—');
+      const trace=cell(row,e.request_id||'—');
+      if(e.request_id&&me.administer&&e.reference?.startsWith('assertion:')){
+       const follow=button('Rechercher dans les logs applicatifs');
+       follow.addEventListener('click',()=>void openLog(follow,e.request_id));
+       trace.append(document.createTextNode(' '),follow)
+      }
+      tb.append(row)}
      const back=button('Retour aux connexions');back.addEventListener('click',()=>show('connections'));const h=node('h4');h.textContent=tr('Session')+' '+x.credential+' — '+(x.subject||'—');panel.replaceChildren(h,wrap,toolbar(back));back.focus()}catch(e){fail(e)}
    }
    async function dashboardView(){
@@ -543,9 +551,16 @@
      charts.append(chartBlock(tr('Refus par jour'),r.days.map(x=>({label:x.day.slice(5),value:x.refusals})),tr('Jour')));
      charts.append(chartBlock((r.views||[]).map(v=>v.view==='none'?tr('pages moteur'):v.view),r.views.map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.consultations})),tr('Vue')));
      charts.append(chartBlock(tr('Actions par vue'),(r.views||[]).map(v=>({label:v.view==='none'?tr('pages moteur'):v.view,value:v.actions})),tr('Vue')));
-     const recent=table(['Date','Événement','Compte','Requête','Résultat']);
-     for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));recent.tb.append(row)}
-     panel.replaceChildren(chainNote(r.chain_valid),help('Quatre indicateurs, six graphiques construits localement (aucune ressource externe) avec tableau alternatif repliable, puis les 20 dernières lignes de la période. La période suit les filtres en haut de section.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
+     const activity=r.activity;
+     if(activity){
+      charts.append(chartBlock(tr('Actions par heure (UTC)'),activity.hours.map(h=>({label:String(h.hour),value:h.actions})),tr('Heure UTC')));
+      charts.append(chartBlock(tr('Consultations par heure (UTC)'),activity.hours.map(h=>({label:String(h.hour),value:h.consultations})),tr('Heure UTC')));
+      charts.append(chartBlock(tr('Événements par réseau du pair TCP'),Object.entries(activity.networks).map(([label,value])=>({label,value})),tr('Réseau du pair TCP')));
+      kpiBar.append(node('span',tr('Ratio actions / consultations')+' · '+activity.ratio.actions+' / '+activity.ratio.consultations))
+     }
+     const recent=table(['Date','Événement','Compte','Requête','Résultat','Pair TCP','Groupes observés']);
+     for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));cell(row,e.peer_ip||'—');cell(row,e.groups?.join(', ')||'—');recent.tb.append(row)}
+     panel.replaceChildren(chainNote(r.chain_valid),help('Les indicateurs, les graphiques et les dernières connexions suivent le même périmètre que le tableau Connexions.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4','20 dernières connexions'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
    async function actionsView(){
     try{const r=await call('GET','/audit/actions'+qs());const entries=r.entries;const {wrap,tb}=table(['Date','Compte','Action','Chemin','Résultat']);
@@ -578,7 +593,7 @@
   /** Open the application log console for an accounts administrator. Reads
    * use the protected log route and optional history contract. Closing the
    * window detaches pending responses and restores the invoking control. */
-  async function openLog(opener){
+  async function openLog(opener, initialSearch=''){
    const modal=node('dialog',undefined,'engine-settings-dialog authority-log-dialog');
    modal.dataset.authorityLogDialog='';
    const title=node('h2','Logs applicatifs');title.id='authority-application-log-title';
@@ -618,7 +633,7 @@
      return select
     };
     const selectLevels=empty=>choices([...(empty?[['','Tous les niveaux']]:[]),...levels.map(level=>[level,level])]);
-    const search=input('search'),filterLevel=selectLevels(true),level=selectLevels(false);
+    const search=input('search',initialSearch),filterLevel=selectLevels(true),level=selectLevels(false);
     const order=choices([['newest','Les plus récents d’abord'],['oldest','Les plus anciens d’abord']]);
     const position=choices([['end','Fin de l’historique'],['start','Début de l’historique'],['all','Tout l’historique']]);
     const source=choices([['all','Journal actif et archives'],['active','Journal actif'],['archives','Archives conservées']]);
@@ -679,6 +694,7 @@
     const exports=toolbar(text,html);
     const heads=['Date','Niveau','Famille','Étape','Code','Résultat','Opération'];
     if(sourceScoping)heads.push('Source');
+    heads.push('Identifiant de suivi');
     let last=null,applied={},request=0,match=-1;
     const number=value=>Number(value).toLocaleString(lang);
     const phrase=(template,tokens)=>Object.entries(tokens).reduce((message,[key,value])=>message.replace('{'+key+'}',value),tr(template));
@@ -795,6 +811,7 @@
        const archived=result.line_archive_at?.[index];
        cell(row,archived==null?tr('Journal actif'):phrase('Archive du {date}',{date:when(archived)}))
       }
+      cell(row,entry.request_id||'—');
       if(applied.q)for(const td of row.cells)highlightCell(td,applied.q);
       tb.append(row)
      }
@@ -838,6 +855,7 @@
      }
     };
     const selection=()=>({q:search.value,level:filterLevel.value,position:position.value,source:source.value,rows:rows.valueAsNumber,bytes:bytes.valueAsNumber});
+    if(initialSearch&&history){position.value='all';bytes.disabled=true}
     applied=selection();
     retry.addEventListener('click',()=>{refresh.focus();void read()});
     filters.addEventListener('submit',event=>{event.preventDefault();applied=selection();renderFilters();void read()});
@@ -970,6 +988,7 @@
      tabs.append(tab)
     }
     selectTab(journalTab);
+    if(initialSearch)renderFilters();
     view.append(tabs,state,journal,settings);
     if(history)await read();else render(first)
    }catch(error){

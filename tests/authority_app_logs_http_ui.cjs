@@ -108,6 +108,25 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.waitForSelector('[data-native-view="admin"]');
  await page.click('[data-native-view="admin"]');
  await page.waitForSelector('[data-authority-log-jump]',{visible:true});
+
+ const filteredAudit=await page.evaluate(async()=>{
+  const get=async suffix=>{
+   const response=await fetch('/api/v1/authority/audit/'+suffix);
+   if(!response.ok)throw Error('Audit returned '+response.status);
+   return response.json();
+  };
+  return {
+   session:await get('sessions?subject=ana'),
+   blank:await get('dashboard?subject=absent-fixture'),
+   export:await get('sessions?subject=ana&format=json'),
+  };
+ });
+ check('audit data shows the observed TCP peer and network',filteredAudit.session.sessions.some(row=>
+  row.peer_ips.includes('127.0.0.1')&&row.networks.includes('127.0.0.0/24')));
+ check('audit dashboard and export use the session filter',filteredAudit.blank.kpis.sign_ins===0&&
+  filteredAudit.blank.total===0&&filteredAudit.export.total===filteredAudit.session.total);
+ await page.waitForFunction(()=>[...document.querySelectorAll('td')].some(cell=>cell.textContent==='127.0.0.0/24'));
+ check('authorized audit table renders the recorded network',true);
  await page.click('[data-authority-log-jump]');
  const query='[data-authority-log-search]';
  const journalTab='[data-authority-log-journal-tab]', rotationTab='[data-authority-log-rotation-tab]';

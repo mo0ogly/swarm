@@ -295,16 +295,28 @@ pub(crate) async fn read_body(front: &Front, body: Incoming) -> Result<Bytes, Re
 /// Request provenance captured once per request for the audit's enriched
 /// columns (ADM-05): truncated user agent, `browser`/`api-key` client and
 /// the arrival instant (for `duration_ms` on outcome lines).
+#[derive(Clone)]
+struct RequestId(String);
+
 struct Meta {
     user_agent: Option<String>,
     client: &'static str,
+    peer_ip: Option<std::net::IpAddr>,
+    groups: Option<Vec<String>>,
+    request_id: Option<String>,
     started: std::time::Instant,
 }
 
 impl Meta {
     fn from(req: &Request<Incoming>, client: &'static str) -> Self {
         let ua = req.headers().get(header::USER_AGENT).and_then(|v| v.to_str().ok()).map(|s| s.chars().take(120).collect::<String>());
-        Self { user_agent: ua, client, started: std::time::Instant::now() }
+        Self {
+            user_agent: ua, client,
+            peer_ip: req.extensions().get::<std::net::IpAddr>().copied(),
+            groups: None,
+            request_id: req.extensions().get::<RequestId>().map(|id| id.0.clone()),
+            started: std::time::Instant::now(),
+        }
     }
     /// Milliseconds elapsed since the request arrived.
     fn duration_ms(&self) -> i64 {
@@ -313,13 +325,20 @@ impl Meta {
 }
 
 /// Route one browser request. Never panics on client input.
-pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
+pub async fn handle(front: Arc<Front>, mut req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     if !host_ok(&front, &req) {
         return Ok(full(StatusCode::FORBIDDEN, "text/plain; charset=utf-8", "authority-host-refused"));
     }
     if !same_origin(&front, &req) {
         return Ok(full(StatusCode::FORBIDDEN, "text/plain; charset=utf-8", "authority-origin-refused"));
     }
+    // The correlation is generated locally and is separate from the signed
+    // assertion nonce. A request cannot supply or override its identifier.
+    let mut random = [0; 16];
+    if getrandom::fill(&mut random).is_err() {
+        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
+    }
+    req.extensions_mut().insert(RequestId(format!("{:032x}", u128::from_be_bytes(random))));
     let query: Vec<(String, String)> = form_urlencoded::parse(req.uri().query().unwrap_or("").as_bytes()).into_owned().collect();
     let english = query.iter().any(|(k, v)| k == "lang" && v == "en");
     match (req.method().clone(), req.uri().path()) {
@@ -350,7 +369,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 if let Ok(Ok(Some(view))) = tokio::task::spawn_blocking(move || f.accounts.current(&Context::new(), &s)).await {
                     if front.reset_requests.request(&view.subject, view.generation, now()) {
                         let ev = audit::Event { at: now(), event: "reset-requested", subject: Some(&view.subject),
-                            client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+                            client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() };
                         if front.audit.record(&ev).is_err() {
                             eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                         }
@@ -373,11 +393,12 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             let outcome = tokio::task::spawn_blocking(move || f.sessions.login(&Context::new(), &f.accounts, &attempted, password.as_bytes(), now())).await;
             let named = swarm_identity_contract::name(subject.as_bytes()).then_some(subject.as_str());
             match outcome {
-                Ok(Ok((token, _))) => {
+                Ok(Ok((token, account))) => {
                     // A refused audit line refuses the sign-in (fail closed).
                     let via = format!("session:{}", crate::sessions::token_id(&token));
                     if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via),
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), groups: Some(&account.audit_groups), ..Default::default() }).is_err() {
                         let _ = front.sessions.logout(&token);
                         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"));
                     }
@@ -386,7 +407,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 }
                 _ => {
                     if front.audit.record(&audit::Event { at: now(), event: "sign-in-refused", subject: named,
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                     let msg = if english { "Sign-in refused. Check the account and password." } else { "Connexion refusée. Vérifiez le compte et le mot de passe." };
@@ -405,7 +427,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 if let Ok(Some(subject)) = front.sessions.logout(&t) {
                     let via = format!("session:{}", crate::sessions::token_id(&t));
                     if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), credential: Some(&via),
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                 }
@@ -471,8 +494,9 @@ fn authorize(front: &Front, view: &AccountView, method: &str, path: &str) -> Res
 /// signed-in account; everything else needs the `administer` decision.
 async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
-    let meta = Meta::from(&req, "browser");
+    let mut meta = Meta::from(&req, "browser");
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
+    meta.groups = Some(view.audit_groups.clone());
     let Credential::Session(token) = credential else {
         // B9: keys never manage accounts, sessions, keys, policy or settings.
         return Ok(full(StatusCode::FORBIDDEN, "application/json", r#"{"error":"authority-key-scope"}"#));
@@ -494,17 +518,13 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
     let via = format!("session:{}", crate::sessions::token_id(&token));
-    let mut request_id = [0; 16];
-    if getrandom::fill(&mut request_id).is_err() {
-        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
-    }
-    let reference = format!("admin:{:032x}", u128::from_be_bytes(request_id));
+    let reference = meta.request_id.as_deref();
     let detail = audit::admin_detail(&method, &path);
-    if let Err(r) = intent(&front, &meta, &subject, &via, Some(&reference), &method, &path, action, detail.as_deref()) {
+    if let Err(r) = intent(&front, &meta, &subject, &via, reference, &method, &path, action, detail.as_deref()) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &meta, &subject, &via, Some(&reference), &method, &path, action, response.status());
+    outcome(&front, &meta, &subject, &via, reference, &method, &path, action, response.status());
     Ok(response)
 }
 
@@ -516,13 +536,14 @@ fn diagnostic_operation(path: &str) -> Option<&'static str> {
         "/api/v1/preparations/release-review" => "preparation-review",
         "/api/v1/task" => "task",
         "/api/v1/mission" => "mission",
+        _ if policy::under(path, "/api/v1") => "engine-api",
         _ => return None,
     })
 }
 
 /// Emit one observed phase using only static fields and optional HTTP status.
 /// Diagnostics are best effort and do not determine the request outcome.
-fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
+fn relay_diagnostic(front: &Front, operation: Option<&str>, request_id: Option<&str>, level: &str,
     phase: &'static str, status: Option<StatusCode>, code: Option<&'static str>) {
     let Some(operation) = operation else { return; };
     let family = match code {
@@ -532,7 +553,7 @@ fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
     };
     front.diag.log(level, "operation-stage", serde_json::json!({
         "operation":operation, "phase":phase, "family":family,
-        "status":status.map(|v|v.as_u16()), "code":code
+        "status":status.map(|v|v.as_u16()), "code":code, "request_id":request_id
     }));
 }
 
@@ -541,24 +562,27 @@ fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
 async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path_and_query().map(|p| p.as_str().to_owned()).unwrap_or_else(|| "/".into());
     let diagnostic = diagnostic_operation(req.uri().path());
+    let request_id = req.extensions().get::<RequestId>().map(|id| id.0.clone());
     let (credential, view) = match authenticate(&front, &req, &path).await {
         Ok(value) => value,
         Err(response) => {
             let level = if response.status().is_server_error() { "critical" } else { "warn" };
-            relay_diagnostic(&front, diagnostic, level, "identity", Some(response.status()), None);
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "identity", Some(response.status()), None);
             return Ok(response);
         }
     };
-    relay_diagnostic(&front, diagnostic, "debug", "identity", None, None);
-    let meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "identity", None, None);
+    let mut meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
+    meta.groups = Some(view.audit_groups.clone());
     // B6: decide before reading the body or touching the engine; a refusal
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
         Ok(a) => a,
         Err(r) => {
             let level = if r.status().is_server_error() { "critical" } else { "warn" };
-            relay_diagnostic(&front, diagnostic, level, "access-policy", Some(r.status()), None);
-            note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "access-policy", Some(r.status()),
+                Some(if r.status() == StatusCode::FORBIDDEN { "authority-policy-denied" } else { "authority-state" }));
+            note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(r.status().as_u16()));
             return Ok(r);
         }
     };
@@ -568,13 +592,13 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         && req.headers().get(header::ACCEPT).and_then(|v| v.to_str().ok()).is_some_and(|a| a.contains("text/html"));
     if let Credential::Key { scope, .. } = &credential {
         if action > *scope {
-            relay_diagnostic(&front, diagnostic, "warn", "access-policy",
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "warn", "access-policy",
                 Some(StatusCode::FORBIDDEN), Some("authority-key-scope"));
             let body = serde_json::json!({"error": "authority-policy-denied", "action": action, "reason": "key-scope"});
             return Ok(full(StatusCode::FORBIDDEN, "application/json", body.to_string()));
         }
     }
-    relay_diagnostic(&front, diagnostic, "debug", "access-policy", None, None);
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "access-policy", None, None);
     let mut nonce = [0u8; 16];
     if getrandom::fill(&mut nonce).is_err() {
         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
@@ -633,16 +657,19 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     };
     // Consultations (page views) are recorded even when the engine is
     // unreachable: the visit happened, whatever the engine's answer.
-    let note_consultation = |status: u16| {
-        if consultation {
-            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(status));
+    let note_transport_failure = || {
+        if let Some((subject, method, path, action)) = &audited {
+            outcome(&front, &meta, subject, &via, Some(&reference), method, path, action, StatusCode::BAD_GATEWAY);
+        } else if consultation {
+            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(502));
         }
     };
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "relay", None, None);
     let stream = match tokio::net::TcpStream::connect(front.engine).await {
         Ok(s) => s,
         Err(_) => {
-            note_consultation(502);
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+            note_transport_failure();
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
                 Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
             return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"));
         }
@@ -650,8 +677,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     let (mut sender, conn) = match hyper::client::conn::http1::handshake(hyper_util::rt::TokioIo::new(stream)).await {
         Ok(v) => v,
         Err(_) => {
-            note_consultation(502);
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+            note_transport_failure();
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
                 Some(StatusCode::BAD_GATEWAY), Some("authority-engine-handshake"));
             return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake"));
         }
@@ -664,11 +691,11 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
             let status = response.status();
             let level = if status.is_server_error() { "critical" }
                 else if status.is_client_error() { "warn" } else { "info" };
-            relay_diagnostic(&front, diagnostic, level, "engine-reply", Some(status), code);
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "engine-reply", Some(status), code);
             response.map(|body| body.boxed())
         }
         Err(_) => {
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
                 Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
             full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable")
         }
@@ -685,7 +712,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
 /// is reported on stderr and never changes the response.
 fn note(front: &Front, meta: &Meta, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
     let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status,
-        view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+        view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
     }
@@ -710,7 +738,8 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
     front
         .audit
         .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None,
-            view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
+            view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
         .map(|_| ())
         .map_err(|_| full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"))
 }
@@ -721,9 +750,10 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
 #[allow(clippy::too_many_arguments)] // one audit line's fields
 fn outcome(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
     let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()),
-        duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+        duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
-        eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "subject": subject, "path": path}));
+        eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "request_id": meta.request_id}));
     }
 }
 
@@ -750,10 +780,13 @@ pub async fn serve(listener: tokio::net::TcpListener, front: Arc<Front>) -> std:
         "phase": "listening"
     }));
     loop {
-        let (stream, _) = listener.accept().await?;
+        let (stream, peer) = listener.accept().await?;
         let f = Arc::clone(&front);
         tokio::spawn(async move {
-            let service = hyper::service::service_fn(move |r| handle(Arc::clone(&f), r));
+            let service = hyper::service::service_fn(move |mut request: Request<Incoming>| {
+                request.extensions_mut().insert(peer.ip().to_canonical());
+                handle(Arc::clone(&f), request)
+            });
             let _ = hyper::server::conn::http1::Builder::new()
                 .serve_connection(hyper_util::rt::TokioIo::new(stream), service)
                 .await;
