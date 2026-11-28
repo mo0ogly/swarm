@@ -80,7 +80,7 @@ peut ouvrir cette console. Les diagnostics à **Debug** montrent les étapes
 d’identité, d’habilitation et de relais, puis l’issue observable. Un échec
 de transport après une intention donne un résultat 502 dans l’audit. Les
 entrées peuvent manquer si le niveau ou la rétention les a écartées. Les
-diagnostics n’ajoutent ni IP, ni en-tête, ni contenu de requête.
+diagnostics n’ajoutent ni IP, ni en-tête, ni contenu de requête. Les réponses réussies aux lectures du moteur sont au niveau Debug. Les succès des mutations sont au niveau Info. Les refus restent au niveau Warn et les erreurs serveur au niveau Critical.
 
 Le filtre hors ressources d’administration exclut les événements dans la vue ou l’API d’administration. Le filtre sans administration porte sur les droits actuels du compte. Un refus de préparation après une intention, comme HTTP 413 pour un corps trop volumineux, conserve son résultat et son identifiant.
 

@@ -726,7 +726,9 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
                 .and_then(|value| value.to_str().ok().and_then(crate::diag::engine_code));
             let status = response.status();
             let level = if status.is_server_error() { "critical" }
-                else if status.is_client_error() { "warn" } else { "info" };
+                else if status.is_client_error() { "warn" }
+                else if action == policy::Action::Read { "debug" }
+                else { "info" };
             relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "engine-reply", Some(status), code);
             response.map(|body| body.boxed())
         }

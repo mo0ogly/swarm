@@ -139,7 +139,7 @@ The session detail can search **Application logs** by tracking ID for a
 relayed request if the account can open that console. At **Debug**, diagnostic
 entries show identity, policy and relay stages and the observed outcome.
 A transport failure after a recorded intent produces a 502 audit outcome.
-The level and retention may exclude entries. Application diagnostics do not
+The level and retention may exclude entries. Successful engine reads use Debug, while successful mutations use Info. Denials remain at Warn and server errors at Critical. Application diagnostics do not
 add peer IPs, headers or request content.
 
 The resource filter excludes activity on the administration view or API. The account filter uses current administration rights. A rejection after recording the intent, such as HTTP 413 for an oversized body, retains its outcome and tracking ID.

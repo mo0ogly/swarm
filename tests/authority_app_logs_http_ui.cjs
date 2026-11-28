@@ -108,6 +108,12 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
  await page.waitForSelector('[data-native-view="admin"]');
  await page.click('[data-native-view="admin"]');
  await page.waitForSelector('[data-authority-log-jump]',{visible:true});
+ const beforeRead=await getLog('?position=all');
+ const relayRead=await page.evaluate(async()=> (await fetch('/api/v1/log-read-policy')).status);
+ const afterRead=await getLog('?position=all');
+ const unchangedSnapshot=beforeRead.body.snapshot===afterRead.body.snapshot;
+ check('successful background reads keep the Info log snapshot stable',relayRead===200&&unchangedSnapshot,
+  {relayRead,unchangedSnapshot});
 
  const filteredAudit=await page.evaluate(async()=>{
   const get=async suffix=>{
@@ -125,6 +131,7 @@ async function listening(port,child){for(;;){if(child.exitCode!==null||child.sig
   row.peer_ips.includes('127.0.0.1')&&row.networks.includes('127.0.0.0/24')));
  check('audit dashboard and export use the session filter',filteredAudit.blank.kpis.sign_ins===0&&
   filteredAudit.blank.total===0&&filteredAudit.export.total===filteredAudit.session.total);
+ await page.click('::-p-text(Journal d’accès)');
  await page.waitForFunction(()=>[...document.querySelectorAll('td')].some(cell=>cell.textContent==='127.0.0.0/24'));
  check('authorized audit table renders the recorded network',true);
  await page.click('[data-authority-log-jump]');
