@@ -778,16 +778,23 @@ pub async fn handle(front: Arc<Front>, req: http::Request<Incoming>, caller: Acc
                 rows.chunks(per).nth(page - 1).unwrap_or_default().to_vec()
             };
             if q("format") == Some("csv") {
-                let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views,groups,peer_ips,networks,launched_views\n");
+                let mut csv = String::from("credential,subject,first_at,last_at,consultations,actions,refusals,signed_out,clients,views,groups,peer_ips,networks,launched_views,display_name,administrator\n");
                 for r in &rows {
-                    let esc = |s: &str| if s.contains(',') || s.contains('"') { format!("\"{}\"", s.replace('"', "\"\"")) } else { s.to_owned() };
-                    csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+                    let esc = |value: &str| {
+                        let text = if value.trim_start().starts_with(['=', '+', '-', '@']) {
+                            format!("'{value}")
+                        } else { value.to_owned() };
+                        if text.contains([',', '"', '\n', '\r']) { format!("\"{}\"", text.replace('"', "\"\"")) }
+                        else { text }
+                    };
+                    csv.push_str(&format!("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
                         esc(&r.credential), esc(r.subject.as_deref().unwrap_or("")), r.first_at, r.last_at,
                         r.consultations, r.actions, r.refusals, r.signed_out,
                         esc(&r.clients.join(" ")), esc(&r.views.join(" ")),
                         esc(&r.groups.join(" ")),
                         esc(&r.peer_ips.iter().map(ToString::to_string).collect::<Vec<_>>().join(" ")),
-                        esc(&r.networks.join(" ")), r.launched_views));
+                        esc(&r.networks.join(" ")), r.launched_views,
+                        esc(r.display_name.as_deref().unwrap_or("")), r.administrator.map(|v|v.to_string()).unwrap_or_default()));
                 }
                 let mut rep = full(StatusCode::OK, "text/csv; charset=utf-8", csv);
                 rep.headers_mut().insert(header::CONTENT_DISPOSITION, HeaderValue::from_static("attachment; filename=\"connections.csv\""));

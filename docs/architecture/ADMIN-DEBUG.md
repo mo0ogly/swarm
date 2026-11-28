@@ -160,3 +160,5 @@ et le démon de production compilé en release. Il conserve les empreintes des d
 binaires et le rapport des assertions.
 
 [Règle de codage des journaux](../../.claude/rules/structured-logging.md).
+
+Le nom d’affichage et le droit d’administration observé sont enregistrés avec le compte authentifié.

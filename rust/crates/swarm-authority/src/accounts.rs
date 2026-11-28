@@ -287,7 +287,7 @@ impl Accounts {
     /// Check `password` for `subject`. Unknown subject and wrong password both
     /// refuse with `account-authentication-refused` (no account oracle). The
     /// returned view proves knowledge of the current secret and carries the
-    /// active group keys for audit. Group journal errors remain typed.
+    /// effective roles and active group keys for audit. Group journal errors remain typed.
     pub fn verify(&self, ctx: &Context, subject: &str, password: &[u8]) -> Result<AccountView, Error> {
         let refused = || Error::Refused("account-authentication-refused");
         if !swarm_identity_contract::name(subject.as_bytes()) {
@@ -297,11 +297,7 @@ impl Accounts {
         let Some((_, body)) = current.into_iter().next() else { return Err(refused()) };
         let pin = credentials::fingerprint(&body.credential).map_err(Error::Credential)?;
         match credentials::verify(&self.installation, &principal(subject), body.generation, &pin, &body.credential, password) {
-            Ok(_) => {
-                let mut verified = view(&body);
-                verified.audit_groups = audit_group_keys(subject, &self.groups_map(ctx)?);
-                Ok(verified)
-            },
+            Ok(_) => Ok(effective_view(&body, &self.groups_map(ctx)?)),
             Err(credentials::Error::Password) => Err(refused()),
             Err(e) => Err(Error::Credential(e)),
         }

@@ -303,6 +303,8 @@ struct Meta {
     client: &'static str,
     peer_ip: Option<std::net::IpAddr>,
     groups: Option<Vec<String>>,
+    display_name: Option<String>,
+    administrator: Option<bool>,
     request_id: Option<String>,
     started: std::time::Instant,
 }
@@ -313,10 +315,20 @@ impl Meta {
         Self {
             user_agent: ua, client,
             peer_ip: req.extensions().get::<std::net::IpAddr>().copied(),
-            groups: None,
+            groups: None, display_name: None, administrator: None,
             request_id: req.extensions().get::<RequestId>().map(|id| id.0.clone()),
             started: std::time::Instant::now(),
         }
+    }
+    /// Attach only the authenticated display identity and observed authority
+    /// status. If policy cannot be read, keep the status unknown.
+    fn identify(&mut self, front: &Front, account: &AccountView) {
+        self.groups = Some(account.audit_groups.clone());
+        self.display_name = Some(account.display_name.clone());
+        self.administrator = front.policy.read().ok().map(|policy| {
+            let subject = policy::Subject { roles: &account.roles, integrity: account.integrity, attributes: &account.attributes };
+            policy::holds(&policy, &subject, "accounts.manage")
+        });
     }
     /// Milliseconds elapsed since the request arrived.
     fn duration_ms(&self) -> i64 {
@@ -384,7 +396,7 @@ pub async fn handle(front: Arc<Front>, mut req: Request<Incoming>) -> Result<Res
             Ok(login_response(StatusCode::OK, login_page(english, safe_next(next), "")))
         }
         (Method::POST, "/login") => {
-            let meta = Meta::from(&req, "browser");
+            let mut meta = Meta::from(&req, "browser");
             let body = match read_body(&front, req.into_body()).await { Ok(b) => b, Err(r) => return Ok(r) };
             let form: Vec<(String, String)> = form_urlencoded::parse(&body).into_owned().collect();
             let get = |k: &str| form.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap_or_default();
@@ -394,11 +406,12 @@ pub async fn handle(front: Arc<Front>, mut req: Request<Incoming>) -> Result<Res
             let named = swarm_identity_contract::name(subject.as_bytes()).then_some(subject.as_str());
             match outcome {
                 Ok(Ok((token, account))) => {
+                    meta.identify(&front, &account);
                     // A refused audit line refuses the sign-in (fail closed).
                     let via = format!("session:{}", crate::sessions::token_id(&token));
                     if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via),
                         client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
-                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), groups: Some(&account.audit_groups), ..Default::default() }).is_err() {
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, ..Default::default() }).is_err() {
                         let _ = front.sessions.logout(&token);
                         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"));
                     }
@@ -501,7 +514,7 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     }
     let mut meta = Meta::from(&req, "browser");
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
-    meta.groups = Some(view.audit_groups.clone());
+    meta.identify(&front, &view);
     let Credential::Session(token) = credential else {
         // B9: keys never manage accounts, sessions, keys, policy or settings.
         return Ok(full(StatusCode::FORBIDDEN, "application/json", r#"{"error":"authority-key-scope"}"#));
@@ -578,7 +591,7 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
     };
     relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "identity", None, None);
     let mut meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
-    meta.groups = Some(view.audit_groups.clone());
+    meta.identify(&front, &view);
     // B6: decide before reading the body or touching the engine; a refusal
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
@@ -736,7 +749,7 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
 fn note(front: &Front, meta: &Meta, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
     let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status,
         view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
-                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), ..Default::default() };
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
     }
@@ -762,7 +775,7 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
         .audit
         .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None,
             view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
-                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
         .map(|_| ())
         .map_err(|_| full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"))
 }
@@ -774,7 +787,7 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
 fn outcome(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
     let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()),
         duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
-                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), request_id: meta.request_id.as_deref(), ..Default::default() };
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "request_id": meta.request_id}));
     }

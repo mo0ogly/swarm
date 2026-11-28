@@ -290,7 +290,8 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert_eq!(c.get("/api/v1/authority/me", &grouped_login).status, 200);
     let recent = c.get("/api/v1/authority/audit/dashboard?subject=dan", &ana).json();
     assert!(recent["recent"].as_array().unwrap().iter().any(|entry|
-        entry["event"] == "sign-in" && entry["groups"] == json!(["ops"])));
+        entry["event"] == "sign-in" && entry["groups"] == json!(["ops"])
+        && entry["display_name"] == "Dan" && entry["administrator"] == false));
 
     assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":[],"members":[]}))), "group-exists");
     let dan_me = c.get("/api/v1/authority/me", &dan_cookie).json();

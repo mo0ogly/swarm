@@ -510,8 +510,8 @@
     return box;
    }
    async function connections(page=1,sort='last_at',dir='desc'){
-    try{const r=await call('GET','/audit/sessions'+qs({page,per_page:50,sort,dir}));const {wrap,tb}=table(['Compte','Session','Ouverture','Dernière activité','Groupes observés','Pair TCP','Réseau du pair TCP','Moyens','Vues','Consultations','Actions','Vues actionnées','Refus','Statut','Détail']);
-     for(const x of r.sessions){const row=node('tr');cell(row,x.subject||'—');cell(row,x.credential+(x.signed_out?' ('+tr('déconnectée')+')':''));cell(row,when(x.first_at));cell(row,when(x.last_at));
+    try{const r=await call('GET','/audit/sessions'+qs({page,per_page:50,sort,dir}));const {wrap,tb}=table(['Compte','Nom affiché','Administration observée','Session','Ouverture','Dernière activité','Groupes observés','Pair TCP','Réseau du pair TCP','Moyens','Vues','Consultations','Actions','Vues actionnées','Refus','Statut','Détail']);
+     for(const x of r.sessions){const row=node('tr');cell(row,x.subject||'—');cell(row,x.display_name||'—');cell(row,x.administrator==null?'—':tr(x.administrator?'Oui':'Non'));cell(row,x.credential+(x.signed_out?' ('+tr('déconnectée')+')':''));cell(row,when(x.first_at));cell(row,when(x.last_at));
       for(const values of [x.groups,x.peer_ips,x.networks])cell(row,values?.join(', ')||'—');
       cell(row,(x.clients||[]).map(c=>tr(clientLabels[c]||c)).join(', ')||'—');cell(row,(x.views||[]).join(', ')||'—');
       cell(row,String(x.consultations));cell(row,String(x.actions));cell(row,x.launched_views==null?'—':String(x.launched_views));cell(row,String(x.refusals));cell(row,x.signed_out?tr('déconnectée'):tr('active'));
@@ -568,8 +568,8 @@
       charts.append(chartBlock(tr('Événements par réseau du pair TCP'),Object.entries(activity.networks).map(([label,value])=>({label,value})),tr('Réseau du pair TCP')));
       kpiBar.append(node('span',tr('Ratio actions / consultations')+' · '+activity.ratio.actions+' / '+activity.ratio.consultations))
      }
-     const recent=table(['Date','Événement','Compte','Requête','Résultat','Pair TCP','Groupes observés']);
-     for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));cell(row,e.peer_ip||'—');cell(row,e.groups?.join(', ')||'—');recent.tb.append(row)}
+     const recent=table(['Date','Événement','Compte','Requête','Résultat','Pair TCP','Groupes observés','Nom affiché','Administration observée']);
+     for(const e of (r.recent||[])){const row=node('tr');cell(row,when(e.at));cell(row,tr(eventLabels[e.event]||e.event));cell(row,e.subject||'—');cell(row,e.method?e.method+' '+e.path:e.path||'—');cell(row,e.status==null?'—':String(e.status));cell(row,e.peer_ip||'—');cell(row,e.groups?.join(', ')||'—');cell(row,e.display_name||'—');cell(row,e.administrator==null?'—':tr(e.administrator?'Oui':'Non'));recent.tb.append(row)}
      panel.replaceChildren(chainNote(r.chain_valid),help(enhanced?'Les indicateurs, les graphiques et les dernières connexions suivent le même périmètre que le tableau Connexions.':'Ce démon filtre le tableau de bord par date.'),kpiBar,charts,node('h4','Activité par jour'),r.days.length?d.wrap:node('p','Aucune activité sur la période.'),node('h4','Activité par compte'),r.accounts.length?a.wrap:node('p','Aucune activité sur la période.'),node('h4',enhanced?'20 dernières connexions':'20 derniers événements'),(r.recent||[]).length?recent.wrap:node('p','Aucune activité sur la période.'))}catch(e){fail(e)}
    }
    async function actionsView(){

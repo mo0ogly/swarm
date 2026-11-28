@@ -143,3 +143,5 @@ The level and retention may exclude entries. Application diagnostics do not
 add peer IPs, headers or request content.
 
 The resource filter excludes activity on the administration view or API. The account filter uses current administration rights. A rejection after recording the intent, such as HTTP 413 for an oversized body, retains its outcome and tracking ID.
+
+The display name and observed administration right are recorded for the authenticated account.

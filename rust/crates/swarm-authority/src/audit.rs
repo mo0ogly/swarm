@@ -83,6 +83,12 @@ pub struct Entry {
     /// Stable group keys at authentication time. Older records have no snapshot.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub groups: Option<Vec<String>>,
+    /// Name and administration status observed at authentication time.
+    /// Older and unauthenticated events retain absent values.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub administrator: Option<bool>,
     /// Daemon-generated correlation across audit and application diagnostics.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -109,6 +115,8 @@ pub struct Event<'a> {
     pub detail: Option<&'a str>,
     pub peer_ip: Option<std::net::IpAddr>,
     pub groups: Option<&'a [String]>,
+    pub display_name: Option<&'a str>,
+    pub administrator: Option<bool>,
     pub request_id: Option<&'a str>,
 }
 
@@ -286,6 +294,8 @@ impl Audit {
             detail: ev.detail.map(str::to_owned),
             peer_ip: ev.peer_ip,
             groups: ev.groups.map(<[String]>::to_vec),
+            display_name: ev.display_name.map(str::to_owned),
+            administrator: ev.administrator,
             request_id: ev.request_id.map(str::to_owned),
             prev: tail.prev.clone(),
         };
@@ -357,7 +367,7 @@ impl Audit {
             client: None,
             user_agent: None,
             detail: None,
-            peer_ip: None, groups: None, request_id: None,
+            peer_ip: None, groups: None, display_name: None, administrator: None, request_id: None,
             prev: String::new(),
         };
         let mut out = serde_json::to_vec(&anchor).map_err(|_| "authority-audit-state")?;
@@ -417,6 +427,8 @@ pub struct SessionSummary {
     pub peer_ips: Vec<std::net::IpAddr>,
     pub networks: Vec<String>,
     pub launched_views: usize,
+    pub display_name: Option<String>,
+    pub administrator: Option<bool>,
 }
 
 /// Group `entries` with `at` in `[from, to)` (and `subject` when given) by
@@ -432,7 +444,7 @@ pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) ->
         }
         let (s, clients, views, launch) = by.entry(c.clone()).or_insert_with(|| (SessionSummary {
             credential: c.clone(), subject: e.subject.clone(), first_at: e.at, last_at: e.at,
-            consultations: 0, actions: 0, refusals: 0, signed_out: false, clients: Vec::new(), views: Vec::new(), groups: Vec::new(), peer_ips: Vec::new(), networks: Vec::new(), launched_views: 0,
+            consultations: 0, actions: 0, refusals: 0, signed_out: false, clients: Vec::new(), views: Vec::new(), groups: Vec::new(), peer_ips: Vec::new(), networks: Vec::new(), launched_views: 0, display_name: None, administrator: None,
         }, Default::default(), Default::default(), Default::default()));
         s.first_at = s.first_at.min(e.at);
         s.last_at = s.last_at.max(e.at);
@@ -455,6 +467,12 @@ pub fn sessions(entries: &[Entry], from: i64, to: i64, subject: Option<&str>) ->
             s.networks.push(peer_network(ip));
         }
         if let Some(groups) = &e.groups { s.groups.extend(groups.iter().cloned()); }
+        if let Some(name) = &e.display_name {
+            if s.display_name.is_none() { s.display_name = Some(name.clone()); }
+        }
+        if let Some(administrator) = e.administrator {
+            s.administrator = Some(s.administrator.unwrap_or(false) || administrator);
+        }
     }
     let mut out: Vec<SessionSummary> = by
         .into_values()
