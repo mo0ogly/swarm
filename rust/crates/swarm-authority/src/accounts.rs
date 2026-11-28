@@ -57,6 +57,9 @@ pub struct AccountView {
     pub subject: String,
     pub display_name: String,
     pub roles: Vec<String>,
+    /// Group keys for the audit snapshot, kept out of account API responses.
+    #[serde(skip)]
+    pub(crate) audit_groups: Vec<String>,
     pub integrity: i64,
     pub attributes: BTreeMap<String, String>,
     pub generation: i64,
@@ -283,7 +286,8 @@ impl Accounts {
 
     /// Check `password` for `subject`. Unknown subject and wrong password both
     /// refuse with `account-authentication-refused` (no account oracle). The
-    /// returned view proves only knowledge of the current secret at this call.
+    /// returned view proves knowledge of the current secret and carries the
+    /// effective roles and active group keys for audit. Group journal errors remain typed.
     pub fn verify(&self, ctx: &Context, subject: &str, password: &[u8]) -> Result<AccountView, Error> {
         let refused = || Error::Refused("account-authentication-refused");
         if !swarm_identity_contract::name(subject.as_bytes()) {
@@ -293,7 +297,7 @@ impl Accounts {
         let Some((_, body)) = current.into_iter().next() else { return Err(refused()) };
         let pin = credentials::fingerprint(&body.credential).map_err(Error::Credential)?;
         match credentials::verify(&self.installation, &principal(subject), body.generation, &pin, &body.credential, password) {
-            Ok(_) => Ok(view(&body)),
+            Ok(_) => Ok(effective_view(&body, &self.groups_map(ctx)?)),
             Err(credentials::Error::Password) => Err(refused()),
             Err(e) => Err(Error::Credential(e)),
         }
@@ -544,6 +548,7 @@ fn view(b: &AccountBody) -> AccountView {
         subject: b.subject.clone(),
         display_name: b.display_name.clone(),
         roles: b.roles.clone(),
+        audit_groups: Vec::new(),
         integrity: b.integrity,
         attributes: b.attributes.clone(),
         generation: b.generation,
@@ -567,5 +572,13 @@ pub fn effective_roles(own: &[String], subject: &str, groups: &BTreeMap<String, 
 fn effective_view(b: &AccountBody, groups: &BTreeMap<String, GroupBody>) -> AccountView {
     let mut v = view(b);
     v.roles = effective_roles(&b.roles, &b.subject, groups);
+    v.audit_groups = audit_group_keys(&b.subject, groups);
     v
+}
+
+
+/// Stable membership keys observed in an already validated group snapshot.
+fn audit_group_keys(subject: &str, groups: &BTreeMap<String, GroupBody>) -> Vec<String> {
+    groups.values().filter(|g| g.members.iter().any(|member| member == subject))
+        .map(|group| group.key.clone()).collect()
 }

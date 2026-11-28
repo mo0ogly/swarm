@@ -295,16 +295,40 @@ pub(crate) async fn read_body(front: &Front, body: Incoming) -> Result<Bytes, Re
 /// Request provenance captured once per request for the audit's enriched
 /// columns (ADM-05): truncated user agent, `browser`/`api-key` client and
 /// the arrival instant (for `duration_ms` on outcome lines).
+#[derive(Clone)]
+struct RequestId(String);
+
 struct Meta {
     user_agent: Option<String>,
     client: &'static str,
+    peer_ip: Option<std::net::IpAddr>,
+    groups: Option<Vec<String>>,
+    display_name: Option<String>,
+    administrator: Option<bool>,
+    request_id: Option<String>,
     started: std::time::Instant,
 }
 
 impl Meta {
     fn from(req: &Request<Incoming>, client: &'static str) -> Self {
         let ua = req.headers().get(header::USER_AGENT).and_then(|v| v.to_str().ok()).map(|s| s.chars().take(120).collect::<String>());
-        Self { user_agent: ua, client, started: std::time::Instant::now() }
+        Self {
+            user_agent: ua, client,
+            peer_ip: req.extensions().get::<std::net::IpAddr>().copied(),
+            groups: None, display_name: None, administrator: None,
+            request_id: req.extensions().get::<RequestId>().map(|id| id.0.clone()),
+            started: std::time::Instant::now(),
+        }
+    }
+    /// Attach only the authenticated display identity and observed authority
+    /// status. If policy cannot be read, keep the status unknown.
+    fn identify(&mut self, front: &Front, account: &AccountView) {
+        self.groups = Some(account.audit_groups.clone());
+        self.display_name = Some(account.display_name.clone());
+        self.administrator = front.policy.read().ok().map(|policy| {
+            let subject = policy::Subject { roles: &account.roles, integrity: account.integrity, attributes: &account.attributes };
+            policy::holds(&policy, &subject, "accounts.manage")
+        });
     }
     /// Milliseconds elapsed since the request arrived.
     fn duration_ms(&self) -> i64 {
@@ -313,13 +337,20 @@ impl Meta {
 }
 
 /// Route one browser request. Never panics on client input.
-pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
+pub async fn handle(front: Arc<Front>, mut req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     if !host_ok(&front, &req) {
         return Ok(full(StatusCode::FORBIDDEN, "text/plain; charset=utf-8", "authority-host-refused"));
     }
     if !same_origin(&front, &req) {
         return Ok(full(StatusCode::FORBIDDEN, "text/plain; charset=utf-8", "authority-origin-refused"));
     }
+    // The correlation is generated locally and is separate from the signed
+    // assertion nonce. A request cannot supply or override its identifier.
+    let mut random = [0; 16];
+    if getrandom::fill(&mut random).is_err() {
+        return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
+    }
+    req.extensions_mut().insert(RequestId(format!("{:032x}", u128::from_be_bytes(random))));
     let query: Vec<(String, String)> = form_urlencoded::parse(req.uri().query().unwrap_or("").as_bytes()).into_owned().collect();
     let english = query.iter().any(|(k, v)| k == "lang" && v == "en");
     match (req.method().clone(), req.uri().path()) {
@@ -350,7 +381,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 if let Ok(Ok(Some(view))) = tokio::task::spawn_blocking(move || f.accounts.current(&Context::new(), &s)).await {
                     if front.reset_requests.request(&view.subject, view.generation, now()) {
                         let ev = audit::Event { at: now(), event: "reset-requested", subject: Some(&view.subject),
-                            client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+                            client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() };
                         if front.audit.record(&ev).is_err() {
                             eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                         }
@@ -364,7 +396,7 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             Ok(login_response(StatusCode::OK, login_page(english, safe_next(next), "")))
         }
         (Method::POST, "/login") => {
-            let meta = Meta::from(&req, "browser");
+            let mut meta = Meta::from(&req, "browser");
             let body = match read_body(&front, req.into_body()).await { Ok(b) => b, Err(r) => return Ok(r) };
             let form: Vec<(String, String)> = form_urlencoded::parse(&body).into_owned().collect();
             let get = |k: &str| form.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap_or_default();
@@ -373,11 +405,13 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
             let outcome = tokio::task::spawn_blocking(move || f.sessions.login(&Context::new(), &f.accounts, &attempted, password.as_bytes(), now())).await;
             let named = swarm_identity_contract::name(subject.as_bytes()).then_some(subject.as_str());
             match outcome {
-                Ok(Ok((token, _))) => {
+                Ok(Ok((token, account))) => {
+                    meta.identify(&front, &account);
                     // A refused audit line refuses the sign-in (fail closed).
                     let via = format!("session:{}", crate::sessions::token_id(&token));
                     if front.audit.record(&audit::Event { at: now(), event: "sign-in", subject: named, credential: Some(&via),
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, ..Default::default() }).is_err() {
                         let _ = front.sessions.logout(&token);
                         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"));
                     }
@@ -386,7 +420,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 }
                 _ => {
                     if front.audit.record(&audit::Event { at: now(), event: "sign-in-refused", subject: named,
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                     let msg = if english { "Sign-in refused. Check the account and password." } else { "Connexion refusée. Vérifiez le compte et le mot de passe." };
@@ -405,7 +440,8 @@ pub async fn handle(front: Arc<Front>, req: Request<Incoming>) -> Result<Respons
                 if let Ok(Some(subject)) = front.sessions.logout(&t) {
                     let via = format!("session:{}", crate::sessions::token_id(&t));
                     if front.audit.record(&audit::Event { at: now(), event: "sign-out", subject: Some(&subject), credential: Some(&via),
-                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() }).is_err() {
+                        client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, request_id: meta.request_id.as_deref(), ..Default::default() }).is_err() {
                         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
                     }
                 }
@@ -471,8 +507,14 @@ fn authorize(front: &Front, view: &AccountView, method: &str, path: &str) -> Res
 /// signed-in account; everything else needs the `administer` decision.
 async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
-    let meta = Meta::from(&req, "browser");
+    // Authorization and dispatch must see the same resource. Empty internal
+    // segments would be discarded by the administration router.
+    if path.contains("//") {
+        return Ok(full(StatusCode::BAD_REQUEST, "application/json", r#"{"error":"authority-request-invalid"}"#));
+    }
+    let mut meta = Meta::from(&req, "browser");
     let (credential, view) = match authenticate(&front, &req, &path).await { Ok(v) => v, Err(r) => return Ok(r) };
+    meta.identify(&front, &view);
     let Credential::Session(token) = credential else {
         // B9: keys never manage accounts, sessions, keys, policy or settings.
         return Ok(full(StatusCode::FORBIDDEN, "application/json", r#"{"error":"authority-key-scope"}"#));
@@ -494,12 +536,13 @@ async fn administration(front: Arc<Front>, req: Request<Incoming>) -> Result<Res
     let method = req.method().as_str().to_owned();
     let subject = view.subject.clone();
     let via = format!("session:{}", crate::sessions::token_id(&token));
+    let reference = meta.request_id.as_deref();
     let detail = audit::admin_detail(&method, &path);
-    if let Err(r) = intent(&front, &meta, &subject, &via, None, &method, &path, action, detail.as_deref()) {
+    if let Err(r) = intent(&front, &meta, &subject, &via, reference, &method, &path, action, detail.as_deref()) {
         return Ok(r);
     }
     let response = admin::handle(Arc::clone(&front), req, view, token).await;
-    outcome(&front, &meta, &subject, &via, None, &method, &path, action, response.status());
+    outcome(&front, &meta, &subject, &via, reference, &method, &path, action, response.status());
     Ok(response)
 }
 
@@ -511,13 +554,14 @@ fn diagnostic_operation(path: &str) -> Option<&'static str> {
         "/api/v1/preparations/release-review" => "preparation-review",
         "/api/v1/task" => "task",
         "/api/v1/mission" => "mission",
+        _ if policy::under(path, "/api/v1") => "engine-api",
         _ => return None,
     })
 }
 
 /// Emit one observed phase using only static fields and optional HTTP status.
 /// Diagnostics are best effort and do not determine the request outcome.
-fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
+fn relay_diagnostic(front: &Front, operation: Option<&str>, request_id: Option<&str>, level: &str,
     phase: &'static str, status: Option<StatusCode>, code: Option<&'static str>) {
     let Some(operation) = operation else { return; };
     let family = match code {
@@ -527,7 +571,7 @@ fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
     };
     front.diag.log(level, "operation-stage", serde_json::json!({
         "operation":operation, "phase":phase, "family":family,
-        "status":status.map(|v|v.as_u16()), "code":code
+        "status":status.map(|v|v.as_u16()), "code":code, "request_id":request_id
     }));
 }
 
@@ -536,24 +580,27 @@ fn relay_diagnostic(front: &Front, operation: Option<&str>, level: &str,
 async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path_and_query().map(|p| p.as_str().to_owned()).unwrap_or_else(|| "/".into());
     let diagnostic = diagnostic_operation(req.uri().path());
+    let request_id = req.extensions().get::<RequestId>().map(|id| id.0.clone());
     let (credential, view) = match authenticate(&front, &req, &path).await {
         Ok(value) => value,
         Err(response) => {
             let level = if response.status().is_server_error() { "critical" } else { "warn" };
-            relay_diagnostic(&front, diagnostic, level, "identity", Some(response.status()), None);
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "identity", Some(response.status()), None);
             return Ok(response);
         }
     };
-    relay_diagnostic(&front, diagnostic, "debug", "identity", None, None);
-    let meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "identity", None, None);
+    let mut meta = Meta::from(&req, if matches!(credential, Credential::Key { .. }) { "api-key" } else { "browser" });
+    meta.identify(&front, &view);
     // B6: decide before reading the body or touching the engine; a refusal
     // is final for this request and carries only stable codes.
     let action = match authorize(&front, &view, req.method().as_str(), req.uri().path()) {
         Ok(a) => a,
         Err(r) => {
             let level = if r.status().is_server_error() { "critical" } else { "warn" };
-            relay_diagnostic(&front, diagnostic, level, "access-policy", Some(r.status()), None);
-            note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(403));
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "access-policy", Some(r.status()),
+                Some(if r.status() == StatusCode::FORBIDDEN { "authority-policy-denied" } else { "authority-state" }));
+            note(&front, &meta, "refused", &view.subject, &credential.label(), req.method().as_str(), req.uri().path(), Some(r.status().as_u16()));
             return Ok(r);
         }
     };
@@ -563,13 +610,13 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         && req.headers().get(header::ACCEPT).and_then(|v| v.to_str().ok()).is_some_and(|a| a.contains("text/html"));
     if let Credential::Key { scope, .. } = &credential {
         if action > *scope {
-            relay_diagnostic(&front, diagnostic, "warn", "access-policy",
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "warn", "access-policy",
                 Some(StatusCode::FORBIDDEN), Some("authority-key-scope"));
             let body = serde_json::json!({"error": "authority-policy-denied", "action": action, "reason": "key-scope"});
             return Ok(full(StatusCode::FORBIDDEN, "application/json", body.to_string()));
         }
     }
-    relay_diagnostic(&front, diagnostic, "debug", "access-policy", None, None);
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "access-policy", None, None);
     let mut nonce = [0u8; 16];
     if getrandom::fill(&mut nonce).is_err() {
         return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-entropy"));
@@ -584,18 +631,45 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
             return Ok(r);
         }
     }
+    // Every return after the intent has an observable, correlated result.
+    // For a read consultation, only the observed HTTP result is recorded.
+    let reject = |response: Response<Body>, phase, code| {
+        let status = response.status();
+        if let Some((subject, method, path, action)) = &audited {
+            outcome(&front, &meta, subject, &via, Some(&reference), method, path, action, status);
+        } else if consultation {
+            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(status.as_u16()));
+        }
+        let level = if status.is_server_error() { "critical" } else { "warn" };
+        relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, phase, Some(status), Some(code));
+        response
+    };
     let (parts, body) = req.into_parts();
-    let body = match read_body(&front, body).await { Ok(b) => b, Err(r) => return Ok(r) };
-    // EP-06 witness: heads after the intent line, so a write's own intent is
-    // covered. A head read failure refuses (no unwitnessed assertion).
+    let body = match read_body(&front, body).await {
+        Ok(body) => body,
+        Err(response) => {
+            let code = if response.status() == StatusCode::PAYLOAD_TOO_LARGE {
+                "authority-body-too-large"
+            } else { "authority-body-refused" };
+            return Ok(reject(response, "relay-body", code));
+        }
+    };
+    // EP-06: the heads are read after the request's own intent.
     let f = Arc::clone(&front);
     let witness = match tokio::task::spawn_blocking(move || f.accounts.head(&Context::new())).await {
         Ok(Ok(head)) => match front.audit.tail() {
             Ok((audit_seq, audit_digest)) => assertion::Witness { journal_seq: head.sequence, journal_digest: head.digest, audit_seq, audit_digest },
-            Err(code) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code)),
+            Err(code) => return Ok(reject(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code), "relay-witness", code)),
         },
-        Ok(Err(e)) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "application/json", serde_json::json!({"error": e.code()}).to_string())),
-        Err(_) => return Ok(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-state")),
+        Ok(Err(error)) => {
+            let code = error.code();
+            let response = full(StatusCode::SERVICE_UNAVAILABLE, "application/json", serde_json::json!({"error": code}).to_string());
+            return Ok(reject(response, "relay-witness", code));
+        }
+        Err(_) => {
+            let code = "authority-state";
+            return Ok(reject(full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", code), "relay-witness", code));
+        }
     };
     let claims = assertion::Claims {
         v: 2,
@@ -610,7 +684,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         witness,
     };
     let Ok(signed) = assertion::sign(&front.signer, &claims) else {
-        return Ok(full(StatusCode::INTERNAL_SERVER_ERROR, "text/plain; charset=utf-8", "authority-sign"));
+        let code = "authority-sign";
+        return Ok(reject(full(StatusCode::INTERNAL_SERVER_ERROR, "text/plain; charset=utf-8", code), "relay-sign", code));
     };
     let mut out = Request::builder().method(parts.method).uri(path);
     for (name, value) in parts.headers.iter() {
@@ -624,31 +699,24 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
         .body(Full::new(body))
     {
         Ok(r) => r,
-        Err(_) => return Ok(full(StatusCode::BAD_REQUEST, "text/plain; charset=utf-8", "authority-relay-request")),
-    };
-    // Consultations (page views) are recorded even when the engine is
-    // unreachable: the visit happened, whatever the engine's answer.
-    let note_consultation = |status: u16| {
-        if consultation {
-            note(&front, &meta, "consultation", &view_subject, &via, "GET", &consulted, Some(status));
+        Err(_) => {
+            let code = "authority-relay-request";
+            return Ok(reject(full(StatusCode::BAD_REQUEST, "text/plain; charset=utf-8", code), "relay-request", code));
         }
     };
+    relay_diagnostic(&front, diagnostic, request_id.as_deref(), "debug", "relay", None, None);
     let stream = match tokio::net::TcpStream::connect(front.engine).await {
         Ok(s) => s,
         Err(_) => {
-            note_consultation(502);
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
-                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
-            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable"));
+            let code = "authority-engine-unavailable";
+            return Ok(reject(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", code), "engine-transport", code));
         }
     };
     let (mut sender, conn) = match hyper::client::conn::http1::handshake(hyper_util::rt::TokioIo::new(stream)).await {
         Ok(v) => v,
         Err(_) => {
-            note_consultation(502);
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
-                Some(StatusCode::BAD_GATEWAY), Some("authority-engine-handshake"));
-            return Ok(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-handshake"));
+            let code = "authority-engine-handshake";
+            return Ok(reject(full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", code), "engine-transport", code));
         }
     };
     tokio::spawn(conn);
@@ -658,12 +726,14 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
                 .and_then(|value| value.to_str().ok().and_then(crate::diag::engine_code));
             let status = response.status();
             let level = if status.is_server_error() { "critical" }
-                else if status.is_client_error() { "warn" } else { "info" };
-            relay_diagnostic(&front, diagnostic, level, "engine-reply", Some(status), code);
+                else if status.is_client_error() { "warn" }
+                else if action == policy::Action::Read { "debug" }
+                else { "info" };
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), level, "engine-reply", Some(status), code);
             response.map(|body| body.boxed())
         }
         Err(_) => {
-            relay_diagnostic(&front, diagnostic, "critical", "engine-transport",
+            relay_diagnostic(&front, diagnostic, request_id.as_deref(), "critical", "engine-transport",
                 Some(StatusCode::BAD_GATEWAY), Some("authority-engine-unavailable"));
             full(StatusCode::BAD_GATEWAY, "text/plain; charset=utf-8", "authority-engine-unavailable")
         }
@@ -680,7 +750,8 @@ async fn relay(front: Arc<Front>, req: Request<Incoming>) -> Result<Response<Bod
 /// is reported on stderr and never changes the response.
 fn note(front: &Front, meta: &Meta, event: &str, subject: &str, via: &str, method: &str, path: &str, status: Option<u16>) {
     let ev = audit::Event { at: now(), event, subject: Some(subject), credential: Some(via), method: Some(method), path: Some(path), status,
-        view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+        view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
         eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable"}));
     }
@@ -705,7 +776,8 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
     front
         .audit
         .record(&audit::Event { at: now(), event: "intent", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: None,
-            view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
+            view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), detail: detail.map(|d| d.to_string()).as_deref(), ..Default::default() })
         .map(|_| ())
         .map_err(|_| full(StatusCode::SERVICE_UNAVAILABLE, "text/plain; charset=utf-8", "authority-audit-unavailable"))
 }
@@ -716,9 +788,10 @@ fn intent(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Optio
 #[allow(clippy::too_many_arguments)] // one audit line's fields
 fn outcome(front: &Front, meta: &Meta, subject: &str, via: &str, reference: Option<&str>, method: &str, path: &str, action: &str, status: StatusCode) {
     let ev = audit::Event { at: now(), event: "outcome", subject: Some(subject), credential: Some(via), reference, method: Some(method), path: Some(path), action: Some(action), status: Some(status.as_u16()),
-        duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(), ..Default::default() };
+        duration_ms: Some(meta.duration_ms()), view: Some(audit::view_of(path)), client: Some(meta.client), user_agent: meta.user_agent.as_deref(),
+                        peer_ip: meta.peer_ip, groups: meta.groups.as_deref(), display_name: meta.display_name.as_deref(), administrator: meta.administrator, request_id: meta.request_id.as_deref(), ..Default::default() };
     if front.audit.record(&ev).is_err() {
-        eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "subject": subject, "path": path}));
+        eprintln!("{}", serde_json::json!({"schema_version": 1, "warning": "authority-audit-unavailable", "request_id": meta.request_id}));
     }
 }
 
@@ -745,10 +818,13 @@ pub async fn serve(listener: tokio::net::TcpListener, front: Arc<Front>) -> std:
         "phase": "listening"
     }));
     loop {
-        let (stream, _) = listener.accept().await?;
+        let (stream, peer) = listener.accept().await?;
         let f = Arc::clone(&front);
         tokio::spawn(async move {
-            let service = hyper::service::service_fn(move |r| handle(Arc::clone(&f), r));
+            let service = hyper::service::service_fn(move |mut request: Request<Incoming>| {
+                request.extensions_mut().insert(peer.ip().to_canonical());
+                handle(Arc::clone(&f), request)
+            });
             let _ = hyper::server::conn::http1::Builder::new()
                 .serve_connection(hyper_util::rt::TokioIo::new(stream), service)
                 .await;

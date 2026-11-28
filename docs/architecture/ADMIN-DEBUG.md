@@ -55,6 +55,35 @@ Un refus de lecture reste visible dans la console avec son code quand celui-ci
 est fourni. Pour reprendre une lecture de projet en échec, refermez et rouvrez
 sa branche. Consultez la [version anglaise](../en/ADMIN-DEBUG.md).
 
+## Journal d’accès
+
+**Connexions**, les exports et le **Tableau de bord** partagent les filtres
+de période et de session. Le tableau de bord compte aussi les connexions
+refusées sans session quand elles satisfont les critères applicables. Les
+dernières connexions listent les ouvertures réussies. **Actions d’administration**
+présente le résultat corrélé aux intentions de l’administration Authority. Un
+résultat historique sans corrélation reste inconnu. Pour purger, il faut le
+droit d’audit et celui de gestion des comptes. La lecture seule ne permet pas
+la purge.
+
+Les groupes proviennent du compte authentifié au moment de l’événement.
+L’adresse est celle du pair TCP immédiat, qui peut être un proxy. Le démon
+n’interprète pas les en-têtes transmis comme preuve de provenance. Les réseaux
+utilisent /24 en IPv4 et /64 en IPv6. Le filtre réseau s’applique aux sessions
+comme aux agrégats. L’activité horaire est en UTC. Le ratio donne les intentions
+d’action et les consultations comptées sur le même périmètre. Les anciennes
+lignes sans ces informations les laissent absentes.
+
+Dans le détail d’une session, l’identifiant de suivi d’une requête relayée
+permet de rechercher ses diagnostics dans **Logs applicatifs** si le compte
+peut ouvrir cette console. Les diagnostics à **Debug** montrent les étapes
+d’identité, d’habilitation et de relais, puis l’issue observable. Un échec
+de transport après une intention donne un résultat 502 dans l’audit. Les
+entrées peuvent manquer si le niveau ou la rétention les a écartées. Les
+diagnostics n’ajoutent ni IP, ni en-tête, ni contenu de requête. Les réponses réussies aux lectures du moteur sont au niveau Debug. Les succès des mutations sont au niveau Info. Les refus restent au niveau Warn et les erreurs serveur au niveau Critical.
+
+Le filtre hors ressources d’administration exclut les événements dans la vue ou l’API d’administration. Le filtre sans administration porte sur les droits actuels du compte. Un refus de préparation après une intention, comme HTTP 413 pour un corps trop volumineux, conserve son résultat et son identifiant.
+
 ## Logs applicatifs du relais
 
 Dans **Administration → Comptes et accès → Logs applicatifs**, ouvrez la
@@ -131,3 +160,5 @@ et le démon de production compilé en release. Il conserve les empreintes des d
 binaires et le rapport des assertions.
 
 [Règle de codage des journaux](../../.claude/rules/structured-logging.md).
+
+Le nom d’affichage et le droit d’administration observé sont enregistrés avec le compte authentifié.

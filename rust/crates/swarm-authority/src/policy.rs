@@ -81,7 +81,7 @@ pub const CATALOG: [Permission; 14] = [
     Permission { key: "budgets.read", family: Action::Read, section: "Budgets", label: "Consulter budgets, plafonds et limites" },
     Permission { key: "budgets.write", family: Action::Administer, section: "Budgets", label: "Modifier budgets, plafonds et limites" },
     Permission { key: "accounts.manage", family: Action::Administer, section: "Administration", label: "Gérer comptes, sessions, clés, habilitations et réglages du démon" },
-    Permission { key: "audit.read", family: Action::Administer, section: "Administration", label: "Consulter et purger le journal d’accès" },
+    Permission { key: "audit.read", family: Action::Administer, section: "Administration", label: "Consulter le journal d’accès" },
     Permission { key: "unclassified.write", family: Action::Administer, section: "Administration", label: "Routes d’écriture non classées (réservé aux administrateurs)" },
 ];
 

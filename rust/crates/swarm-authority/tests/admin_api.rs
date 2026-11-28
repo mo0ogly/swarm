@@ -152,6 +152,9 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let me = me.json();
     assert_eq!((me["account"]["subject"].as_str(), me["administer"].as_bool()), (Some("ana"), Some(true)));
     assert!(me["account"].get("credential").is_none(), "no verifier material exposed");
+    assert_eq!(c.get("/api/v1/authority//audit/sessions", &ana).status, 400);
+    assert_eq!(c.post("/api/v1/authority//audit/purge", &ana, json!({"older_than_days":1})).status, 400);
+
     let ana_session = me["session"].as_str().unwrap().to_owned();
 
     // Accounts: create (witness), duplicate and invalid refusals, Origin required.
@@ -268,6 +271,9 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     assert_eq!(c.post("/api/v1/authority/accounts", &ana, dan).status, 200, "custom role assignable now");
     let dan_cookie = c.login("dan", "dan pass").cookie();
     assert_eq!(c.get("/api/v1/authority/audit", &dan_cookie).status, 200, "auditor reads the audit");
+    let cannot_purge = c.post("/api/v1/authority/audit/purge", &dan_cookie, json!({"older_than_days":1}));
+    assert_eq!(cannot_purge.status, 403, "an audit reader cannot purge");
+
     assert_eq!(c.get("/api/v1/authority/accounts", &dan_cookie).status, 403, "but does not manage accounts");
     // A role still held by an account cannot be deleted.
     let mut without = after["policy"].clone();
@@ -280,6 +286,13 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     // group roles seen by sessions, `/me` and policy decisions.
     assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["root"],"members":[]}))), "account-role-unknown");
     assert_eq!(c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":["operator"],"members":["dan"]})).status, 200, "create with roles and members");
+    let grouped_login = c.login("dan", "dan pass").cookie();
+    assert_eq!(c.get("/api/v1/authority/me", &grouped_login).status, 200);
+    let recent = c.get("/api/v1/authority/audit/dashboard?subject=dan", &ana).json();
+    assert!(recent["recent"].as_array().unwrap().iter().any(|entry|
+        entry["event"] == "sign-in" && entry["groups"] == json!(["ops"])
+        && entry["display_name"] == "Dan" && entry["administrator"] == false));
+
     assert_eq!(error(&c.post("/api/v1/authority/groups", &ana, json!({"key":"ops","label":"Ops","roles":[],"members":[]}))), "group-exists");
     let dan_me = c.get("/api/v1/authority/me", &dan_cookie).json();
     assert!(dan_me["account"]["roles"].as_array().unwrap().iter().any(|r| r == "operator"), "dan sees the group role");
@@ -406,6 +419,13 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     // ADM-06: enrichment columns, filters, sort, pagination, export.
     let carol = carol_row.as_object().unwrap();
     assert_eq!(carol["clients"][0], "browser", "access means recorded");
+    assert_eq!(carol["peer_ips"], json!(["127.0.0.1"]));
+    assert_eq!(carol["networks"], json!(["127.0.0.0/24"]));
+    assert!(carol["groups"].is_array());
+    let filtered_network = c.get("/api/v1/authority/audit/dashboard?network=198.51.100.0%2F24", &fresh).json();
+    assert_eq!(filtered_network["total"], 0);
+    assert_eq!(filtered_network["activity"]["networks"], json!({}));
+
     assert!(carol["views"].as_array().unwrap().iter().any(|v| v == "view.authority"), "views touched by the session");
     assert_eq!(c.get("/api/v1/authority/audit/sessions?client=api-key", &fresh).json()["sessions"].as_array().unwrap().len(), 0, "no key used in this run");
     assert_eq!(c.get("/api/v1/authority/audit/sessions?view=view.authority", &fresh).json()["sessions"].as_array().unwrap().iter().all(|r| r["views"].as_array().unwrap().iter().any(|v| v == "view.authority")), true);
@@ -436,6 +456,16 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
     let exported = c.get("/api/v1/authority/audit/sessions?format=json", &fresh).json();
     assert_eq!(exported["sessions"].as_array().unwrap().len() as u64, total, "JSON export not paginated either");
     let dash = c.get("/api/v1/authority/audit/dashboard", &fresh).json();
+    let empty = c.get("/api/v1/authority/audit/dashboard?subject=absent-fixture", &fresh).json();
+    assert_eq!(empty["kpis"]["sign_ins"], 0, "dashboard follows the session subject filter");
+    assert_eq!(empty["recent"], json!([]));
+    let recent_logins = dash["recent"].as_array().unwrap();
+    assert!(recent_logins.iter().all(|e| e["event"] == "sign-in"));
+    let administrative = c.get("/api/v1/authority/audit/actions?subject=ana", &fresh).json();
+    assert!(administrative["entries"].as_array().unwrap().iter().any(|e|
+        e["event"] == "intent" && e["action"] == "administer" && e["status"] == 200),
+        "an administration outcome is joined to its intent");
+
     assert!(!dash["days"].as_array().unwrap().is_empty() && dash["accounts"].as_array().unwrap().iter().any(|a| a["subject"] == "ana"));
     // ADM-07: KPIs, per-view usage, 20 most recent lines.
     assert!(dash["kpis"]["sign_ins"].as_u64().unwrap() >= 3, "sign-in KPI");
@@ -501,6 +531,33 @@ fn administration_api_manages_accounts_sessions_policy_and_config() {
         && row["level"] == "critical" && row["code"] == "authority-engine-unavailable"));
     assert!(!entries.to_string().contains("swarm-secret-marker"));
     assert!(!entries.to_string().contains(&fresh));
+    let write = c.post("/api/v1/mission?opaque=swarm-secret-marker", &fresh, json!({}));
+    assert_eq!(write.status, 502);
+    let timeline = c.get("/api/v1/authority/audit", &fresh).json();
+    let outcome = timeline["entries"].as_array().unwrap().iter().rev()
+        .find(|row| row["event"] == "outcome" && row["path"] == "/api/v1/mission").unwrap();
+    assert_eq!(outcome["status"], 502, "transport loss has a recorded outcome");
+    let id = outcome["request_id"].as_str().unwrap();
+    let query = format!("/api/v1/authority/log?q={id}");
+    let log = c.get(&query, &fresh).json();
+    let trace: Vec<Value> = log["lines"].as_array().unwrap().iter()
+        .map(|line| serde_json::from_str(line.as_str().unwrap()).unwrap()).collect();
+    assert!(trace.iter().all(|row| row["request_id"] == id));
+    for phase in ["identity", "access-policy", "relay", "engine-transport"] {
+        assert!(trace.iter().any(|row| row["phase"] == phase), "{phase} shares the audit tracking ID");
+    }
+    assert!(!log.to_string().contains("swarm-secret-marker"));
+    let limited = c.post("/api/v1/mission", &fresh, json!({"value":"x".repeat(1_048_576)}));
+    assert_eq!(limited.status, 413);
+    let timeline = c.get("/api/v1/authority/audit", &fresh).json();
+    let rejection = timeline["entries"].as_array().unwrap().iter().rev()
+        .find(|row| row["event"] == "outcome" && row["path"] == "/api/v1/mission").unwrap();
+    assert_eq!(rejection["status"], 413);
+    let matched = c.get(&format!("/api/v1/authority/log?q={}",rejection["request_id"].as_str().unwrap()), &fresh).json();
+    assert!(matched["lines"].as_array().unwrap().iter().any(|line|
+        line.as_str().is_some_and(|s| s.contains("authority-body-too-large"))));
+
+
     // Fail closed: an unwritable audit refuses the mutation, with no effect.
     let log = conf.join("audit.jsonl");
     fs::set_permissions(&log, fs::Permissions::from_mode(0o400)).unwrap();

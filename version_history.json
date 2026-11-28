@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Le journal d’accès partage ses filtres entre vues et exports, affiche les groupes observés et le pair réseau, et relie les requêtes relayées aux diagnostics Rust par un identifiant de suivi.",
+        "en": "Access audit views and exports share filters, show observed groups and the network peer, and link relayed requests to Rust diagnostics with a tracking ID."
+      },
+      {
         "fr": "La planification remet les annulations avant démarrage dont le moteur a conservé la preuve. Le reçu natif reste requis pour les workers démarrés.",
         "en": "Planning can deliver recorded pre-start cancellations. Started workers still require their native completion receipts."
       },

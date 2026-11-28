@@ -117,3 +117,31 @@ runs targeted tests and the authenticated UI with the distribution engine and
 release authority daemon. It retains both binary digests and the assertion report.
 
 [Logging code rule](../../.claude/rules/structured-logging.md).
+
+## Access audit
+
+**Connections**, exports and the **Dashboard** share period and session
+filters. The dashboard also counts refused sign-ins without a session when
+they match the applicable filters. Recent connections lists successful
+sign-ins. **Administration actions** shows the recorded outcome matched to
+each Authority administration intent. Historical entries without correlation
+display an unknown result. Purging requires both audit access and account
+management. Audit readers cannot purge.
+
+Groups reflect the authenticated account at the time of the event. The IP
+address is the immediate TCP peer, which may be a proxy. The daemon does not
+trust forwarded headers as provenance. Networks use /24 for IPv4 and /64 for
+IPv6. The network filter applies to sessions and aggregates. Hourly activity
+uses UTC. The ratio reports action intents and page views in the same scope.
+Older records keep absent values.
+
+The session detail can search **Application logs** by tracking ID for a
+relayed request if the account can open that console. At **Debug**, diagnostic
+entries show identity, policy and relay stages and the observed outcome.
+A transport failure after a recorded intent produces a 502 audit outcome.
+The level and retention may exclude entries. Successful engine reads use Debug, while successful mutations use Info. Denials remain at Warn and server errors at Critical. Application diagnostics do not
+add peer IPs, headers or request content.
+
+The resource filter excludes activity on the administration view or API. The account filter uses current administration rights. A rejection after recording the intent, such as HTTP 413 for an oversized body, retains its outcome and tracking ID.
+
+The display name and observed administration right are recorded for the authenticated account.
